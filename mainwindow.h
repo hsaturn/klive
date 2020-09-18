@@ -71,6 +71,8 @@ class MainWindow : public QMainWindow
 
 public:
     MainWindow();
+    ~MainWindow();
+
     QAction* addMenuEntry(const std::string menu, std::string entry="", std::string before="");
 
     void createDockWindow(Handler* handler, QWidget* widget);
@@ -100,7 +102,7 @@ private:
     std::map<std::string, QMenu*> menus;
     std::map<std::string, QAction*> actions;
 
-    Ui::MainWindow ui;
+    // Ui::MainWindow ui;
 };
 
 #endif

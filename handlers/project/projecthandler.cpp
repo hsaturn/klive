@@ -1,5 +1,4 @@
 #include "projecthandler.h"
-#include "project.ui"
 
 static ProjectHandler handler1;
 

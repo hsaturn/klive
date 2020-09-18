@@ -15,9 +15,9 @@
 
 MainWindow::MainWindow()
     : mdiArea(new QMdiArea)
-    , ui(new Ui::MainWindow)
+    //, ui(new Ui::MainWindow)
 {
-    ui->setupUi(this);
+    //ui->setupUi(this);
     mdiArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     mdiArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     setCentralWidget(mdiArea);
@@ -40,7 +40,7 @@ MainWindow::MainWindow()
 
 MainWindow::~MainWindow()
 {
-    delete ui;
+    // delete ui;
 }
 
 
