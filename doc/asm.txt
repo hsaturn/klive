@@ -1,0 +1,65 @@
+#include "file.asm"
+
+.global_labels		// labels in the current file are global
+.static_labels		// labels in the current file are local to the file
+.global label		// Define label in global scope
+
+; comment
+// comment
+
+.db	%11010		// binary constant
+.db	10		// decimal constant
+.db	$16		// hexa constant
+.db	0x16		// hexa constant
+.db	"string"	// string constant (not followed by 0)
+.db	'c'		// char constant
+
+.db	0x16, 10	// define byte
+.db	"string",0	// Define a string (one must add the 0)
+.ds	"string"	// Degine a string (0 is auto added)
+.dw	0xFFFF, 32768	// define word
+
+.bound n		// Bound next generated code
+.bound 2		// Next byte will be word align
+.bound 1024		// Next byte will be 1k aligned
+.var [type] label	// auto choose an area for a var (could reuse lost areas with bound for example)
+
+.org	
+
+label:	.equ expr	// label is a constant
+label=expr		// same
+
+.block	n		// reserve n unassigned bytes
+
+.alias	defines an alias on a register
+
+label:
+
+	.module name	// Module local label scope
+_local:			// Local label in module
+
+	TODO (end module, what is a module)
+
+#define macro(args) definition	// monoline macro
+
+#define macro(args)	// multiline macro
+  definition
+#endmacro
+
+(a voir)
+#ifdef label
+#else
+#endif
+
+
+--- self modifying code ---
+	
+	// compute addr in de
+	ld (insitu), de
+	call {insitu}
+	jp {insitu}
+	
+	ld (insitu_8}, a
+	jr {insitu_8}
+
+

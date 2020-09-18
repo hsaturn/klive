@@ -1,0 +1,41 @@
+Sections de mémoire read only (auto)
+- Détection des writes sur des sections de code
+- les .dw .db .ds sont writables
+
+--- délire, classe en asm ---
+
+.class foo
+  // public method
+  foo:	xor a
+	ld (var1), a	  	// wrong var1 is not a valid adress
+	ld var1(ix), a	  	// acceptable (?) ix==this
+	ld (this.var1), a	// good
+        ret
+
+  // public method
+  inc:  ld a, (this.var1)
+        inc a
+        ld (this.var1), a
+        ret
+
+  var1: .db 1
+  var2: .dw 1
+.endclass
+
+.class bar: public foo
+  bar: call foo
+       xor a
+       ld (this.var3), a
+       ret
+
+  var3: .dw 1
+   
+.endclass
+
+// utilisation
+
+foo_1:	foo
+foo_2:	foo
+
+	call foo_1.inc
+	call foo_2.loop
