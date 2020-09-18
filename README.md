@@ -1,2 +1,2 @@
 # klive
-ZX Spectrum IDE
+Attempt to create a modern a powerful ZX Spectrum IDE
