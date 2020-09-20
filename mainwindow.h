@@ -54,6 +54,7 @@
 #include <QMainWindow>
 #include <QMdiArea>
 #include <QAction>
+#include <DockManager.h>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -93,7 +94,6 @@ private:
     void createStatusBar();
     void createDockWindows();
 
-    QMdiArea *mdiArea;
     // QTextEdit *textEdit;
     QListWidget *customerList;
     QListWidget *paragraphsList;
@@ -102,6 +102,11 @@ private:
     std::map<std::string, QMenu*> menus;
     std::map<std::string, QAction*> actions;
 
+    ads::CDockManager* DockManager;
+    ads::CDockAreaWidget* CentralDockArea;
+
+    // TODO unused yet
+    ads::CDockWidget* TimelineDockWidget;
     // Ui::MainWindow ui;
 };
 

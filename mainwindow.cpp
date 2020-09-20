@@ -1,4 +1,5 @@
 #include <QtWidgets>
+#include "mainwindow.h"
 #include "./ui_mainwindow.h"
 
 #if defined(QT_PRINTSUPPORT_LIB)
@@ -12,22 +13,42 @@
 #include "core/handler.h"
 #include <iostream>
 #include <algorithm>
+#include <DockManager.h>
+#include <DockAreaWidget.h>
+#include <ads_globals.h>
+
+using ads::CDockWidget;
 
 MainWindow::MainWindow()
-    : mdiArea(new QMdiArea)
-    //, ui(new Ui::MainWindow)
+    : QMainWindow()
+   // , ui(new Ui::MainWindow)
 {
+   // ui->setupUi(this);
+    ads::CDockManager::setConfigFlag(ads::CDockManager::OpaqueSplitterResize, true);
+    ads::CDockManager::setConfigFlag(ads::CDockManager::XmlCompressionEnabled, false);
+    ads::CDockManager::setConfigFlag(ads::CDockManager::FocusHighlighting, true);
+    DockManager = new ads::CDockManager(this);
+
+    // Set central widget
+    QPlainTextEdit* w = new QPlainTextEdit();
+    w->setPlaceholderText("This is the central editor. Enter your text here.");
+    CDockWidget* CentralDockWidget = new CDockWidget("CentralWidget");
+    CentralDockWidget->setWidget(w);
+    CentralDockArea = DockManager->setCentralWidget(CentralDockWidget);
+    CentralDockArea->setAllowedAreas(ads::DockWidgetArea::OuterDockAreas);
+
+
     //ui->setupUi(this);
-    mdiArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-    mdiArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-    setCentralWidget(mdiArea);
+    // mdiArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    // mdiArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    // setCentralWidget(mdiArea);
     /*
     connect(mdiArea, &QMdiArea::subWindowActivated,
             this, &MainWindow::updateMenus);
     */
     createActions();
     createStatusBar();
-    createDockWindows();
+   // createDockWindows();
 
     Handlers::initialize(this);
 
@@ -210,7 +231,7 @@ void MainWindow::dockTopLevelChanged()
             std::cerr << "DOCK FLOATING" << std::endl;
 
             widget=dock->widget();
-            mdi = mdiArea->addSubWindow(widget);
+            // mdi = mdiArea->addSubWindow(widget);
             mdi->show();
            // connect(mdi, )
             // dock->hide();
@@ -370,21 +391,26 @@ void MainWindow::createStatusBar()
 //! [9]
 void MainWindow::createDockWindows()
 {
-    QDockWidget *dock = new QDockWidget(tr("Customers"), this);
-    dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-    customerList = new QListWidget(dock);
-    customerList->addItems(QStringList()
-            << "John Doe, Harmony Enterprises, 12 Lakeside, Ambleton"
-            << "Jane Doe, Memorabilia, 23 Watersedge, Beaton"
-            << "Tammy Shea, Tiblanka, 38 Sea Views, Carlton"
-            << "Tim Sheen, Caraba Gifts, 48 Ocean Way, Deal"
-            << "Sol Harvey, Chicos Coffee, 53 New Springs, Eccleston"
-            << "Sally Hobart, Tiroli Tea, 67 Long River, Fedula");
-    dock->setWidget(customerList);
-    addDockWidget(Qt::RightDockWidgetArea, dock);
-    viewMenu->addAction(dock->toggleViewAction());
+    {
+        ads::CDockWidget *dock = new ads::CDockWidget(tr("Customers"), this);
 
-    dock = new QDockWidget(tr("Paragraphs"), this);
+        dock->setMinimumSizeHintMode(ads::CDockWidget::MinimumSizeHintFromDockWidget);
+        dock->resize(250, 150);
+        dock->setMinimumSize(200,150);
+        customerList = new QListWidget(dock);
+        customerList->addItems(QStringList()
+                << "John Doe, Harmony Enterprises, 12 Lakeside, Ambleton"
+                << "Jane Doe, Memorabilia, 23 Watersedge, Beaton"
+                << "Tammy Shea, Tiblanka, 38 Sea Views, Carlton"
+                << "Tim Sheen, Caraba Gifts, 48 Ocean Way, Deal"
+                << "Sol Harvey, Chicos Coffee, 53 New Springs, Eccleston"
+                << "Sally Hobart, Tiroli Tea, 67 Long River, Fedula");
+        dock->setWidget(customerList);
+        viewMenu->addAction(dock->toggleViewAction());
+    }
+
+
+    auto dock = new QDockWidget(tr("Paragraphs"), this);
     paragraphsList = new QListWidget(dock);
     paragraphsList->addItems(QStringList()
             << "Thank you for your payment which we have received today."
@@ -435,6 +461,17 @@ void MainWindow::createDockWindows()
 
 void MainWindow::createDockWindow(Handler* handler, QWidget* widget)
 {
+    {
+       ads::CDockWidget *dock = new ads::CDockWidget(tr("TITLE"));
+       dock->setWidget(widget);
+       dock->resize(250, 150);
+       dock->setMinimumSize(200,150);
+       // dock->setMinimumSizeHintMode(ads::CDockWidget::MinimumSizeHintFromDockWidget);
+       auto* dockArea = DockManager->addDockWidget(ads::DockWidgetArea::LeftDockWidgetArea, dock, CentralDockArea);
+       viewMenu->addAction(dock->toggleViewAction());
+       return;
+   }
+
     // mdiArea->addSubWindow(widget);
     // return;
     // TODO what happens when widget is deleted ???
@@ -445,7 +482,7 @@ void MainWindow::createDockWindow(Handler* handler, QWidget* widget)
     connect(dock, &QDockWidget::topLevelChanged, this, &MainWindow::dockTopLevelChanged);
     viewMenu->addAction(dock->toggleViewAction());
     dock->setAllowedAreas(Qt::AllDockWidgetAreas);
+
     // dock->setFloating(false);
     // mdiArea->addSubWindow(dock);
 }
-//! [9]

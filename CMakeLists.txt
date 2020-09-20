@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 3.5)
 
 project(Klive LANGUAGES CXX)
 
+add_subdirectory(ext/Qt-Advanced-Docking-System)
+
+include_directories(ext/Qt-Advanced-Docking-System/src)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 set(CMAKE_AUTOUIC ON)
@@ -17,6 +20,7 @@ find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets LinguistTools REQUIRED)
 set(TS_FILES resources/Klive_fr_FR.ts)
 
 add_executable(Klive
+    ${ads_SRCS}
     main.cpp
     mainwindow.cpp
     mainwindow.h
@@ -33,6 +37,8 @@ add_executable(Klive
     handlers/screen/screenhandler.h
     handlers/screen/screen.cpp
     handlers/screen/screen.h
+    handlers/screen/linebouncer.cpp
+    handlers/screen/linebouncer.h
 
     handlers/memory/memoryhandler.cpp
     handlers/memory/memoryhandler.h
@@ -40,11 +46,15 @@ add_executable(Klive
     handlers/memory/memoryviewer.cpp
     handlers/memory/memoryviewer.h
 
+    handlers/gadgets/clock/clock.cpp
+    handlers/gadgets/clock/clock.h
+
     resources/klive.qrc
     ${TS_FILES}
 )
 
 
 target_link_libraries(Klive PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
+target_link_libraries(Klive PRIVATE qtadvanceddocking)
 
 qt5_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})

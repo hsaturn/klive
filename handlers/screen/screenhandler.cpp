@@ -2,7 +2,7 @@
 
 static ScreenHandler screen;
 
-ScreenHandler::ScreenHandler() : Handler("Screen")
+ScreenHandler::ScreenHandler() : Handler("LHANDLER")
 {
 
 }

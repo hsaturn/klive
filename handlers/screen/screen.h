@@ -1,6 +1,11 @@
 #pragma once
 
 #include <QWidget>
+#include <QPoint>
+#include <QLine>
+
+#include "linebouncer.h"
+#include <list>
 
 class Screen : public QWidget
 {
@@ -12,4 +17,7 @@ public:
 protected:
     void paintEvent(QPaintEvent* event) override;
 
+private:
+    LineBouncer bouncer;
+    std::list<LineBouncer*> lines;
 };

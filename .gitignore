@@ -71,3 +71,4 @@ Thumbs.db
 *.dll
 *.exe
 
+ext/build-Qt-Advanced-Docking-System-Desktop_Qt_5_15_1_MSVC2015_64bit-Debug/*
