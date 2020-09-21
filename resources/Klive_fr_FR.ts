@@ -122,6 +122,7 @@
 <context>
     <name>MainWindow</name>
     <message>
+        <location filename="../ext/Qt-Advanced-Docking-System/demo/mainwindow.ui" line="14"/>
         <location filename="../ext/Qt-Advanced-Docking-System/examples/sidebar/MainWindow.ui" line="14"/>
         <location filename="../ext/Qt-Advanced-Docking-System/examples/simple/MainWindow.ui" line="14"/>
         <location filename="../mainwindow.ui" line="14"/>
@@ -129,14 +130,46 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../ext/Qt-Advanced-Docking-System/demo/mainwindow.ui" line="32"/>
         <location filename="../mainwindow.cpp" line="318"/>
         <source>File</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../ext/Qt-Advanced-Docking-System/demo/mainwindow.ui" line="39"/>
         <location filename="../ext/Qt-Advanced-Docking-System/examples/sidebar/MainWindow.ui" line="75"/>
         <location filename="../ext/Qt-Advanced-Docking-System/examples/simple/MainWindow.ui" line="28"/>
         <source>View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ext/Qt-Advanced-Docking-System/demo/mainwindow.ui" line="44"/>
+        <source>About</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ext/Qt-Advanced-Docking-System/demo/mainwindow.ui" line="49"/>
+        <source>Tests</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ext/Qt-Advanced-Docking-System/demo/mainwindow.ui" line="59"/>
+        <source>toolBar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ext/Qt-Advanced-Docking-System/demo/mainwindow.ui" line="70"/>
+        <source>Exit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ext/Qt-Advanced-Docking-System/demo/mainwindow.ui" line="75"/>
+        <source>Save State</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ext/Qt-Advanced-Docking-System/demo/mainwindow.ui" line="80"/>
+        <source>Restore State</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
