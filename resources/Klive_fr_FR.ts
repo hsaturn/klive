@@ -184,7 +184,7 @@
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="55"/>
-        <source>Dock Widgets</source>
+        <source>KLive IDE</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

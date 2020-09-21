@@ -52,7 +52,7 @@ MainWindow::MainWindow()
 
     Handlers::initialize(this);
 
-    setWindowTitle(tr("Dock Widgets"));
+    setWindowTitle(tr("KLive IDE"));
 
     newLetter();
     setUnifiedTitleAndToolBarOnMac(true);
