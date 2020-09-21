@@ -24,10 +24,13 @@ add_executable(Klive
     main.cpp
     mainwindow.cpp
     mainwindow.h
-    mainwindow.ui
 
     core/handler.cpp
     core/handler.h
+    core/hardware/computer.cpp
+    core/hardware/computer.h
+    core/hardware/memory.cpp
+    core/hardware/memory.h
 
     handlers/project/projecthandler.cpp
     handlers/project/projecthandler.h

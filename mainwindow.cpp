@@ -462,7 +462,7 @@ void MainWindow::createDockWindows()
 void MainWindow::createDockWindow(Handler* handler, QWidget* widget)
 {
     {
-       ads::CDockWidget *dock = new ads::CDockWidget(tr("TITLE"));
+       ads::CDockWidget *dock = new ads::CDockWidget(tr(handler->name().c_str()));
        dock->setWidget(widget);
        dock->resize(250, 150);
        dock->setMinimumSize(200,150);
