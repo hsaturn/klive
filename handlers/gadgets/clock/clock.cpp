@@ -19,7 +19,7 @@ private:
     Clock* clock;
 };
 
-ClockHandler::ClockHandler() : Handler("LINES")
+ClockHandler::ClockHandler() : Handler("Clock")
 {
 
 }

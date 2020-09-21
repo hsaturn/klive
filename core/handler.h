@@ -33,7 +33,6 @@ public:
 
 private:
     std::string name_;
-
 };
 
 #endif // HANDLER_H
