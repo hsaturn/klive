@@ -1,4 +1,4 @@
-#pragma once#include <QWidget>
+#pragma once
 #include <QPaintEvent>
 #include <QWidget>
 #include <QPoint>

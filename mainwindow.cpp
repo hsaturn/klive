@@ -171,7 +171,6 @@ void MainWindow::undo()
 }
 //! [5]
 
-//! [6]
 void MainWindow::insertCustomer(const QString &customer)
 {
     /*
@@ -196,54 +195,6 @@ void MainWindow::insertCustomer(const QString &customer)
             oldcursor.endEditBlock();
     }
     */
-}
-//! [6]
-
-void MainWindow::addParagraph(const QString &paragraph)
-{
-    /*
-    if (paragraph.isEmpty())
-        return;
-    QTextDocument *document = textEdit->document();
-    QTextCursor cursor = document->find(tr("Yours sincerely,"));
-    if (cursor.isNull())
-        return;
-    cursor.beginEditBlock();
-    cursor.movePosition(QTextCursor::PreviousBlock, QTextCursor::MoveAnchor, 2);
-    cursor.insertBlock();
-    cursor.insertText(paragraph);
-    cursor.insertBlock();
-    cursor.endEditBlock();
-    */
-
-}
-
-void MainWindow::dockTopLevelChanged()
-{
-    static QWidget* widget;
-    static QMdiSubWindow* mdi;
-
-    QDockWidget* dock = dynamic_cast<QDockWidget*>(sender());
-    if (dock)
-    {
-        if (dock->isFloating())
-        {
-            std::cerr << "DOCK FLOATING" << std::endl;
-
-            widget=dock->widget();
-            // mdi = mdiArea->addSubWindow(widget);
-            mdi->show();
-           // connect(mdi, )
-            // dock->hide();
-        }
-        else
-        {
-            std::cerr << "DOCKED" << std::endl;
-            dock->setWidget(mdi->widget());
-            mdi->setWidget(nullptr);
-            mdi->hide();
-        }
-    }
 }
 
 void MainWindow::closeMdi()
@@ -437,8 +388,6 @@ void MainWindow::createDockWindows()
 
     connect(customerList, &QListWidget::currentTextChanged,
             this, &MainWindow::insertCustomer);
-    connect(paragraphsList, &QListWidget::currentTextChanged,
-            this, &MainWindow::addParagraph);
 
     dock = new QDockWidget(tr("ASM"), this);
     paragraphsList = new QListWidget(dock);
@@ -461,28 +410,11 @@ void MainWindow::createDockWindows()
 
 void MainWindow::createDockWindow(Handler* handler, QWidget* widget)
 {
-    {
-       ads::CDockWidget *dock = new ads::CDockWidget(tr(handler->name().c_str()));
-       dock->setWidget(widget);
-       dock->resize(250, 150);
-       dock->setMinimumSize(200,150);
-       // dock->setMinimumSizeHintMode(ads::CDockWidget::MinimumSizeHintFromDockWidget);
-       auto* dockArea = DockManager->addDockWidget(ads::DockWidgetArea::LeftDockWidgetArea, dock, CentralDockArea);
-       viewMenu->addAction(dock->toggleViewAction());
-       return;
-   }
-
-    // mdiArea->addSubWindow(widget);
-    // return;
-    // TODO what happens when widget is deleted ???
-    QDockWidget *dock = new QDockWidget(tr(handler->name().c_str()));
-    dock->setWidget(widget);
-    // TODO Should be a caller's decision
-    addDockWidget(Qt::RightDockWidgetArea, dock);
-    connect(dock, &QDockWidget::topLevelChanged, this, &MainWindow::dockTopLevelChanged);
-    viewMenu->addAction(dock->toggleViewAction());
-    dock->setAllowedAreas(Qt::AllDockWidgetAreas);
-
-    // dock->setFloating(false);
-    // mdiArea->addSubWindow(dock);
+   ads::CDockWidget *dock = new ads::CDockWidget(tr(handler->name().c_str()));
+   dock->setWidget(widget);
+   dock->resize(250, 150);
+   dock->setMinimumSize(200,150);
+   // dock->setMinimumSizeHintMode(ads::CDockWidget::MinimumSizeHintFromDockWidget);
+   DockManager->addDockWidget(ads::DockWidgetArea::LeftDockWidgetArea, dock, CentralDockArea);
+   viewMenu->addAction(dock->toggleViewAction());
 }

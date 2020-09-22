@@ -15,7 +15,7 @@ Screen::Screen(QWidget *parent)
 
     // TODO should be setTitle, and setTitle should call all what is
     // needed to change the title everywhere
-    setWindowTitle(tr("ZX Screen"));
+    // setWindowTitle(tr("ZX Screen"));
 
     resize(200, 200);
 }

@@ -85,8 +85,6 @@ private slots:
     void undo();
     void about();
     void insertCustomer(const QString &customer);
-    void addParagraph(const QString &paragraph);
-    void dockTopLevelChanged();
     void closeMdi();
 
 private:
