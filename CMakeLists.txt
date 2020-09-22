@@ -26,6 +26,8 @@ add_executable(Klive
     mainwindow.cpp
     mainwindow.h
 
+    common/observer.h
+
     core/handler.cpp
     core/handler.h
     core/hardware/computer.cpp
