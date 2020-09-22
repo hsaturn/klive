@@ -1,0 +1,96 @@
+Source : https://stackoverflow.com/questions/27190411/fast-plotting-with-pixmap-or-bitmap-in-qt
+
+
+If painting is overhead, you can move it to another thread, this way it will not lock up the event loop of your application, and the result will be updated when it is done.
+
+Since you want arbitrary plots, there is really no magic way to "convert data to bitmap", you have to use QPainter to draw your stuff.
+
+Here is a quick example how to use an async plotter object:
+
+class Plotter : public QObject {
+    Q_OBJECT
+public:
+    Plotter(QSize size, QRectF range, QVector<double> data)
+        : _size(size), _range(range), _data(data) { }
+
+signals:
+    void done(QImage);
+    void cleanup();
+
+public slots:
+    void plot() {
+        QElapsedTimer t;
+        t.start();
+        QImage img(_size, QImage::Format_ARGB32_Premultiplied);
+        img.fill(Qt::white);
+        QPainter p(&img);
+        QPen pen(Qt::darkBlue);
+        pen.setWidth(1);
+        p.setPen(pen);
+        for (int i = 0; i < _data.size(); i += 2) {
+            p.drawPoint(map(_data[i], _data[i + 1]));
+        }
+        qDebug() << "plotted in" << t.elapsed() << "msec";
+        emit done(img);
+        emit cleanup();
+    }
+
+private:
+    inline QPointF map(double x, double y) {
+        return QPointF(_size.width() * (x / (_range.width() - _range.x())),
+                       _size.height() * (y / (_range.height() - _range.y())));
+    }
+
+    QSize _size;
+    QRectF _range;
+    QVector<double> _data;
+};
+
+The plotter is created with its size, range and data parameters, I used a QRectF for the range, basically using the x/width and y/height as horizontal and vertical range. The plotter is a very naive implementation for the sake of example, and uses the map() method to "normalize" the data points to the area of the image that is being drawn onto in a linear fashion. I also added a timer to see how long it takes to plot all points.
+
+This is the example widget which is used to create the plot, populate the data and show the result:
+
+class Widget : public QWidget {
+    Q_OBJECT
+public:
+    Widget(QWidget * parent = 0) : QWidget(parent) {
+        // prepping data
+        QVector<double> data;
+        data.reserve(200000);
+        for (int i = 0; i < 200000; ++i) data.append((double)qrand() / RAND_MAX);
+
+        // create plotter and thread
+        Plotter * p = new Plotter(size(), QRectF(0, 0, 1, 1), data);
+        QThread * thread = new QThread;
+        p->moveToThread(thread);
+
+        // do connections
+        connect(thread, SIGNAL(started()), p, SLOT(plot()));
+        connect(p, SIGNAL(done(QImage)), this, SLOT(updatePlot(QImage)));
+        connect(p, SIGNAL(cleanup()), thread, SLOT(quit()));
+        connect(thread, SIGNAL(finished()), p, SLOT(deleteLater()));
+        connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
+
+        thread->start();
+    }
+
+protected:
+    void paintEvent(QPaintEvent *) {
+        QPainter p(this);
+        p.drawImage(QPoint(0, 0), plot);
+    }
+
+public slots:
+    void updatePlot(QImage p) {
+        plot = p;
+        repaint();
+    }
+
+private:
+    QImage plot;
+};
+
+For my example I populate the data with 200 000 values in the range 0-1. Then create the plotter with the size of the widget, the range 0-1 for X and Y, create the thread and move the plotter to it, do the necessary connections and start the thread. Upon start up, the thread will call the plot() slot, which will emit the plot result to the widget's updatePlot() slot. When the result is sent the plotter will quit the thread event loop, which will delete the plotter object and the thread so they don't leak.
+
+As for how fast this is, my i7 desktop plots the 200 000 points in 8 milliseconds, so it is not slow by any means.
+
