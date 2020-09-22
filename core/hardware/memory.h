@@ -65,9 +65,16 @@ public:
         type_t     flags;
     };
 
-
     using size_t = uint16_t;
     using addr_t = uint16_t;  // Enough for ZX Spectrum yet (could change in future)
+
+    struct Message
+    {
+        bool attr;      // True if attribute was modified (instead of content)
+        addr_t start;   // Start of memory range modified
+        addr_t end;
+    };
+
 
     Memory();
     virtual ~Memory(){}

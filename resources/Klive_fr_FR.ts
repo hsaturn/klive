@@ -4,80 +4,85 @@
 <context>
     <name>CMainWindow</name>
     <message>
-        <location filename="../ext/Qt-Advanced-Docking-System/examples/centralwidget/mainwindow.ui" line="14"/>
+        <location filename="../ext/AdvancedDocking/examples/centralwidget/mainwindow.ui" line="14"/>
         <source>MainWindow</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ext/Qt-Advanced-Docking-System/examples/centralwidget/mainwindow.ui" line="28"/>
+        <location filename="../ext/AdvancedDocking/examples/centralwidget/mainwindow.ui" line="28"/>
         <source>View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ext/AdvancedDocking/examples/centralwidget/mainwindow.ui" line="35"/>
+        <source>toolBar</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>CStatusDialogClass</name>
     <message>
-        <location filename="../ext/Qt-Advanced-Docking-System/demo/StatusDialog.ui" line="20"/>
+        <location filename="../ext/AdvancedDocking/demo/StatusDialog.ui" line="20"/>
         <source>Dock Widget Status</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ext/Qt-Advanced-Docking-System/demo/StatusDialog.ui" line="35"/>
+        <location filename="../ext/AdvancedDocking/demo/StatusDialog.ui" line="35"/>
         <source>Dock Widget:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ext/Qt-Advanced-Docking-System/demo/StatusDialog.ui" line="58"/>
+        <location filename="../ext/AdvancedDocking/demo/StatusDialog.ui" line="58"/>
         <source>Status</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ext/Qt-Advanced-Docking-System/demo/StatusDialog.ui" line="64"/>
+        <location filename="../ext/AdvancedDocking/demo/StatusDialog.ui" line="64"/>
         <source>closed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ext/Qt-Advanced-Docking-System/demo/StatusDialog.ui" line="71"/>
+        <location filename="../ext/AdvancedDocking/demo/StatusDialog.ui" line="71"/>
         <source>floating</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ext/Qt-Advanced-Docking-System/demo/StatusDialog.ui" line="78"/>
+        <location filename="../ext/AdvancedDocking/demo/StatusDialog.ui" line="78"/>
         <source>tabbed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ext/Qt-Advanced-Docking-System/demo/StatusDialog.ui" line="85"/>
+        <location filename="../ext/AdvancedDocking/demo/StatusDialog.ui" line="85"/>
         <source>is current tab</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ext/Qt-Advanced-Docking-System/demo/StatusDialog.ui" line="101"/>
+        <location filename="../ext/AdvancedDocking/demo/StatusDialog.ui" line="101"/>
         <source>Feature Flags</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ext/Qt-Advanced-Docking-System/demo/StatusDialog.ui" line="107"/>
+        <location filename="../ext/AdvancedDocking/demo/StatusDialog.ui" line="107"/>
         <source>DockWidgetClosable</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ext/Qt-Advanced-Docking-System/demo/StatusDialog.ui" line="114"/>
+        <location filename="../ext/AdvancedDocking/demo/StatusDialog.ui" line="114"/>
         <source>DockWidgetMovable</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ext/Qt-Advanced-Docking-System/demo/StatusDialog.ui" line="121"/>
+        <location filename="../ext/AdvancedDocking/demo/StatusDialog.ui" line="121"/>
         <source>DockWidgetFloatable</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ext/Qt-Advanced-Docking-System/demo/StatusDialog.ui" line="128"/>
+        <location filename="../ext/AdvancedDocking/demo/StatusDialog.ui" line="128"/>
         <source>DockWidgetDeleteOnClose</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ext/Qt-Advanced-Docking-System/demo/StatusDialog.ui" line="135"/>
+        <location filename="../ext/AdvancedDocking/demo/StatusDialog.ui" line="135"/>
         <source>CustomCloseHandling</source>
         <translation type="unfinished"></translation>
     </message>
@@ -122,58 +127,58 @@
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../ext/Qt-Advanced-Docking-System/demo/mainwindow.ui" line="14"/>
-        <location filename="../ext/Qt-Advanced-Docking-System/examples/sidebar/MainWindow.ui" line="14"/>
-        <location filename="../ext/Qt-Advanced-Docking-System/examples/simple/MainWindow.ui" line="14"/>
+        <location filename="../ext/AdvancedDocking/demo/mainwindow.ui" line="14"/>
+        <location filename="../ext/AdvancedDocking/examples/sidebar/MainWindow.ui" line="14"/>
+        <location filename="../ext/AdvancedDocking/examples/simple/MainWindow.ui" line="14"/>
         <location filename="../mainwindow.ui" line="14"/>
         <source>MainWindow</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ext/Qt-Advanced-Docking-System/demo/mainwindow.ui" line="32"/>
+        <location filename="../ext/AdvancedDocking/demo/mainwindow.ui" line="32"/>
         <location filename="../mainwindow.cpp" line="269"/>
         <source>File</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ext/Qt-Advanced-Docking-System/demo/mainwindow.ui" line="39"/>
-        <location filename="../ext/Qt-Advanced-Docking-System/examples/sidebar/MainWindow.ui" line="75"/>
-        <location filename="../ext/Qt-Advanced-Docking-System/examples/simple/MainWindow.ui" line="28"/>
+        <location filename="../ext/AdvancedDocking/demo/mainwindow.ui" line="39"/>
+        <location filename="../ext/AdvancedDocking/examples/sidebar/MainWindow.ui" line="75"/>
+        <location filename="../ext/AdvancedDocking/examples/simple/MainWindow.ui" line="28"/>
         <source>View</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ext/Qt-Advanced-Docking-System/demo/mainwindow.ui" line="44"/>
+        <location filename="../ext/AdvancedDocking/demo/mainwindow.ui" line="44"/>
         <source>About</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ext/Qt-Advanced-Docking-System/demo/mainwindow.ui" line="49"/>
+        <location filename="../ext/AdvancedDocking/demo/mainwindow.ui" line="49"/>
         <source>Tests</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ext/Qt-Advanced-Docking-System/demo/mainwindow.ui" line="59"/>
+        <location filename="../ext/AdvancedDocking/demo/mainwindow.ui" line="59"/>
         <source>toolBar</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ext/Qt-Advanced-Docking-System/demo/mainwindow.ui" line="70"/>
+        <location filename="../ext/AdvancedDocking/demo/mainwindow.ui" line="70"/>
         <source>Exit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ext/Qt-Advanced-Docking-System/demo/mainwindow.ui" line="75"/>
+        <location filename="../ext/AdvancedDocking/demo/mainwindow.ui" line="75"/>
         <source>Save State</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ext/Qt-Advanced-Docking-System/demo/mainwindow.ui" line="80"/>
+        <location filename="../ext/AdvancedDocking/demo/mainwindow.ui" line="80"/>
         <source>Restore State</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ext/Qt-Advanced-Docking-System/examples/sidebar/MainWindow.ui" line="26"/>
+        <location filename="../ext/AdvancedDocking/examples/sidebar/MainWindow.ui" line="26"/>
         <source>PushButton</source>
         <translation type="unfinished"></translation>
     </message>
@@ -277,47 +282,47 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../ext/Qt-Advanced-Docking-System/demo/MainWindow.cpp" line="128"/>
+        <location filename="../ext/AdvancedDocking/demo/MainWindow.cpp" line="128"/>
         <source>Help</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ext/Qt-Advanced-Docking-System/demo/MainWindow.cpp" line="299"/>
+        <location filename="../ext/AdvancedDocking/demo/MainWindow.cpp" line="299"/>
         <source>Options</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ext/Qt-Advanced-Docking-System/demo/MainWindow.cpp" line="308"/>
+        <location filename="../ext/AdvancedDocking/demo/MainWindow.cpp" line="308"/>
         <source>Clear Editor</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ext/Qt-Advanced-Docking-System/demo/MainWindow.cpp" line="417"/>
+        <location filename="../ext/AdvancedDocking/demo/MainWindow.cpp" line="417"/>
         <source>Create Editor</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ext/Qt-Advanced-Docking-System/src/DockAreaTitleBar.cpp" line="158"/>
+        <location filename="../ext/AdvancedDocking/src/DockAreaTitleBar.cpp" line="158"/>
         <source>List All Tabs</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ext/Qt-Advanced-Docking-System/src/DockAreaTitleBar.cpp" line="168"/>
+        <location filename="../ext/AdvancedDocking/src/DockAreaTitleBar.cpp" line="168"/>
         <source>Detach Group</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ext/Qt-Advanced-Docking-System/src/DockAreaTitleBar.cpp" line="181"/>
+        <location filename="../ext/AdvancedDocking/src/DockAreaTitleBar.cpp" line="181"/>
         <source>Close Active Tab</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ext/Qt-Advanced-Docking-System/src/DockAreaTitleBar.cpp" line="185"/>
+        <location filename="../ext/AdvancedDocking/src/DockAreaTitleBar.cpp" line="185"/>
         <source>Close Group</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ext/Qt-Advanced-Docking-System/src/DockWidgetTab.cpp" line="217"/>
+        <location filename="../ext/AdvancedDocking/src/DockWidgetTab.cpp" line="217"/>
         <source>Close Tab</source>
         <translation type="unfinished"></translation>
     </message>
@@ -398,17 +403,17 @@
 <context>
     <name>ads::CDockAreaTitleBar</name>
     <message>
-        <location filename="../ext/Qt-Advanced-Docking-System/src/DockAreaTitleBar.cpp" line="582"/>
+        <location filename="../ext/AdvancedDocking/src/DockAreaTitleBar.cpp" line="582"/>
         <source>Detach Group</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ext/Qt-Advanced-Docking-System/src/DockAreaTitleBar.cpp" line="585"/>
+        <location filename="../ext/AdvancedDocking/src/DockAreaTitleBar.cpp" line="585"/>
         <source>Close Group</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ext/Qt-Advanced-Docking-System/src/DockAreaTitleBar.cpp" line="587"/>
+        <location filename="../ext/AdvancedDocking/src/DockAreaTitleBar.cpp" line="587"/>
         <source>Close Other Groups</source>
         <translation type="unfinished"></translation>
     </message>
@@ -416,7 +421,7 @@
 <context>
     <name>ads::CDockManager</name>
     <message>
-        <location filename="../ext/Qt-Advanced-Docking-System/src/DockManager.cpp" line="467"/>
+        <location filename="../ext/AdvancedDocking/src/DockManager.cpp" line="485"/>
         <source>Show View</source>
         <translation type="unfinished"></translation>
     </message>
@@ -424,17 +429,17 @@
 <context>
     <name>ads::CDockWidgetTab</name>
     <message>
-        <location filename="../ext/Qt-Advanced-Docking-System/src/DockWidgetTab.cpp" line="469"/>
+        <location filename="../ext/AdvancedDocking/src/DockWidgetTab.cpp" line="469"/>
         <source>Detach</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ext/Qt-Advanced-Docking-System/src/DockWidgetTab.cpp" line="472"/>
+        <location filename="../ext/AdvancedDocking/src/DockWidgetTab.cpp" line="472"/>
         <source>Close</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ext/Qt-Advanced-Docking-System/src/DockWidgetTab.cpp" line="474"/>
+        <location filename="../ext/AdvancedDocking/src/DockWidgetTab.cpp" line="474"/>
         <source>Close Others</source>
         <translation type="unfinished"></translation>
     </message>
