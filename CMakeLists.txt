@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.5)
 
 project(Klive LANGUAGES CXX)
 
-add_subdirectory(ext/Qt-Advanced-Docking-System)
+add_subdirectory(ext/AdvancedDocking)
 add_compile_options(-Wall)
 
 include_directories(ext/Qt-Advanced-Docking-System/src)
