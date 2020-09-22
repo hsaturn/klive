@@ -1,11 +1,7 @@
-#ifndef SCREENHANDLER_H
-#define SCREENHANDLER_H
-
+#pragma once
 #include <core/handler.h>
 
 #include "screen.h"
-
-using namespace hw;
 
 class ScreenHandler : public Handler
 {
@@ -18,5 +14,3 @@ public:
 private:
     Screen* screen;
 };
-
-#endif // SCREENHANDLER_H

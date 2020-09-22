@@ -1,19 +1,25 @@
 #pragma once
 #include <list>
 
+#include <QObject>
+
+#include "memory.h"
+
 namespace hw
 {
 
 class Cpu;
-class Memory;
 class Keyboard;
 class Screen;
 class Peripheral;
 
-class Computer
+class Computer : public QObject
 {
+    Q_OBJECT
 public:
     Computer();
+    virtual ~Computer();
+    void timer();
 
     Cpu* cpu;
     Memory* memory;

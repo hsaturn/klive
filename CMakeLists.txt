@@ -30,6 +30,7 @@ add_executable(Klive
 
     core/handler.cpp
     core/handler.h
+
     core/hardware/computer.cpp
     core/hardware/computer.h
     core/hardware/memory.cpp
@@ -54,6 +55,8 @@ add_executable(Klive
 
     handlers/gadgets/clock/clock.cpp
     handlers/gadgets/clock/clock.h
+    handlers/gadgets/zx/spectrum/SpectrumScreen.cpp
+    handlers/gadgets/zx/spectrum/SpectrumScreen.h
 
     resources/klive.qrc
     ${TS_FILES}
