@@ -408,9 +408,9 @@ void MainWindow::createDockWindows()
     */
 }
 
-void MainWindow::createDockWindow(Handler* handler, QWidget* widget)
+void MainWindow::createDockWindow(Handler* handler, QWidget* widget, const std::string title)
 {
-   ads::CDockWidget *dock = new ads::CDockWidget(tr(handler->name().c_str()));
+   ads::CDockWidget *dock = new ads::CDockWidget(tr(title.c_str()));
    dock->setWidget(widget);
    dock->resize(250, 150);
    dock->setMinimumSize(200,150);

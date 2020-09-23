@@ -1,7 +1,7 @@
 #pragma once
 #include <list>
 
-#include <QObject>
+#include <QWidget>
 
 #include "memory.h"
 
@@ -13,9 +13,10 @@ class Keyboard;
 class Screen;
 class Peripheral;
 
-class Computer : public QObject
+class Computer : public QWidget
 {
     Q_OBJECT
+
 public:
     Computer();
     virtual ~Computer();

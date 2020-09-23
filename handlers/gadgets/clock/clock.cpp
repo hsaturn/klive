@@ -27,7 +27,7 @@ ClockHandler::ClockHandler() : Handler("Clock")
 void ClockHandler::initialize(MainWindow *main)
 {
     clock = new Clock();
-    main->createDockWindow(this, clock);
+    main->createDockWindow(this, clock, "Clock");
 }
 
 static ClockHandler clock_handler;

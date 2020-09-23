@@ -76,7 +76,7 @@ public:
 
     QAction* addMenuEntry(const std::string menu, std::string entry="", std::string before="");
 
-    void createDockWindow(Handler* handler, QWidget* widget);
+    void createDockWindow(Handler* handler, QWidget* widget, const std::string title);
 
 private slots:
     void newLetter();

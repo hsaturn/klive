@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <vector>
+#include <iostream>
 
 #include "common/observer.h"
 
@@ -41,7 +42,7 @@ public:
     class Byte
     {
     public:
-        using value_type=char;
+        using value_type=unsigned char;
 
         explicit Byte(value_type byte, type_t type)
             : byte(byte) { flags = type; }
@@ -107,6 +108,7 @@ public:
         }
         else
         {
+            std::cerr << "TODO: manage memory access error" << std::endl;
             return 0;   // TODO err ?
         }
     }
@@ -142,7 +144,7 @@ public:
                 continue;
             }
 
-            byte = byte;
+            byte = value;
             if (type != UNCHANGE)
             {
                 byte.setType(type);
