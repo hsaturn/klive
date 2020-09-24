@@ -69,7 +69,10 @@ protected:
         return hi+low;
     }
 
-    reg8 compare(reg8&);
+    void add_hl(uint16_t, cycle burnt);
+    uint8_t dec(uint8_t value);
+    void and_(reg8, cycle burnt);
+    reg8 compare(reg8);
     void jr(bool condition);
 
 private:
