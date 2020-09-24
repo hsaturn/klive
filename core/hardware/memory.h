@@ -9,22 +9,6 @@
 namespace hw
 {
 
-/*
-         \
-        / \
-       /   \
-      /  |  \
-     /   |   \
-    /    |    \
-   /     |     \
-  /             \
- /       *       \
--------------------
-
-This class will probably change a lot !
-TODO
-*/
-
 class Memory : public Observable<Memory>
 {
 public:
@@ -113,46 +97,9 @@ public:
         }
     }
 
-    void fill(addr_t start, Byte::value_type value, size_t size=1, type_t type=UNCHANGE)
-    {
-        Message msg;
-        msg.event = Message::WRITTEN;
-        msg.flags = Message::DATA | (type==UNCHANGE ? 0 : Message::TYPE);
-        msg.size = 1;
+    void fill(addr_t start, Byte::value_type value, size_t size=1, type_t type=UNCHANGE);
 
-        if (start+size>=ramtop)
-        {
-            msg.event = Message::BAD_WRITE;
-            notify(msg);
-            return;
-        }
-
-        while(size--)
-        {
-            msg.start = start;
-            Byte& byte = bytes[start];
-
-            if (byte.type()&RD_ONLY && mem_protection)
-            {
-                if (detectBadWrites)
-                {
-                    Message msg;
-                    msg.event = Message::BAD_WRITE;
-                    notify(msg);
-                    msg.event = Message::WRITTEN;
-                }
-                continue;
-            }
-
-            byte = value;
-            if (type != UNCHANGE)
-            {
-                byte.setType(type);
-            }
-            notify(msg);
-            start++;
-        }
-    }
+    void loadRomImage(std::string f, addr_t start);
 
     void poke(const addr_t& start, Byte::value_type value)
     {

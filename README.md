@@ -16,6 +16,7 @@ The goal is to have ( - planned, * in progress, > done)
 - ROM/RAM Disassembler Routines labels (custom)
 - ZX 48 Emulator (mine, so it won't be so accurate but should play games)
   -> I hope with enhanced tools like stack overflow detection etc...
+  > Zx Screen emulation
 * Some useless so essential gadgets (clock, lines -> for UI Architecture tests)
 
 And if all is working as expected, I'll enhance the project

@@ -5,7 +5,7 @@ project(Klive LANGUAGES CXX)
 add_subdirectory(ext/AdvancedDocking)
 add_compile_options(-Wall)
 
-include_directories(ext/Qt-Advanced-Docking-System/src)
+include_directories(ext/AdvancedDocking/src)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 set(CMAKE_AUTOUIC ON)
@@ -35,6 +35,10 @@ add_executable(Klive
     core/hardware/computer.h
     core/hardware/memory.cpp
     core/hardware/memory.h
+    core/hardware/cpu.cpp
+    core/hardware/cpu.h
+    core/hardware/z80.cpp
+    core/hardware/z80.h
 
     handlers/project/projecthandler.cpp
     handlers/project/projecthandler.h
