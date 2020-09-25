@@ -46,6 +46,42 @@ union regaf
 
 class z80: public Observable<z80>, public Cpu
 {
+    struct registers
+    {
+        registers()
+            :
+              a(af.a),
+              b(bc.hi),
+              c(bc.lo),
+              d(de.hi),
+              e(de.lo),
+              h(hl.hi),
+              l(hl.lo) {};
+
+        reg16   pc;
+        reg16   sp;
+        reg16   ix;
+        reg16   iy;
+        regaf   af;
+        reg16u  bc;
+        reg16u  de;
+        reg16u  hl;
+        regaf   af2;
+        reg16u  bc2;
+        reg16u  de2;
+        reg16u  hl2;
+        reg8    i;
+        reg8    r;
+
+        reg8&	a;
+        reg8&	b;
+        reg8&	c;
+        reg8&	d;
+        reg8&	e;
+        reg8&	h;
+        reg8&	l;
+    };
+
 public:
     struct Message
     {
@@ -109,21 +145,23 @@ protected:
     // from opcode (see DDxx, FDxx, FDCB**XX instructions etc.)
     uint8_t* calc_dest_reg(uint8_t opcode);
 
+    registers& regs() { return R; }
+
 private:
-    reg16   pc;
-    reg16   sp;
-    reg16   ix;
-    reg16   iy;
-    regaf   af;
-    reg16u  bc;
-    reg16u  de;
-    reg16u  hl;
-    regaf   af2;
-    reg16u  bc2;
-    reg16u  de2;
-    reg16u  hl2;
-    reg8    i;
-    reg8    r;
+    registers R;
+
+    reg16&   pc;
+    reg16&   sp;
+    reg16&   ix;
+    reg16&   iy;
+    regaf&   af;
+    reg16u&  bc;
+    reg16u&  de;
+    reg16u&  hl;
+    regaf&   af2;
+    reg16u&  bc2;
+    reg16u&  de2;
+    reg16u&  hl2;
 
     reg8&	a;
     reg8&	b;
@@ -132,7 +170,8 @@ private:
     reg8&	e;
     reg8&	h;
     reg8&	l;
-
+    reg8&    i;
+    reg8&    r;
 };
 
 }

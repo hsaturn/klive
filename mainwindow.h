@@ -79,7 +79,8 @@ public:
     void createDockWindow(Handler* handler, QWidget* widget, const std::string title);
 
 private slots:
-    void newLetter();
+    void saveLayout();
+    void restoreLayout();
     void save();
     void print();
     void undo();

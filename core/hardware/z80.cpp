@@ -8,13 +8,11 @@ namespace hw
 {
 z80::z80(Memory* memory)
     : Cpu(memory),
-    a(af.a),
-    b(bc.hi),
-    c(bc.lo),
-    d(de.hi),
-    e(de.lo),
-    h(hl.hi),
-    l(hl.lo)
+      pc(R.sp), sp(R.sp), ix(R.ix), iy(R.iy),
+      af(R.af), bc(R.bc), de(R.de), hl(R.hl),
+      af2(R.af),bc2(R.bc),de2(R.de),hl2(R.hl),
+      a(R.a), b(R.b), c(R.c), d(R.d), e(R.e), h(R.h), l(R.l),
+      i(R.i), r(R.r)
 {
     reset();
 }
@@ -113,7 +111,6 @@ void z80::step()
         case 0xA5: and_(l, 4); break; 					// and l
         case 0xA6: and_(memory->peek(hl.val), 7); break;// and (HL)
         case 0xA7: and_(a, 4); break;	// and a
-
 
         case 0xAF: a=0; af.c=0; af.pv=1; af.z=1; af.n=0; af.s=0; burn(4); break; // xor a
         case 0xB8: compare(b); burn(4); break;	// cp b

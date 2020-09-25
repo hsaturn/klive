@@ -37,7 +37,6 @@ MainWindow::MainWindow()
     CentralDockArea = DockManager->setCentralWidget(CentralDockWidget);
     CentralDockArea->setAllowedAreas(ads::DockWidgetArea::OuterDockAreas);
 
-
     //ui->setupUi(this);
     // mdiArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     // mdiArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
@@ -54,8 +53,8 @@ MainWindow::MainWindow()
 
     setWindowTitle(tr("KLive IDE"));
 
-    newLetter();
     setUnifiedTitleAndToolBarOnMac(true);
+    restoreLayout();
 }
 
 
@@ -64,58 +63,6 @@ MainWindow::~MainWindow()
     // delete ui;
 }
 
-
-
-void MainWindow::newLetter()
-{
-/*
- *     textEdit->clear();
-
-    QTextCursor cursor(textEdit->textCursor());
-    cursor.movePosition(QTextCursor::Start);
-    QTextFrame *topFrame = cursor.currentFrame();
-    QTextFrameFormat topFrameFormat = topFrame->frameFormat();
-    topFrameFormat.setPadding(16);
-    topFrame->setFrameFormat(topFrameFormat);
-
-    QTextCharFormat textFormat;
-    QTextCharFormat boldFormat;
-    boldFormat.setFontWeight(QFont::Bold);
-    QTextCharFormat italicFormat;
-    italicFormat.setFontItalic(true);
-
-    QTextTableFormat tableFormat;
-    tableFormat.setBorder(1);
-    tableFormat.setCellPadding(16);
-    tableFormat.setAlignment(Qt::AlignRight);
-    cursor.insertTable(1, 1, tableFormat);
-    cursor.insertText("The Firm", boldFormat);
-    cursor.insertBlock();
-    cursor.insertText("321 City Street", textFormat);
-    cursor.insertBlock();
-    cursor.insertText("Industry Park");
-    cursor.insertBlock();
-    cursor.insertText("Some Country");
-    cursor.setPosition(topFrame->lastPosition());
-    cursor.insertText(QDate::currentDate().toString("d MMMM yyyy"), textFormat);
-    cursor.insertBlock();
-    cursor.insertBlock();
-    cursor.insertText("Dear ", textFormat);
-    cursor.insertText("NAME", italicFormat);
-    cursor.insertText(",", textFormat);
-    for (int i = 0; i < 3; ++i)
-        cursor.insertBlock();
-    cursor.insertText(tr("Yours sincerely,"), textFormat);
-    for (int i = 0; i < 3; ++i)
-        cursor.insertBlock();
-    cursor.insertText("The Boss", textFormat);
-    cursor.insertBlock();
-    cursor.insertText("ADDRESS", italicFormat);
-    */
-}
-//! [2]
-
-//! [3]
 void MainWindow::print()
 {
 #if defined(QT_PRINTSUPPORT_LIB) && QT_CONFIG(printdialog)
@@ -131,9 +78,7 @@ void MainWindow::print()
     statusBar()->showMessage(tr("Ready"), 2000);
 #endif
 }
-//! [3]
 
-//! [4]
 void MainWindow::save()
 {
     /*
@@ -159,9 +104,7 @@ void MainWindow::save()
     statusBar()->showMessage(tr("Saved '%1'").arg(fileName), 2000);
     */
 }
-//! [4]
 
-//! [5]
 void MainWindow::undo()
 {
     /*
@@ -169,7 +112,6 @@ void MainWindow::undo()
     document->undo();
     */
 }
-//! [5]
 
 void MainWindow::insertCustomer(const QString &customer)
 {
@@ -274,12 +216,12 @@ void MainWindow::createActions()
     projectMenu->addAction(newProject);
 
 */
-    const QIcon newIcon = QIcon::fromTheme("document-new", QIcon(":/images/new.png"));
-    QAction *newLetterAct = addMenuEntry("&File", "&New Letter");
-    newLetterAct->setShortcuts(QKeySequence::New);
-    newLetterAct->setStatusTip(tr("Create a new form letter"));
-    connect(newLetterAct, &QAction::triggered, this, &MainWindow::newLetter);
-    fileToolBar->addAction(newLetterAct);
+    // const QIcon newIcon = QIcon::fromTheme("document-new", QIcon(":/images/new.png"));
+    QAction *saveLayoutAct = addMenuEntry("&File", "&Save Layout");
+    // saveLayoutAct->setShortcuts(QKeySequence::New);
+    saveLayoutAct->setStatusTip(tr("Save windows layout"));
+    connect(saveLayoutAct, &QAction::triggered, this, &MainWindow::saveLayout);
+    fileToolBar->addAction(saveLayoutAct);
 
     const QIcon saveIcon = QIcon::fromTheme("document-save", QIcon(":/images/save.png"));
     QAction *saveAct = addMenuEntry("&File", "&Save...");
@@ -332,12 +274,26 @@ void MainWindow::createActions()
     aboutQtAct->setStatusTip(tr("Show the Qt library's About box"));
 }
 
-//! [8]
+void MainWindow::saveLayout()
+{
+    QSettings Settings("Settings.ini", QSettings::IniFormat);
+    Settings.setValue("mainWindow/Geometry", saveGeometry());
+    Settings.setValue("mainWindow/State", saveState());
+    Settings.setValue("mainWindow/DockingState", DockManager->saveState());
+}
+
+void MainWindow::restoreLayout()
+{
+    QSettings Settings("Settings.ini", QSettings::IniFormat);
+    restoreGeometry(Settings.value("mainWindow/Geometry").toByteArray());
+    restoreState(Settings.value("mainWindow/State").toByteArray());
+    DockManager->restoreState(Settings.value("mainWindow/DockingState").toByteArray());
+}
+
 void MainWindow::createStatusBar()
 {
     statusBar()->showMessage(tr("Ready"));
 }
-//! [8]
 
 //! [9]
 void MainWindow::createDockWindows()
