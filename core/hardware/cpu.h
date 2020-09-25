@@ -12,7 +12,7 @@ class CpuClock
 public:
     CpuClock() : curr(0) {}
 
-    inline void burn(cycle n) { curr+=n; }
+    inline void burn(const cycle n) { curr+=n; }
 
     friend bool operator==(const CpuClock& c1, const CpuClock& c2)
     { return c1.curr == c2.curr; }

@@ -346,7 +346,7 @@ void MainWindow::createDockWindows()
         ads::CDockWidget *dock = new ads::CDockWidget(tr("Customers"), this);
 
         dock->setMinimumSizeHintMode(ads::CDockWidget::MinimumSizeHintFromDockWidget);
-        dock->resize(250, 150);
+        dock->resize(250, 250);
         dock->setMinimumSize(200,150);
         customerList = new QListWidget(dock);
         customerList->addItems(QStringList()
@@ -412,8 +412,8 @@ void MainWindow::createDockWindow(Handler* handler, QWidget* widget, const std::
 {
    ads::CDockWidget *dock = new ads::CDockWidget(tr(title.c_str()));
    dock->setWidget(widget);
-   dock->resize(250, 150);
-   dock->setMinimumSize(200,150);
+   dock->resize(250, 250);
+   dock->setMinimumSize(300,250);
    // dock->setMinimumSizeHintMode(ads::CDockWidget::MinimumSizeHintFromDockWidget);
    DockManager->addDockWidget(ads::DockWidgetArea::LeftDockWidgetArea, dock, CentralDockArea);
    viewMenu->addAction(dock->toggleViewAction());

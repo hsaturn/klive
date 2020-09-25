@@ -12,8 +12,8 @@ ScreenHandler::ScreenHandler() : Handler("Screen")
 
 void ScreenHandler::initialize(MainWindow *main)
 {
-    screen = new Screen();
-    main->createDockWindow(this, screen, "Lines");
+    // screen = new Screen();
+    // main->createDockWindow(this, screen, "Lines");
 
     // TODO c'est pour tester
     auto computer = new hw::Computer;

@@ -8,6 +8,7 @@ namespace hw
 using reg8 = uint8_t;
 using reg16 = uint16_t;
 using byte = Memory::Byte::value_type;
+
 union reg16u
 {
     uint16_t val;
@@ -51,29 +52,56 @@ public:
     virtual void reset() override;
     void irq_mode(int mode){}
     void di() {};
-    void burn(cycle cycles) { clock.burn(cycles); };
+    inline void burn(cycle cycles) { clock.burn(cycles); };
 
 protected:
     void step_ed();
     void step_cb();
-    void step_dd();
-    void step_fd();
+    void step_dd_fd(reg16&);
+    void step_xxcb(reg16);
     void nop(byte opcode, const char* prefix=nullptr);
     void out(uint8_t port, uint8_t val);
 
-    inline uint8_t getByte() { return memory->peek(pc++); }
+    inline uint8_t getByte(const cycle t=0) { burn(t); return memory->peek(pc++); }
 
-    inline uint16_t getWord()
-    { 	uint16_t hi =memory->peek(pc++);
-        uint16_t low=memory->peek(pc++)<<8;
-        return hi+low;
+    inline uint16_t getWord(const cycle t=0)
+    {
+        uint16_t lo =memory->peek(pc++);
+        uint16_t hi=memory->peek(pc++);
+        burn(t);
+        return (hi<<8)+lo;
     }
+
+    // read write 16 bits value from addr stored at pc & pc+1
+    uint16_t readMem16(const cycle burnt);
+    void writeMem16(const uint16_t, const cycle burnt);
 
     void add_hl(uint16_t, cycle burnt);
     uint8_t dec(uint8_t value);
+    uint8_t inc(uint8_t value);
     void and_(reg8, cycle burnt);
+    void or_(reg8, cycle burnt);
     reg8 compare(reg8);
     void jr(bool condition);
+    void call(cycle burnt);
+    void ret();
+
+    void push(uint16_t, cycle burnt);
+    void pop(uint16_t&, cycle burnt);
+
+    void rrca();
+    uint8_t rlc(uint8_t);
+    uint8_t rrc(uint8_t);
+    uint8_t rl(uint8_t);
+    uint8_t rr(uint8_t);
+    uint8_t sla(uint8_t);
+    uint8_t sra(uint8_t);
+    uint8_t sll(uint8_t);
+    uint8_t srl(uint8_t);
+
+    // return adress of srce/dest register
+    // from opcode (see DDxx, FDxx, FDCB**XX instructions etc.)
+    uint8_t* calc_dest_reg(uint8_t opcode);
 
 private:
     reg16   pc;
