@@ -127,7 +127,7 @@
 <context>
     <name>Gens</name>
     <message>
-        <location filename="../handlers/asm/gens.ui" line="16"/>
+        <location filename="../handlers/gadgets/z80/gens.ui" line="16"/>
         <source>Form</source>
         <translation type="unfinished"></translation>
     </message>
@@ -285,7 +285,7 @@
 <context>
     <name>Mons</name>
     <message>
-        <location filename="../handlers/asm/mons.ui" line="14"/>
+        <location filename="../handlers/gadgets/z80/mons.ui" line="14"/>
         <source>Form</source>
         <translation type="unfinished"></translation>
     </message>

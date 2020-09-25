@@ -43,10 +43,10 @@ add_executable(Klive
     handlers/project/projecthandler.h
     handlers/project/project.ui
 
-    handlers/asm/gens.cpp
-    handlers/asm/gens.ui
-    handlers/asm/mons.cpp
-    handlers/asm/mons.ui
+    handlers/gadgets/z80/gens.cpp
+    handlers/gadgets/z80/gens.ui
+    handlers/gadgets/z80/mons.cpp
+    handlers/gadgets/z80/mons.ui
 
     handlers/screen/screenhandler.cpp
     handlers/screen/screenhandler.h
