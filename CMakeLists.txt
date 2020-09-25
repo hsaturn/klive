@@ -27,7 +27,6 @@ add_executable(Klive
     mainwindow.h
 
     common/observer.h
-
     core/handler.cpp
     core/handler.h
 
@@ -43,6 +42,11 @@ add_executable(Klive
     handlers/project/projecthandler.cpp
     handlers/project/projecthandler.h
     handlers/project/project.ui
+
+    handlers/asm/gens.cpp
+    handlers/asm/gens.ui
+    handlers/asm/mons.cpp
+    handlers/asm/mons.ui
 
     handlers/screen/screenhandler.cpp
     handlers/screen/screenhandler.h

@@ -1,5 +1,6 @@
 #pragma once
 #include <core/hardware/cpu.h>
+#include <common/observer.h>
 
 #include <cstdint>
 
@@ -43,8 +44,13 @@ union regaf
     };
 };
 
-class z80: public Cpu
+class z80: public Observable<z80>, public Cpu
 {
+public:
+    struct Message
+    {
+    };
+
 public:
     z80(Memory* memory);
 

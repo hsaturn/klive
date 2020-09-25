@@ -38,10 +38,12 @@ void z80::nop(byte opcode, const char* prefix)
 
 void z80::step()
 {
-    if (pc==0xDD9)
+    if (observersCount())
     {
-        cout << "Breakpoint" << endl;
+        static Message stepMsg;
+        notify(stepMsg);
     }
+
     CpuClock before(clock);
 
     byte opcode = getByte();

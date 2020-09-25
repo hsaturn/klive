@@ -53,6 +53,8 @@ public:
         }
     }
 
+    inline size_t observersCount() const { return observers.size(); }
+
 private:
     std::list<Observer<T>*> observers;
 };

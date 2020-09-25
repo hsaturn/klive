@@ -125,6 +125,14 @@
     </message>
 </context>
 <context>
+    <name>Gens</name>
+    <message>
+        <location filename="../handlers/asm/gens.ui" line="16"/>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>MainWindow</name>
     <message>
         <location filename="../ext/AdvancedDocking/demo/mainwindow.ui" line="14"/>
@@ -276,6 +284,14 @@
     <message>
         <location filename="../mainwindow.cpp" line="392"/>
         <source>ASM</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>Mons</name>
+    <message>
+        <location filename="../handlers/asm/mons.ui" line="14"/>
+        <source>Form</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

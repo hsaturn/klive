@@ -30,6 +30,7 @@ public:
     virtual void reset()=0;
 
     void burn(cycle n) { clock.burn(n); }
+    const Memory* getMemory() const { return memory; }
 
 protected:
     Memory* memory;
