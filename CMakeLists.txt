@@ -27,6 +27,8 @@ add_executable(Klive
     mainwindow.h
 
     common/observer.h
+    common/mapreader.h
+
     core/handler.cpp
     core/handler.h
 
@@ -38,6 +40,7 @@ add_executable(Klive
     core/hardware/cpu.h
     core/hardware/z80.cpp
     core/hardware/z80.h
+    core/hardware/ioports.h
 
     handlers/project/projecthandler.cpp
     handlers/project/projecthandler.h

@@ -99,7 +99,7 @@ public:
 
     void fill(addr_t start, Byte::value_type value, size_t size=1, type_t type=UNCHANGE);
 
-    void loadRomImage(std::string f, addr_t start);
+    void loadRomImage(std::string f, addr_t start, bool dump=false);
 
     void poke(const addr_t& start, Byte::value_type value)
     {

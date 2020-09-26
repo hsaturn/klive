@@ -50,8 +50,9 @@ void Memory::fill(addr_t start, Byte::value_type value, size_t size, type_t type
     }
 }
 
-void Memory::loadRomImage(string f, Memory::addr_t start)
+void Memory::loadRomImage(string f, Memory::addr_t start, bool dump)
 {
+    long bytesRead=0;
     ifstream rom(f.c_str(), ios::in | ios::binary);
     if (rom)
     {
@@ -61,22 +62,25 @@ void Memory::loadRomImage(string f, Memory::addr_t start)
         {
             rom.read(&c, 1);
             poke(start, c);	// TODO rom & rdonly attributes !
-            if (count==0)
+            if (dump)
             {
-                count=16;
-                printf("\n%04x: ", start);
+                if (count==0)
+                {
+                    count=16;
+                    printf("\n%04x: ", start);
+                }
+                printf("%02x ", (uint8_t)c);
             }
-            printf("%02x ", (uint8_t)c);
             count--;
             start++;
+            bytesRead++;
         }
-        cout << endl;
-        std::cout << dec;
     }
     else
     {
         cerr << "Unable to open ROM file " << f << endl;
     }
+    cout << "Rom image load result: " << f << ", " << bytesRead << " bytes." << endl;
 }
 
 }
