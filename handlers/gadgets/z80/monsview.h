@@ -3,6 +3,7 @@
 #include "mons.h"
 
 #include <QTableView>
+#include <QStandardItemModel>
 #include <core/hardware/memory.h>
 
 using hw::Memory;
@@ -27,5 +28,6 @@ private:
     Mons mons;
     Memory* memory;
     Memory::addr_t visible_mem;
+    QStandardItemModel *model;
 };
 

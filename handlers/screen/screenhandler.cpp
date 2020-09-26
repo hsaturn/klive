@@ -42,9 +42,9 @@ void ScreenHandler::initialize(MainWindow *main)
     main->createDockWindow(this, screen,  "ZX Screen");
 
     // Disasm test
-    mons = new MonsView;
-    mons->setMemory(computer->memory);
-    main->createDockWindow(this, mons, "Disasm");
+    monsView = new MonsView;
+    monsView->setMemory(computer->memory);
+    main->createDockWindow(this, monsView, "Disasm");
 
     // TODO archi, supprimer ce downcast
     cpu = dynamic_cast<Z80*>(computer->cpu);
@@ -54,5 +54,5 @@ void ScreenHandler::initialize(MainWindow *main)
 
 void ScreenHandler::update(Z80* z80, const Z80::Message& msg)
 {
-    if (mons) mons->setPointer(z80->regs().pc);
+    if (monsView) monsView->setPointer(z80->regs().pc);
 }

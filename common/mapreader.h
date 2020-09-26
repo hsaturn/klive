@@ -11,13 +11,14 @@ using namespace std;
 class MapReader
 {
 public:
+
     template<class Key, class Value>
     static size_t ReadTabFile(
-            const string filename,  map<Key, Value> outmap,
-            std::function<Key(const Key&)> keyModifier = [](const Key& key) -> Key{return key; },
-            std::function<Value(const Value&)> valueModifier = [](const Value& value) -> Value{return value; })
+            const string filename,  map<Key, Value>& outmap,
+            void keyValueModifier(long line, Key&, Value& value) = [](long line, Key& key, Value& value) {})
     {
-        size_t lines=0;
+        size_t inserted=0;
+        size_t line_nr=0;
         Q_INIT_RESOURCE(klive);
 
         QFile file(filename .c_str());
@@ -26,28 +27,29 @@ public:
             QTextStream stream(&file);
             while(!stream.atEnd())
             {
-
+                line_nr++;
                 string line = stream.readLine().toStdString();
 
                 auto pos = line.find('\t');
 
                 if (pos != string::npos)
                 {
-                    string key=keyModifier(line.substr(0,pos));
-                    string value=valueModifier(line.substr(pos+1));
+                    string key=line.substr(0,pos);
+                    string value=line.substr(pos+1);
+                    keyValueModifier(line_nr, key, value);
 
                     if (key.length() &&
                             key[0] != '/' &&
                             key[0] != '#')
                     {
                         if (outmap.insert({key, value}).second)
-                            lines++;
+                            inserted++;
                     }
                 }
             }
         }
         file.close();
-        return lines;
+        return inserted;
     }
 };
 
