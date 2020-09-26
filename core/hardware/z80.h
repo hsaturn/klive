@@ -47,7 +47,7 @@ union regaf
     };
 };
 
-class z80: public Observable<z80>, public Cpu
+class Z80: public Observable<Z80>, public Cpu
 {
     struct registers
     {
@@ -91,15 +91,16 @@ public:
     };
 
 public:
-    z80(Memory* memory);
+    Z80(Memory* memory);
 
     virtual void step() override;
     virtual void reset() override;
     void irq_mode(int mode){}
     void di() {};
-    inline void burn(cycle cycles) { clock.burn(cycles); };
+    registers& regs() { return R; }
 
 protected:
+    inline void burn(cycle cycles) { clock.burn(cycles); };
     void step_ed();
     void step_cb();
     void step_dd_fd(reg16&);
@@ -147,8 +148,6 @@ protected:
     // return adress of srce/dest register
     // from opcode (see DDxx, FDxx, FDCB**XX instructions etc.)
     uint8_t* calc_dest_reg(uint8_t opcode);
-
-    registers& regs() { return R; }
 
 private:
     registers R;

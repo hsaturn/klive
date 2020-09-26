@@ -13,16 +13,7 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <widget class="QColumnView" name="columnView">
-   <property name="geometry">
-    <rect>
-     <x>350</x>
-     <y>10</y>
-     <width>351</width>
-     <height>531</height>
-    </rect>
-   </property>
-  </widget>
+  <layout class="QGridLayout" name="gridLayout"/>
  </widget>
  <resources/>
  <connections/>

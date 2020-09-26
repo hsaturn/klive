@@ -45,8 +45,8 @@ add_executable(Klive
 
     handlers/gadgets/z80/gens.cpp
     handlers/gadgets/z80/gens.ui
-    handlers/gadgets/z80/mons.cpp
-    handlers/gadgets/z80/mons.ui
+    handlers/gadgets/z80/monsview.cpp
+    handlers/gadgets/z80/monsview.h
 
     handlers/screen/screenhandler.cpp
     handlers/screen/screenhandler.h

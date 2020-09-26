@@ -1,16 +1,28 @@
 #pragma once
 #include <core/handler.h>
+#include <common/observer.h>
+#include <core/hardware/z80.h>
 
-#include "screen.h"
+using hw::Z80;
 
-class ScreenHandler : public Handler
+class MonsView;
+class SpectrumScreen;
+
+class ScreenHandler : public Handler,
+        public Observer<Z80>
 {
 public:
     ScreenHandler();
-    virtual ~ScreenHandler()=default;
+    virtual ~ScreenHandler();
+
+    virtual void update(Z80*, const Z80::Message& msg) override;
+    virtual void observableDies(const Z80* z80) override;
+    void setCpu(Z80*);
 
     virtual void initialize(MainWindow*) override;
 
 private:
-    Screen* screen;
+    Z80* cpu = nullptr;
+    MonsView* mons = nullptr;
+    SpectrumScreen* screen = nullptr;
 };

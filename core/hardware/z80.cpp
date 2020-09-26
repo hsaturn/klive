@@ -6,9 +6,9 @@ using namespace std;
 
 namespace hw
 {
-z80::z80(Memory* memory)
+Z80::Z80(Memory* memory)
     : Cpu(memory),
-      pc(R.sp), sp(R.sp), ix(R.ix), iy(R.iy),
+      pc(R.pc), sp(R.sp), ix(R.ix), iy(R.iy),
       af(R.af), bc(R.bc), de(R.de), hl(R.hl),
       af2(R.af),bc2(R.bc),de2(R.de),hl2(R.hl),
       a(R.a), b(R.b), c(R.c), d(R.d), e(R.e), h(R.h), l(R.l),
@@ -17,7 +17,7 @@ z80::z80(Memory* memory)
     reset();
 }
 
-void z80::reset()
+void Z80::reset()
 {
     pc=0;
     irq_mode(0);
@@ -26,7 +26,7 @@ void z80::reset()
     r=0;
 }
 
-void z80::nop(byte opcode, const char* prefix)
+void Z80::nop(byte opcode, const char* prefix)
 {
     const char c=0;
     if (prefix==nullptr) prefix=&c;
@@ -34,7 +34,7 @@ void z80::nop(byte opcode, const char* prefix)
     cout << std::flush;
 }
 
-void z80::step()
+void Z80::step()
 {
     if (observersCount())
     {
@@ -151,21 +151,21 @@ void z80::step()
     }
 }
 
-void z80::call(cycle burnt)
+void Z80::call(cycle burnt)
 {
     reg16 next_pc = getWord();
     push(pc, burnt);
     pc = next_pc;
 }
 
-void z80::ret()
+void Z80::ret()
 {
     pc = memory->peek(sp)+(memory->peek(sp+1)<<8);
     sp += 2;
     burn(10);
 }
 
-void z80::push(uint16_t value, cycle burnt)
+void Z80::push(uint16_t value, cycle burnt)
 {
     burn(burnt);
     sp -=2;
@@ -173,13 +173,13 @@ void z80::push(uint16_t value, cycle burnt)
     memory->poke(sp+1, value >> 8);
 }
 
-void z80::pop(uint16_t& reg, cycle burnt)
+void Z80::pop(uint16_t& reg, cycle burnt)
 {
      reg = memory->peek(sp)+(memory->peek(sp+1)<<8);
      burn(burnt);
 }
 
-uint8_t z80::inc(uint8_t val)
+uint8_t Z80::inc(uint8_t val)
 {
     af.pv= val==0x7F ? 1 : 0;
     af.h = (val&0x0F)==0x0F;	// TODO borrow from bit 3
@@ -190,7 +190,7 @@ uint8_t z80::inc(uint8_t val)
     return val;
 }
 
-uint8_t z80::dec(uint8_t val)
+uint8_t Z80::dec(uint8_t val)
 {
     af.pv= val==0x80 ? 1 : 0;
     af.h = (val&0x10)==0x10;	// TODO borrow from bit 4
@@ -201,7 +201,7 @@ uint8_t z80::dec(uint8_t val)
     return val;
 }
 
-void z80::add_hl(uint16_t val, cycle burnt)
+void Z80::add_hl(uint16_t val, cycle burnt)
 {
     burn(burnt);
     hl.val += val;
@@ -209,7 +209,7 @@ void z80::add_hl(uint16_t val, cycle burnt)
     af.n = 0;
 }
 
-void z80::jr(bool condition)
+void Z80::jr(bool condition)
 {
     uint8_t depl=getByte();
 
@@ -222,25 +222,25 @@ void z80::jr(bool condition)
         burn(7);
 }
 
-void z80::step_cb()
+void Z80::step_cb()
 {
     nop(0xcb);   // TODO
 }
 
-uint16_t z80::readMem16(const cycle burnt)
+uint16_t Z80::readMem16(const cycle burnt)
 {
     Memory::addr_t dest=getWord(burnt);
     return memory->peek(dest)+(memory->peek(dest+1)<<8);
 }
 
-void z80::writeMem16(uint16_t val, const cycle burnt)
+void Z80::writeMem16(uint16_t val, const cycle burnt)
 {
     Memory::addr_t dest=getWord(burnt);
     memory->poke(dest, val & 0xff);
     memory->poke(dest+1, val >> 8);
 }
 
-void z80::step_ed()
+void Z80::step_ed()
 {
     uint8_t opcode=getByte();
     switch(opcode)
@@ -300,7 +300,7 @@ void z80::step_ed()
     }
 }
 
-void z80::step_dd_fd(reg16& in)
+void Z80::step_dd_fd(reg16& in)
 {
     uint8_t opcode=getByte();
     switch(opcode)
@@ -358,7 +358,7 @@ inline uint8_t parity(uint8_t r)
     return r&1;
 }
 
-uint8_t* z80::calc_dest_reg(uint8_t opcode)
+uint8_t* Z80::calc_dest_reg(uint8_t opcode)
 {
     switch(opcode & 0x07)
     {
@@ -373,7 +373,7 @@ uint8_t* z80::calc_dest_reg(uint8_t opcode)
     return nullptr;
 }
 
-void z80::step_xxcb(reg16 base_addr)
+void Z80::step_xxcb(reg16 base_addr)
 {
     // FDCB**XX ou DDCB**XX
     // ** -> operation offset
@@ -458,7 +458,7 @@ void z80::step_xxcb(reg16 base_addr)
 
 }
 
-void z80::rrca()
+void Z80::rrca()
 {
     af.h=0;
     af.n=0;
@@ -467,7 +467,7 @@ void z80::rrca()
     burn(4);
 }
 
-uint8_t z80::rlc(uint8_t val)
+uint8_t Z80::rlc(uint8_t val)
 {
     val=(val<<1)|(val>>7);
     af.c=val & 1;
@@ -478,22 +478,22 @@ uint8_t z80::rlc(uint8_t val)
     return val;
 }
 
-uint8_t z80::rrc(uint8_t) { nop(0, "rrc"); }
-uint8_t z80::rl(uint8_t) { nop(0, "rl"); }
-uint8_t z80::rr(uint8_t) { nop(0, "rr"); }
-uint8_t z80::sla(uint8_t) { nop(0, "sla"); }
-uint8_t z80::sra(uint8_t) { nop(0, "sra"); }
-uint8_t z80::sll(uint8_t) { nop(0, "sll"); }
-uint8_t z80::srl(uint8_t) { nop(0, "srl"); }
+uint8_t Z80::rrc(uint8_t) { nop(0, "rrc"); }
+uint8_t Z80::rl(uint8_t) { nop(0, "rl"); }
+uint8_t Z80::rr(uint8_t) { nop(0, "rr"); }
+uint8_t Z80::sla(uint8_t) { nop(0, "sla"); }
+uint8_t Z80::sra(uint8_t) { nop(0, "sra"); }
+uint8_t Z80::sll(uint8_t) { nop(0, "sll"); }
+uint8_t Z80::srl(uint8_t) { nop(0, "srl"); }
 
-void z80::out(uint8_t port, uint8_t val)
+void Z80::out(uint8_t port, uint8_t val)
 {
     // TODO
     // Send notification to out listeners
     cout << "Z80: nyi out" << endl;
 }
 
-void z80::and_(reg8 n, cycle burnt)
+void Z80::and_(reg8 n, cycle burnt)
 {
     burn(burnt);
     a = a & n;
@@ -505,7 +505,7 @@ void z80::and_(reg8 n, cycle burnt)
     af.c = 0;
 }
 
-void z80::or_(reg8 n, cycle burnt)
+void Z80::or_(reg8 n, cycle burnt)
 {
     burn(burnt);
     a = a | n;
@@ -517,7 +517,7 @@ void z80::or_(reg8 n, cycle burnt)
     af.c = 0;
 }
 
-reg8 z80::compare(reg8 n)
+reg8 Z80::compare(reg8 n)
 {
     reg8 r = (a-n) & 0xFF;
     af.s = a & 0x80 ? 1 : 0;

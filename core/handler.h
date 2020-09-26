@@ -5,6 +5,7 @@
 #include <mainwindow.h>
 
 class Handler;
+class MainWindow;
 
 class Handlers
 {
