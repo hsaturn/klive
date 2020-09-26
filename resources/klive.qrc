@@ -4,5 +4,6 @@
         <file>images/print.png</file>
         <file>images/save.png</file>
         <file>images/undo.png</file>
+        <file>z80.txt</file>
     </qresource>
 </RCC>

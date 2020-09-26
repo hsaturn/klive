@@ -20,7 +20,6 @@ public:
     Observable(){}
     virtual ~Observable()
     {
-        // TODO should use walkOnObservers(lamda)
         for(auto& observer: observers)
             observer->observableDies(static_cast<const T*>(this));
     }

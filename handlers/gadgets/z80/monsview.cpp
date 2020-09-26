@@ -1,13 +1,25 @@
 #include "monsview.h"
-#include <QTableView>
 #include <iostream>
+
+#include <QStandardItemModel>
+#include <QFile>
+#include <QTextStream>
 
 using namespace std;
 
 MonsView::MonsView(QWidget *parent) :
-    QWidget(parent),
+    QTableView(parent),
     memory(nullptr)
 {
+
+    QStandardItemModel *model=new QStandardItemModel();
+
+    // model->setHorizontalHeaderLabels(list);
+    // model->setItem(row, col, newItem);
+
+    setModel(model);
+    setWindowTitle(QObject::tr("Frozen Column Example"));
+    show();
 }
 
 MonsView::~MonsView()
@@ -35,7 +47,10 @@ void MonsView::update(Memory* memory, const Memory::Message& msg)
 
 void MonsView::setPointer(Memory::addr_t pc)
 {
-    cout << "MONS " << pc << endl;
+    if (memory==nullptr) return;
+
+
+
 }
 
 // void SpectrumScreen::resizeEvent(QResizeEvent *event)

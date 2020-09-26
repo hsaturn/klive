@@ -337,6 +337,11 @@
         <source>Close Tab</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location filename="../handlers/gadgets/z80/monsview.cpp" line="21"/>
+        <source>Frozen Column Example</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ToolBar</name>

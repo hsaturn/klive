@@ -1,0 +1,1285 @@
+// $r =  8 relative value
+// $w = 16 word
+// $v =  8 value
+// $o =  8 relative offset
+// $j =  8 relative jump
+// $a = 16 address
+00	nop
+01$w	ld bc,**
+02	ld (bc),a
+03	inc bc
+04	inc b
+05	dec b
+06$v	ld b,*
+07	rlca
+08	ex af,af'
+09	add hl,bc
+0a	ld a,(bc)
+0b	dec bc
+0c	inc c
+0d	dec c
+0e$v	ld c,*
+0f	rrca
+10$j	djnz *
+11$w	ld de,**
+12	ld (de),a 
+13	inc de 
+14	inc d 
+15	dec d 
+16$v	ld d,*
+17	rla 
+18$j	jr *
+19	add hl,de 
+1a	ld a,(de) 
+1b	dec de 
+1c	inc e 
+1d	dec e 
+1e$v	ld e,*
+1f	rra
+20$j	jr nz,*
+21$w	ld hl,**
+22$a	ld (**),hl
+23	inc hl 
+24	inc h 
+25	dec h 
+26$v	ld h,*
+27	daa 
+28$j	jr z,*
+29	add hl,hl 
+2a$a	ld hl,(**)
+2b	dec hl 
+2c	inc l 
+2d	dec l 
+2e$v	ld l,*
+2f	cpl
+30$j	jr nc,*
+31$w	ld sp,**
+32$a	ld (**),a
+33	inc sp 
+34	inc (hl) 
+35	dec (hl) 
+36$v	ld (hl),*
+37	scf 
+38$j	jr c,*
+39	add hl,sp 
+3a$a	ld a,(**)
+3b	dec sp 
+3c	inc a 
+3d	dec a 
+3e$v	ld a,*
+3f	ccf
+40	ld b,b 
+41	ld b,c 
+42	ld b,d 
+43	ld b,e 
+44	ld b,h 
+45	ld b,l 
+46	ld b,(hl) 
+47	ld b,a 
+48	ld c,b 
+49	ld c,c 
+4a	ld c,d 
+4b	ld c,e 
+4c	ld c,h 
+4d	ld c,l 
+4e	ld c,(hl) 
+4f	ld c,a
+50	ld d,b 
+51	ld d,c 
+52	ld d,d 
+53	ld d,e 
+54	ld d,h 
+55	ld d,l 
+56	ld d,(hl) 
+57	ld d,a 
+58	ld e,b 
+59	ld e,c 
+5a	ld e,d 
+5b	ld e,e 
+5c	ld e,h 
+5d	ld e,l 
+5e	ld e,(hl) 
+5f	ld e,a
+60	ld h,b 
+61	ld h,c 
+62	ld h,d 
+63	ld h,e 
+64	ld h,h 
+65	ld h,l 
+66	ld h,(hl) 
+67	ld h,a 
+68	ld l,b 
+69	ld l,c 
+6a	ld l,d 
+6b	ld l,e 
+6c	ld l,h 
+6d	ld l,l 
+6e	ld l,(hl) 
+6f	ld l,a
+70	ld (hl),b 
+71	ld (hl),c 
+72	ld (hl),d 
+73	ld (hl),e 
+74	ld (hl),h 
+75	ld (hl),l 
+76	halt 
+77	ld (hl),a 
+78	ld a,b 
+79	ld a,c 
+7a	ld a,d 
+7b	ld a,e 
+7c	ld a,h 
+7d	ld a,l 
+7e	ld a,(hl) 
+7f	ld a,a
+80	add a,b 
+81	add a,c 
+82	add a,d 
+83	add a,e 
+84	add a,h 
+85	add a,l 
+86	add a,(hl) 
+87	add a,a 
+88	adc a,b 
+89	adc a,c 
+8a	adc a,d 
+8b	adc a,e 
+8c	adc a,h 
+8d	adc a,l 
+8e	adc a,(hl) 
+8f	adc a,a
+90	sub b 
+91	sub c 
+92	sub d 
+93	sub e 
+94	sub h 
+95	sub l 
+96	sub (hl) 
+97	sub a 
+98	sbc a,b 
+99	sbc a,c 
+9a	sbc a,d 
+9b	sbc a,e 
+9c	sbc a,h 
+9d	sbc a,l 
+9e	sbc a,(hl) 
+9f	sbc a,a
+a0	and b 
+a1	and c 
+a2	and d 
+a3	and e 
+a4	and h 
+a5	and l 
+a6	and (hl) 
+a7	and a 
+a8	xor b 
+a9	xor c 
+aa	xor d 
+ab	xor e 
+ac	xor h 
+ad	xor l 
+ae	xor (hl) 
+af	xor a
+b0	or b 
+b1	or c 
+b2	or d 
+b3	or e 
+b4	or h 
+b5	or l 
+b6	or (hl) 
+b7	or a 
+b8	cp b 
+b9	cp c 
+ba	cp d 
+bb	cp e 
+bc	cp h 
+bd	cp l 
+be	cp (hl) 
+bf	cp a
+c0	ret nz 
+c1	pop bc 
+c2$a	jp nz,**
+c3$a	jp **
+c4$a	call nz,**
+c5	push bc 
+c6$v	add a,*
+c7	rst 00h 
+c8	ret z 
+c9	ret 
+ca$a	jp z,**
+cb	-BITS
+cc$a	call z,**
+cd$a	call **
+ce$v	adc a,*
+cf	rst 08h
+d0	ret nc 
+d1	pop de 
+d2$a	jp nc,**
+d3$v	out (*),a
+d4$a	call nc,**
+d5	push de 
+d6$v	sub *
+d7	rst 10h 
+d8	ret c 
+d9	exx 
+da$a	jp c,**
+db$v	in a,(*)
+dc$a	call c,**
+dd	-IX
+de$v	sbc a,*
+df	rst 18h
+e0	ret po 
+e1	pop hl 
+e2$a	jp po,**
+e3	ex (sp),hl 
+e4$a	call po,**
+e5	push hl 
+e6$v	and *
+e7	rst 20h 
+e8	ret pe 
+e9	jp (hl) 
+ea$a	jp pe,**
+eb	ex de,hl 
+ec$a	call pe,**
+ed	-EXTD
+ee$v	xor *
+ef	rst 28h
+f0	ret p 
+f1	pop af 
+f2$a	jp p,**
+f3	di 
+f4$a	call p,**
+f5	push af 
+f6$v	or *
+f7	rst 30h 
+f8	ret m 
+f9	ld sp,hl 
+fa$a	jp m,**
+fb	ei 
+fc$a	call m,**
+fd	-IY
+fe$v	cp *
+ff	rst 38h
+
+ed40	in b,(c)
+ed41	out (c),b
+ed42	sbc hl,bc
+ed43$a	ld (**),bc
+ed44	neg
+ed45	retn
+ed46	im 0
+ed47	ld i,a
+ed48	in c,(c)
+ed49	out (c),c
+ed4a	adc hl,bc
+ed4b$a	ld bc,(**)
+ed4c	neg
+ed4d	reti
+ed4e	im 0/1
+ed4f	ld r,a
+ed50	in d,(c)
+ed51	out (c),d
+ed52	sbc hl,de
+ed53$a	ld (**),de
+ed54	neg
+ed55	retn
+ed56	im 1
+ed57	ld a,i
+ed58	in e,(c)
+ed59	out (c),e
+ed5a	adc hl,de
+ed5b$a	ld de,(**)
+ed5c	neg
+ed5d	retn
+ed5e	im 2
+ed5f	ld a,r
+ed60	in h,(c)
+ed61	out (c),h
+ed62	sbc hl,hl
+ed63$a	ld (**),hl
+ed64	neg
+ed65	retn
+ed66	im 0
+ed67	rrd
+ed68	in l,(c)
+ed69	out (c),l
+ed6a	adc hl,hl
+ed6b$a	ld hl,(**)
+ed6c	neg
+ed6d	retn
+ed6e	im 0/1
+ed6f	rld
+ed70	in (c)
+ed71	out (c),0
+ed72	sbc hl,sp
+ed73$a	ld (**),sp
+ed74	neg
+ed75	retn
+ed76	im 1
+ed77
+ed78	in a,(c)
+ed79	out (c),a
+ed7a	adc hl,sp
+ed7b$a	ld sp,(**)
+ed7c	neg
+ed7d	retn
+ed7e	im 2
+
+eda0	ldi
+eda1	cpi
+eda2	ini
+eda3	outi
+
+eda8	ldd
+eda9	cpd
+edaa	ind
+edab	outd
+
+edb0	ldir
+edb1	cpir
+edb2	inir
+edb3	otir
+
+edb8	lddr
+edb9	cpdr
+edba	indr
+edbb	otdr
+
+cb00 	rlc b
+cb01 	rlc c
+cb02 	rlc d
+cb03 	rlc e
+cb04 	rlc h
+cb05 	rlc l
+cb06 	rlc (hl)
+cb07 	rlc a
+cb08 	rrc b
+cb09 	rrc c
+cb0a 	rrc d
+cb0b 	rrc e
+cb0c 	rrc h
+cb0d 	rrc l
+cb0e 	rrc (hl)
+cb0f 	rrc a
+cb10	rl b
+cb11	rl c
+cb12	rl d
+cb13	rl e
+cb14	rl h
+cb15	rl l
+cb16	rl (hl)
+cb17	rl a
+cb18	rr b
+cb19	rr c
+cb1a	rr d
+cb1b	rr e
+cb1c	rr h
+cb1d	rr l
+cb1e	rr (hl)
+cb1f	rr a
+cb20	sla b
+cb21	sla c
+cb22	sla d
+cb23	sla e
+cb24	sla h
+cb25	sla l
+cb26	sla (hl)
+cb27	sla a
+cb28	sra b
+cb29	sra c
+cb2a	sra d
+cb2b	sra e
+cb2c	sra h
+cb2d	sra l
+cb2e	sra (hl)
+cb2f	sra a
+cb30	sll b
+cb31	sll c
+cb32	sll d
+cb33	sll e
+cb34	sll h
+cb35	sll l
+cb36	sll (hl)
+cb37	sll a
+cb38	srl b
+cb39	srl c
+cb3a	srl d
+cb3b	srl e
+cb3c	srl h
+cb3d	srl l
+cb3e	srl (hl)
+cb3f	srl a
+cb40	bit 0,b
+cb41	bit 0,c
+cb42	bit 0,d
+cb43	bit 0,e
+cb44	bit 0,h
+cb45	bit 0,l
+cb46	bit 0,(hl)
+cb47	bit 0,a
+cb48	bit 1,b
+cb49	bit 1,c
+cb4a	bit 1,d
+cb4b	bit 1,e
+cb4c	bit 1,h
+cb4d	bit 1,l
+cb4e	bit 1,(hl)
+cb4f	bit 1,a
+cb50	bit 2,b
+cb51	bit 2,c
+cb52	bit 2,d
+cb53	bit 2,e
+cb54	bit 2,h
+cb55	bit 2,l
+cb56	bit 2,(hl)
+cb57	bit 2,a
+cb58	bit 3,b
+cb59	bit 3,c
+cb5a	bit 3,d
+cb5b	bit 3,e
+cb5c	bit 3,h
+cb5d	bit 3,l
+cb5e	bit 3,(hl)
+cb5f	bit 3,a
+cb60	bit 4,b
+cb61	bit 4,c
+cb62	bit 4,d
+cb63	bit 4,e
+cb64	bit 4,h
+cb65	bit 4,l
+cb66	bit 4,(hl)
+cb67	bit 4,a
+cb68	bit 5,b
+cb69	bit 5,c
+cb6a	bit 5,d
+cb6b	bit 5,e
+cb6c	bit 5,h
+cb6d	bit 5,l
+cb6e	bit 5,(hl)
+cb6f	bit 5,a
+cb70	bit 6,b
+cb71	bit 6,c
+cb72	bit 6,d
+cb73	bit 6,e
+cb74	bit 6,h
+cb75	bit 6,l
+cb76	bit 6,(hl)
+cb77	bit 6,a
+cb78	bit 7,b
+cb79	bit 7,c
+cb7a	bit 7,d
+cb7b	bit 7,e
+cb7c	bit 7,h
+cb7d	bit 7,l
+cb7e	bit 7,(hl)
+cb7f	bit 7,a
+cb80	res 0,b
+cb81	res 0,c
+cb82	res 0,d
+cb83	res 0,e
+cb84	res 0,h
+cb85	res 0,l
+cb86	res 0,(hl)
+cb87	res 0,a
+cb88	res 1,b
+cb89	res 1,c
+cb8a	res 1,d
+cb8b	res 1,e
+cb8c	res 1,h
+cb8d	res 1,l
+cb8e	res 1,(hl)
+cb8f	res 1,a
+cb90	res 2,b
+cb91	res 2,c
+cb92	res 2,d
+cb93	res 2,e
+cb94	res 2,h
+cb95	res 2,l
+cb96	res 2,(hl)
+cb97	res 2,a
+cb98	res 3,b
+cb99	res 3,c
+cb9a	res 3,d
+cb9b	res 3,e
+cb9c	res 3,h
+cb9d	res 3,l
+cb9e	res 3,(hl)
+cb9f	res 3,a
+cba0	res 4,b
+cba1	res 4,c
+cba2	res 4,d
+cba3	res 4,e
+cba4	res 4,h
+cba5	res 4,l
+cba6	res 4,(hl)
+cba7	res 4,a
+cba8	res 5,b
+cba9	res 5,c
+cbaa	res 5,d
+cbab	res 5,e
+cbac	res 5,h
+cbad	res 5,l
+cbae	res 5,(hl)
+cbaf	res 5,a
+cbb0	res 6,b
+cbb1	res 6,c
+cbb2	res 6,d
+cbb3	res 6,e
+cbb4	res 6,h
+cbb5	res 6,l
+cbb6	res 6,(hl)
+cbb7	res 6,a
+cbb8	res 7,b
+cbb9	res 7,c
+cbba	res 7,d
+cbbb	res 7,e
+cbbc	res 7,h
+cbbd	res 7,l
+cbbe	res 7,(hl)
+cbbf	res 7,a
+cbc0	set 0,b
+cbc1	set 0,c
+cbc2	set 0,d
+cbc3	set 0,e
+cbc4	set 0,h
+cbc5	set 0,l
+cbc6	set 0,(hl)
+cbc7	set 0,a
+cbc8	set 1,b
+cbc9	set 1,c
+cbca	set 1,d
+cbcb	set 1,e
+cbcc	set 1,h
+cbcd	set 1,l
+cbce	set 1,(hl)
+cbcf	set 1,a
+cbd0	set 2,b
+cbd1	set 2,c
+cbd2	set 2,d
+cbd3	set 2,e
+cbd4	set 2,h
+cbd5	set 2,l
+cbd6	set 2,(hl)
+cbd7	set 2,a
+cbd8	set 3,b
+cbd9	set 3,c
+cbda	set 3,d
+cbdb	set 3,e
+cbdc	set 3,h
+cbdd	set 3,l
+cbde	set 3,(hl)
+cbdf	set 3,a
+cbe0	set 4,b
+cbe1	set 4,c
+cbe2	set 4,d
+cbe3	set 4,e
+cbe4	set 4,h
+cbe5	set 4,l
+cbe6	set 4,(hl)
+cbe7	set 4,a
+cbe8	set 5,b
+cbe9	set 5,c
+cbea	set 5,d
+cbeb	set 5,e
+cbec	set 5,h
+cbed	set 5,l
+cbee	set 5,(hl)
+cbef	set 5,a
+cbf0	set 6,b
+cbf1	set 6,c
+cbf2	set 6,d
+cbf3	set 6,e
+cbf4	set 6,h
+cbf5	set 6,l
+cbf6	set 6,(hl)
+cbf7	set 6,a
+cbf8	set 7,b
+cbf9	set 7,c
+cbfa	set 7,d
+cbfb	set 7,e
+cbfc	set 7,h
+cbfd	set 7,l
+cbfe	set 7,(hl)
+cbff	set 7,a
+
+
+
+
+
+
+
+
+
+
+dd09 	add ix,bc
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+dd19	add ix,de
+
+
+
+
+
+
+
+dd21$w	ld ix,**
+dd22$a	ld (**),ix
+dd23	inc ix
+dd24	inc ixh
+dd25	dec ixh
+dd26$v	ld ixh,*
+
+
+dd29	add ix,ix
+dd2a$a	ld ix,(**)
+dd2b	dec ix
+dd2c	inc ixl
+dd2d	dec ixl
+dd2e$v	ld ixl,*
+
+
+
+
+
+dd34$o	inc (ix+*)
+dd35$o	dec (ix+*)
+dd36$o$v	ld (ix+*),*
+
+
+dd39	add ix,sp
+
+
+
+
+
+
+
+
+
+
+dd44	ld b,ixh
+dd45	ld b,ixl
+dd46$o	ld b,(ix+*)
+
+
+
+
+
+dd4c	ld c,ixh
+dd4d	ld c,ixl
+dd4e$o	ld c,(ix+*)
+
+
+
+
+
+dd54	ld d,ixh
+dd55	ld d,ixl
+dd56$o	ld d,(ix+*)
+
+
+
+
+
+dd5c	ld e,ixh
+dd5d	ld e,ixl
+dd5e$o	ld e,(ix+*)
+
+dd60	ld ixh,b
+dd61	ld ixh,c
+dd62	ld ixh,d
+dd63	ld ixh,e
+dd64	ld ixh,ixh
+dd65	ld ixh,ixl
+dd66$o	ld h,(ix+*)
+dd67	ld ixh,a
+dd68	ld ixl,b
+dd69	ld ixl,c
+dd6a	ld ixl,d
+dd6b	ld ixl,e
+dd6c	ld ixl,ixh
+dd6d	ld ixl,ixl
+dd6e$o	ld l,(ix+*)
+dd6f	ld ixl,a
+dd70$o	ld (ix+*),b
+dd71$o	ld (ix+*),c
+dd72$o	ld (ix+*),d
+dd73$o	ld (ix+*),e
+dd74$o	ld (ix+*),h
+dd75$o	ld (ix+*),l
+
+dd77$o	ld (ix+*),a
+
+dd7c	ld a,ixh
+dd7d	ld a,ixl
+dd7e$o	ld a,(ix+*)
+
+dd84	add a,ixh
+dd85	add a,ixl
+dd86$o	add a,(ix+*)
+
+dd8c	adc a,ixh
+dd8d	adc a,ixl
+dd8e$o	adc a,(ix+*)
+
+dd94	sub ixh
+dd95	sub ixl
+dd96$o	sub (ix+*)
+
+dd9c	sbc a,ixh
+dd9d	sbc a,ixl
+dd9e$o	sbc a,(ix+*)
+
+dda4	and ixh
+dda5	and ixl
+dda6$o	and (ix+*)
+
+ddac	xor ixh
+ddad	xor ixl
+ddae$o	xor (ix+*)
+
+ddb4	or ixh
+ddb5	or ixl
+ddb6$o	or (ix+*)
+
+ddbc	cp ixh
+ddbd	cp ixl
+ddbe$o	cp (ix+*)
+
+dde1	pop ix
+
+dde3	ex (sp),ix
+
+dde5	push ix
+
+dde9	jp (ix)
+
+ddf9	ld sp,ix
+
+ddcb$o00 	rlc (ix+*),b
+ddcb$o01 	rlc (ix+*),c
+ddcb$o02 	rlc (ix+*),d
+ddcb$o03 	rlc (ix+*),e
+ddcb$o04 	rlc (ix+*),h
+ddcb$o05 	rlc (ix+*),l
+ddcb$o06 	rlc (ix+*)
+ddcb$o07 	rlc (ix+*),a
+ddcb$o08 	rrc (ix+*),b
+ddcb$o09 	rrc (ix+*),c
+ddcb$o0a 	rrc (ix+*),d
+ddcb$o0b 	rrc (ix+*),e
+ddcb$o0c 	rrc (ix+*),h
+ddcb$o0d 	rrc (ix+*),l
+ddcb$o0e 	rrc (ix+*)
+ddcb$o0f 	rrc (ix+*),a
+ddcb$o10	rl (ix+*),b
+ddcb$o11	rl (ix+*),c
+ddcb$o12	rl (ix+*),d
+ddcb$o13	rl (ix+*),e
+ddcb$o14	rl (ix+*),h
+ddcb$o15	rl (ix+*),l
+ddcb$o16	rl (ix+*)
+ddcb$o17	rl (ix+*),a
+ddcb$o18	rr (ix+*),b
+ddcb$o19	rr (ix+*),c
+ddcb$o1a	rr (ix+*),d
+ddcb$o1b	rr (ix+*),e
+ddcb$o1c	rr (ix+*),h
+ddcb$o1d	rr (ix+*),l
+ddcb$o1e	rr (ix+*)
+ddcb$o1f	rr (ix+*),a
+ddcb$o20	sla (ix+*),b
+ddcb$o21	sla (ix+*),c
+ddcb$o22	sla (ix+*),d
+ddcb$o23	sla (ix+*),e
+ddcb$o24	sla (ix+*),h
+ddcb$o25	sla (ix+*),l
+ddcb$o26	sla (ix+*)
+ddcb$o27	sla (ix+*),a
+ddcb$o28	sra (ix+*),b
+ddcb$o29	sra (ix+*),c
+ddcb$o2a	sra (ix+*),d
+ddcb$o2b	sra (ix+*),e
+ddcb$o2c	sra (ix+*),h
+ddcb$o2d	sra (ix+*),l
+ddcb$o2e	sra (ix+*)
+ddcb$o2f	sra (ix+*),a
+ddcb$o30	sll (ix+*),b
+ddcb$o31	sll (ix+*),c
+ddcb$o32	sll (ix+*),d
+ddcb$o33	sll (ix+*),e
+ddcb$o34	sll (ix+*),h
+ddcb$o35	sll (ix+*),l
+ddcb$o36	sll (ix+*)
+ddcb$o37	sll (ix+*),a
+ddcb$o38	srl (ix+*),b
+ddcb$o39	srl (ix+*),c
+ddcb$o3a	srl (ix+*),d
+ddcb$o3b	srl (ix+*),e
+ddcb$o3c	srl (ix+*),h
+ddcb$o3d	srl (ix+*),l
+ddcb$o3e	srl (ix+*)
+ddcb$o3f	srl (ix+*),a
+ddcb$o40	bit 0,(ix+*)
+ddcb$o41	bit 0,(ix+*)
+ddcb$o42	bit 0,(ix+*)
+ddcb$o43	bit 0,(ix+*)
+ddcb$o44	bit 0,(ix+*)
+ddcb$o45	bit 0,(ix+*)
+ddcb$o46	bit 0,(ix+*)
+ddcb$o47	bit 0,(ix+*)
+ddcb$o48	bit 1,(ix+*)
+ddcb$o49	bit 1,(ix+*)
+ddcb$o4a	bit 1,(ix+*)
+ddcb$o4b	bit 1,(ix+*)
+ddcb$o4c	bit 1,(ix+*)
+ddcb$o4d	bit 1,(ix+*)
+ddcb$o4e	bit 1,(ix+*)
+ddcb$o4f	bit 1,(ix+*)
+ddcb$o50	bit 2,(ix+*)
+ddcb$o51	bit 2,(ix+*)
+ddcb$o52	bit 2,(ix+*)
+ddcb$o53	bit 2,(ix+*)
+ddcb$o54	bit 2,(ix+*)
+ddcb$o55	bit 2,(ix+*)
+ddcb$o56	bit 2,(ix+*)
+ddcb$o57	bit 2,(ix+*)
+ddcb$o58	bit 3,(ix+*)
+ddcb$o59	bit 3,(ix+*)
+ddcb$o5a	bit 3,(ix+*)
+ddcb$o5b	bit 3,(ix+*)
+ddcb$o5c	bit 3,(ix+*)
+ddcb$o5d	bit 3,(ix+*)
+ddcb$o5e	bit 3,(ix+*)
+ddcb$o5f	bit 3,(ix+*)
+ddcb$o60	bit 4,(ix+*)
+ddcb$o61	bit 4,(ix+*)
+ddcb$o62	bit 4,(ix+*)
+ddcb$o63	bit 4,(ix+*)
+ddcb$o64	bit 4,(ix+*)
+ddcb$o65	bit 4,(ix+*)
+ddcb$o66	bit 4,(ix+*)
+ddcb$o67	bit 4,(ix+*)
+ddcb$o68	bit 5,(ix+*)
+ddcb$o69	bit 5,(ix+*)
+ddcb$o6a	bit 5,(ix+*)
+ddcb$o6b	bit 5,(ix+*)
+ddcb$o6c	bit 5,(ix+*)
+ddcb$o6d	bit 5,(ix+*)
+ddcb$o6e	bit 5,(ix+*)
+ddcb$o6f	bit 5,(ix+*)
+ddcb$o70	bit 6,(ix+*)
+ddcb$o71	bit 6,(ix+*)
+ddcb$o72	bit 6,(ix+*)
+ddcb$o73	bit 6,(ix+*)
+ddcb$o74	bit 6,(ix+*)
+ddcb$o75	bit 6,(ix+*)
+ddcb$o76	bit 6,(ix+*)
+ddcb$o77	bit 6,(ix+*)
+ddcb$o78	bit 7,(ix+*)
+ddcb$o79	bit 7,(ix+*)
+ddcb$o7a	bit 7,(ix+*)
+ddcb$o7b	bit 7,(ix+*)
+ddcb$o7c	bit 7,(ix+*)
+ddcb$o7d	bit 7,(ix+*)
+ddcb$o7e	bit 7,(ix+*)
+ddcb$o7f	bit 7,(ix+*)
+ddcb$o80	res 0,(ix+*),b
+ddcb$o81	res 0,(ix+*),c
+ddcb$o82	res 0,(ix+*),d
+ddcb$o83	res 0,(ix+*),e
+ddcb$o84	res 0,(ix+*),h
+ddcb$o85	res 0,(ix+*),l
+ddcb$o86	res 0,(ix+*)
+ddcb$o87	res 0,(ix+*),a
+ddcb$o88	res 1,(ix+*),b
+ddcb$o89	res 1,(ix+*),c
+ddcb$o8a	res 1,(ix+*),d
+ddcb$o8b	res 1,(ix+*),e
+ddcb$o8c	res 1,(ix+*),h
+ddcb$o8d	res 1,(ix+*),l
+ddcb$o8e	res 1,(ix+*)
+ddcb$o8f	res 1,(ix+*),a
+ddcb$o90	res 2,(ix+*),b
+ddcb$o91	res 2,(ix+*),c
+ddcb$o92	res 2,(ix+*),d
+ddcb$o93	res 2,(ix+*),e
+ddcb$o94	res 2,(ix+*),h
+ddcb$o95	res 2,(ix+*),l
+ddcb$o96	res 2,(ix+*)
+ddcb$o97	res 2,(ix+*),a
+ddcb$o98	res 3,(ix+*),b
+ddcb$o99	res 3,(ix+*),c
+ddcb$o9a	res 3,(ix+*),d
+ddcb$o9b	res 3,(ix+*),e
+ddcb$o9c	res 3,(ix+*),h
+ddcb$o9d	res 3,(ix+*),l
+ddcb$o9e	res 3,(ix+*)
+ddcb$o9f	res 3,(ix+*),a
+ddcb$oa0	res 4,(ix+*),b
+ddcb$oa1	res 4,(ix+*),c
+ddcb$oa2	res 4,(ix+*),d
+ddcb$oa3	res 4,(ix+*),e
+ddcb$oa4	res 4,(ix+*),h
+ddcb$oa5	res 4,(ix+*),l
+ddcb$oa6	res 4,(ix+*)
+ddcb$oa7	res 4,(ix+*),a
+ddcb$oa8	res 5,(ix+*),b
+ddcb$oa9	res 5,(ix+*),c
+ddcb$oaa	res 5,(ix+*),d
+ddcb$oab	res 5,(ix+*),e
+ddcb$oac	res 5,(ix+*),h
+ddcb$oad	res 5,(ix+*),l
+ddcb$oae	res 5,(ix+*)
+ddcb$oaf	res 5,(ix+*),a
+ddcb$ob0	res 6,(ix+*),b
+ddcb$ob1	res 6,(ix+*),c
+ddcb$ob2	res 6,(ix+*),d
+ddcb$ob3	res 6,(ix+*),e
+ddcb$ob4	res 6,(ix+*),h
+ddcb$ob5	res 6,(ix+*),l
+ddcb$ob6	res 6,(ix+*)
+ddcb$ob7	res 6,(ix+*),a
+ddcb$ob8	res 7,(ix+*),b
+ddcb$ob9	res 7,(ix+*),c
+ddcb$oba	res 7,(ix+*),d
+ddcb$obb	res 7,(ix+*),e
+ddcb$obc	res 7,(ix+*),h
+ddcb$obd	res 7,(ix+*),l
+ddcb$obe	res 7,(ix+*)
+ddcb$obf	res 7,(ix+*),a
+ddcb$oc0	set 0,(ix+*),b
+ddcb$oc1	set 0,(ix+*),c
+ddcb$oc2	set 0,(ix+*),d
+ddcb$oc3	set 0,(ix+*),e
+ddcb$oc4	set 0,(ix+*),h
+ddcb$oc5	set 0,(ix+*),l
+ddcb$oc6	set 0,(ix+*)
+ddcb$oc7	set 0,(ix+*),a
+ddcb$oc8	set 1,(ix+*),b
+ddcb$oc9	set 1,(ix+*),c
+ddcb$oca	set 1,(ix+*),d
+ddcb$ocb	set 1,(ix+*),e
+ddcb$occ	set 1,(ix+*),h
+ddcb$ocd	set 1,(ix+*),l
+ddcb$oce	set 1,(ix+*)
+ddcb$ocf	set 1,(ix+*),a
+ddcb$od0	set 2,(ix+*),b
+ddcb$od1	set 2,(ix+*),c
+ddcb$od2	set 2,(ix+*),d
+ddcb$od3	set 2,(ix+*),e
+ddcb$od4	set 2,(ix+*),h
+ddcb$od5	set 2,(ix+*),l
+ddcb$od6	set 2,(ix+*)
+ddcb$od7	set 2,(ix+*),a
+ddcb$od8	set 3,(ix+*),b
+ddcb$od9	set 3,(ix+*),c
+ddcb$oda	set 3,(ix+*),d
+ddcb$odb	set 3,(ix+*),e
+ddcb$odc	set 3,(ix+*),h
+ddcb$odd	set 3,(ix+*),l
+ddcb$ode	set 3,(ix+*)
+ddcb$odf	set 3,(ix+*),a
+ddcb$oe0	set 4,(ix+*),b
+ddcb$oe1	set 4,(ix+*),c
+ddcb$oe2	set 4,(ix+*),d
+ddcb$oe3	set 4,(ix+*),e
+ddcb$oe4	set 4,(ix+*),h
+ddcb$oe5	set 4,(ix+*),l
+ddcb$oe6	set 4,(ix+*)
+ddcb$oe7	set 4,(ix+*),a
+ddcb$oe8	set 5,(ix+*),b
+ddcb$oe9	set 5,(ix+*),c
+ddcb$oea	set 5,(ix+*),d
+ddcb$oeb	set 5,(ix+*),e
+ddcb$oec	set 5,(ix+*),h
+ddcb$oed	set 5,(ix+*),l
+ddcb$oee	set 5,(ix+*)
+ddcb$oef	set 5,(ix+*),a
+ddcb$of0	set 6,(ix+*),b
+ddcb$of1	set 6,(ix+*),c
+ddcb$of2	set 6,(ix+*),d
+ddcb$of3	set 6,(ix+*),e
+ddcb$of4	set 6,(ix+*),h
+ddcb$of5	set 6,(ix+*),l
+ddcb$of6	set 6,(ix+*)
+ddcb$of7	set 6,(ix+*),a
+ddcb$of8	set 7,(ix+*),b
+ddcb$of9	set 7,(ix+*),c
+ddcb$ofa	set 7,(ix+*),d
+ddcb$ofb	set 7,(ix+*),e
+ddcb$ofc	set 7,(ix+*),h
+ddcb$ofd	set 7,(ix+*),l
+ddcb$ofe	set 7,(ix+*)
+ddcb$off	set 7,(ix+*),a
+
+// $o : relative offset
+fdcb$o00 	rlc (iy+*),b
+fdcb$o01 	rlc (iy+*),c
+fdcb$o02 	rlc (iy+*),d
+fdcb$o03 	rlc (iy+*),e
+fdcb$o04 	rlc (iy+*),h
+fdcb$o05 	rlc (iy+*),l
+fdcb$o06 	rlc (iy+*)
+fdcb$o07 	rlc (iy+*),a
+fdcb$o08 	rrc (iy+*),b
+fdcb$o09 	rrc (iy+*),c
+fdcb$o0a 	rrc (iy+*),d
+fdcb$o0b 	rrc (iy+*),e
+fdcb$o0c 	rrc (iy+*),h
+fdcb$o0d 	rrc (iy+*),l
+fdcb$o0e 	rrc (iy+*)
+fdcb$o0f 	rrc (iy+*),a
+fdcb$o10	rl (iy+*),b
+fdcb$o11	rl (iy+*),c
+fdcb$o12	rl (iy+*),d
+fdcb$o13	rl (iy+*),e
+fdcb$o14	rl (iy+*),h
+fdcb$o15	rl (iy+*),l
+fdcb$o16	rl (iy+*)
+fdcb$o17	rl (iy+*),a
+fdcb$o18	rr (iy+*),b
+fdcb$o19	rr (iy+*),c
+fdcb$o1a	rr (iy+*),d
+fdcb$o1b	rr (iy+*),e
+fdcb$o1c	rr (iy+*),h
+fdcb$o1d	rr (iy+*),l
+fdcb$o1e	rr (iy+*)
+fdcb$o1f	rr (iy+*),a
+fdcb$o20	sla (iy+*),b
+fdcb$o21	sla (iy+*),c
+fdcb$o22	sla (iy+*),d
+fdcb$o23	sla (iy+*),e
+fdcb$o24	sla (iy+*),h
+fdcb$o25	sla (iy+*),l
+fdcb$o26	sla (iy+*)
+fdcb$o27	sla (iy+*),a
+fdcb$o28	sra (iy+*),b
+fdcb$o29	sra (iy+*),c
+fdcb$o2a	sra (iy+*),d
+fdcb$o2b	sra (iy+*),e
+fdcb$o2c	sra (iy+*),h
+fdcb$o2d	sra (iy+*),l
+fdcb$o2e	sra (iy+*)
+fdcb$o2f	sra (iy+*),a
+fdcb$o30	sll (iy+*),b
+fdcb$o31	sll (iy+*),c
+fdcb$o32	sll (iy+*),d
+fdcb$o33	sll (iy+*),e
+fdcb$o34	sll (iy+*),h
+fdcb$o35	sll (iy+*),l
+fdcb$o36	sll (iy+*)
+fdcb$o37	sll (iy+*),a
+fdcb$o38	srl (iy+*),b
+fdcb$o39	srl (iy+*),c
+fdcb$o3a	srl (iy+*),d
+fdcb$o3b	srl (iy+*),e
+fdcb$o3c	srl (iy+*),h
+fdcb$o3d	srl (iy+*),l
+fdcb$o3e	srl (iy+*)
+fdcb$o3f	srl (iy+*),a
+fdcb$o40	bit 0,(iy+*)
+fdcb$o41	bit 0,(iy+*)
+fdcb$o42	bit 0,(iy+*)
+fdcb$o43	bit 0,(iy+*)
+fdcb$o44	bit 0,(iy+*)
+fdcb$o45	bit 0,(iy+*)
+fdcb$o46	bit 0,(iy+*)
+fdcb$o47	bit 0,(iy+*)
+fdcb$o48	bit 1,(iy+*)
+fdcb$o49	bit 1,(iy+*)
+fdcb$o4a	bit 1,(iy+*)
+fdcb$o4b	bit 1,(iy+*)
+fdcb$o4c	bit 1,(iy+*)
+fdcb$o4d	bit 1,(iy+*)
+fdcb$o4e	bit 1,(iy+*)
+fdcb$o4f	bit 1,(iy+*)
+fdcb$o50	bit 2,(iy+*)
+fdcb$o51	bit 2,(iy+*)
+fdcb$o52	bit 2,(iy+*)
+fdcb$o53	bit 2,(iy+*)
+fdcb$o54	bit 2,(iy+*)
+fdcb$o55	bit 2,(iy+*)
+fdcb$o56	bit 2,(iy+*)
+fdcb$o57	bit 2,(iy+*)
+fdcb$o58	bit 3,(iy+*)
+fdcb$o59	bit 3,(iy+*)
+fdcb$o5a	bit 3,(iy+*)
+fdcb$o5b	bit 3,(iy+*)
+fdcb$o5c	bit 3,(iy+*)
+fdcb$o5d	bit 3,(iy+*)
+fdcb$o5e	bit 3,(iy+*)
+fdcb$o5f	bit 3,(iy+*)
+fdcb$o60	bit 4,(iy+*)
+fdcb$o61	bit 4,(iy+*)
+fdcb$o62	bit 4,(iy+*)
+fdcb$o63	bit 4,(iy+*)
+fdcb$o64	bit 4,(iy+*)
+fdcb$o65	bit 4,(iy+*)
+fdcb$o66	bit 4,(iy+*)
+fdcb$o67	bit 4,(iy+*)
+fdcb$o68	bit 5,(iy+*)
+fdcb$o69	bit 5,(iy+*)
+fdcb$o6a	bit 5,(iy+*)
+fdcb$o6b	bit 5,(iy+*)
+fdcb$o6c	bit 5,(iy+*)
+fdcb$o6d	bit 5,(iy+*)
+fdcb$o6e	bit 5,(iy+*)
+fdcb$o6f	bit 5,(iy+*)
+fdcb$o70	bit 6,(iy+*)
+fdcb$o71	bit 6,(iy+*)
+fdcb$o72	bit 6,(iy+*)
+fdcb$o73	bit 6,(iy+*)
+fdcb$o74	bit 6,(iy+*)
+fdcb$o75	bit 6,(iy+*)
+fdcb$o76	bit 6,(iy+*)
+fdcb$o77	bit 6,(iy+*)
+fdcb$o78	bit 7,(iy+*)
+fdcb$o79	bit 7,(iy+*)
+fdcb$o7a	bit 7,(iy+*)
+fdcb$o7b	bit 7,(iy+*)
+fdcb$o7c	bit 7,(iy+*)
+fdcb$o7d	bit 7,(iy+*)
+fdcb$o7e	bit 7,(iy+*)
+fdcb$o7f	bit 7,(iy+*)
+fdcb$o80	res 0,(iy+*),b
+fdcb$o81	res 0,(iy+*),c
+fdcb$o82	res 0,(iy+*),d
+fdcb$o83	res 0,(iy+*),e
+fdcb$o84	res 0,(iy+*),h
+fdcb$o85	res 0,(iy+*),l
+fdcb$o86	res 0,(iy+*)
+fdcb$o87	res 0,(iy+*),a
+fdcb$o88	res 1,(iy+*),b
+fdcb$o89	res 1,(iy+*),c
+fdcb$o8a	res 1,(iy+*),d
+fdcb$o8b	res 1,(iy+*),e
+fdcb$o8c	res 1,(iy+*),h
+fdcb$o8d	res 1,(iy+*),l
+fdcb$o8e	res 1,(iy+*)
+fdcb$o8f	res 1,(iy+*),a
+fdcb$o90	res 2,(iy+*),b
+fdcb$o91	res 2,(iy+*),c
+fdcb$o92	res 2,(iy+*),d
+fdcb$o93	res 2,(iy+*),e
+fdcb$o94	res 2,(iy+*),h
+fdcb$o95	res 2,(iy+*),l
+fdcb$o96	res 2,(iy+*)
+fdcb$o97	res 2,(iy+*),a
+fdcb$o98	res 3,(iy+*),b
+fdcb$o99	res 3,(iy+*),c
+fdcb$o9a	res 3,(iy+*),d
+fdcb$o9b	res 3,(iy+*),e
+fdcb$o9c	res 3,(iy+*),h
+fdcb$o9d	res 3,(iy+*),l
+fdcb$o9e	res 3,(iy+*)
+fdcb$o9f	res 3,(iy+*),a
+fdcb$oa0	res 4,(iy+*),b
+fdcb$oa1	res 4,(iy+*),c
+fdcb$oa2	res 4,(iy+*),d
+fdcb$oa3	res 4,(iy+*),e
+fdcb$oa4	res 4,(iy+*),h
+fdcb$oa5	res 4,(iy+*),l
+fdcb$oa6	res 4,(iy+*)
+fdcb$oa7	res 4,(iy+*),a
+fdcb$oa8	res 5,(iy+*),b
+fdcb$oa9	res 5,(iy+*),c
+fdcb$oaa	res 5,(iy+*),d
+fdcb$oab	res 5,(iy+*),e
+fdcb$oac	res 5,(iy+*),h
+fdcb$oad	res 5,(iy+*),l
+fdcb$oae	res 5,(iy+*)
+fdcb$oaf	res 5,(iy+*),a
+fdcb$ob0	res 6,(iy+*),b
+fdcb$ob1	res 6,(iy+*),c
+fdcb$ob2	res 6,(iy+*),d
+fdcb$ob3	res 6,(iy+*),e
+fdcb$ob4	res 6,(iy+*),h
+fdcb$ob5	res 6,(iy+*),l
+fdcb$ob6	res 6,(iy+*)
+fdcb$ob7	res 6,(iy+*),a
+fdcb$ob8	res 7,(iy+*),b
+fdcb$ob9	res 7,(iy+*),c
+fdcb$oba	res 7,(iy+*),d
+fdcb$obb	res 7,(iy+*),e
+fdcb$obc	res 7,(iy+*),h
+fdcb$obd	res 7,(iy+*),l
+fdcb$obe	res 7,(iy+*)
+fdcb$obf	res 7,(iy+*),a
+fdcb$oc0	set 0,(iy+*),b
+fdcb$oc1	set 0,(iy+*),c
+fdcb$oc2	set 0,(iy+*),d
+fdcb$oc3	set 0,(iy+*),e
+fdcb$oc4	set 0,(iy+*),h
+fdcb$oc5	set 0,(iy+*),l
+fdcb$oc6	set 0,(iy+*)
+fdcb$oc7	set 0,(iy+*),a
+fdcb$oc8	set 1,(iy+*),b
+fdcb$oc9	set 1,(iy+*),c
+fdcb$oca	set 1,(iy+*),d
+fdcb$ocb	set 1,(iy+*),e
+fdcb$occ	set 1,(iy+*),h
+fdcb$ocd	set 1,(iy+*),l
+fdcb$oce	set 1,(iy+*)
+fdcb$ocf	set 1,(iy+*),a
+fdcb$od0	set 2,(iy+*),b
+fdcb$od1	set 2,(iy+*),c
+fdcb$od2	set 2,(iy+*),d
+fdcb$od3	set 2,(iy+*),e
+fdcb$od4	set 2,(iy+*),h
+fdcb$od5	set 2,(iy+*),l
+fdcb$od6	set 2,(iy+*)
+fdcb$od7	set 2,(iy+*),a
+fdcb$od8	set 3,(iy+*),b
+fdcb$od9	set 3,(iy+*),c
+fdcb$oda	set 3,(iy+*),d
+fdcb$odb	set 3,(iy+*),e
+fdcb$odc	set 3,(iy+*),h
+fdcb$ofd	set 3,(iy+*),l
+fdcb$ode	set 3,(iy+*)
+fdcb$odf	set 3,(iy+*),a
+fdcb$oe0	set 4,(iy+*),b
+fdcb$oe1	set 4,(iy+*),c
+fdcb$oe2	set 4,(iy+*),d
+fdcb$oe3	set 4,(iy+*),e
+fdcb$oe4	set 4,(iy+*),h
+fdcb$oe5	set 4,(iy+*),l
+fdcb$oe6	set 4,(iy+*)
+fdcb$oe7	set 4,(iy+*),a
+fdcb$oe8	set 5,(iy+*),b
+fdcb$oe9	set 5,(iy+*),c
+fdcb$oea	set 5,(iy+*),d
+fdcb$oeb	set 5,(iy+*),e
+fdcb$oec	set 5,(iy+*),h
+fdcb$oed	set 5,(iy+*),l
+fdcb$oee	set 5,(iy+*)
+fdcb$oef	set 5,(iy+*),a
+fdcb$of0	set 6,(iy+*),b
+fdcb$of1	set 6,(iy+*),c
+fdcb$of2	set 6,(iy+*),d
+fdcb$of3	set 6,(iy+*),e
+fdcb$of4	set 6,(iy+*),h
+fdcb$of5	set 6,(iy+*),l
+fdcb$of6	set 6,(iy+*)
+fdcb$of7	set 6,(iy+*),a
+fdcb$of8	set 7,(iy+*),b
+fdcb$of9	set 7,(iy+*),c
+fdcb$ofa	set 7,(iy+*),d
+fdcb$ofb	set 7,(iy+*),e
+fdcb$ofc	set 7,(iy+*),h
+fdcb$ofd	set 7,(iy+*),l
+fdcb$ofe	set 7,(iy+*)
+fdcb$off	set 7,(iy+*),a
