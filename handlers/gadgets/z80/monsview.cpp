@@ -87,7 +87,6 @@ void MonsView::update(Memory* memory, const Memory::Message& msg)
 
 void MonsView::setPointer(Memory::addr_t pc)
 {
-    return;	// TODO
     const auto& line = addr_to_table_line.find(pc);
     if (line == addr_to_table_line.end())
         return;

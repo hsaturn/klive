@@ -34,8 +34,8 @@ void Computer::timer()
 {
     if (cpu)
     {
-        for(int i=0; i<50; i++)
-            cpu->step();
+        cpu->step();
+        cpu->steps_to_rt();
     }
     return;
     static Memory::addr_t hl=16384+6144;

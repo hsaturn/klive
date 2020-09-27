@@ -1,10 +1,12 @@
 #pragma once
 #include "memory.h"
+#include <QElapsedTimer>
 
 namespace hw
 {
 
-using cycle=uint32_t;
+using cycle=uint64_t;
+
 
 // TODO move elsewhere
 class CpuClock
@@ -16,8 +18,19 @@ public:
 
     friend bool operator==(const CpuClock& c1, const CpuClock& c2)
     { return c1.curr == c2.curr; }
+
+    void setFrequency(uint32_t hertz) { freq_hz = hertz; }
+    auto getEllapsedNs() const { return timer.nsecsElapsed(); }
+    auto getFrequency() const { return freq_hz; }
+    auto getTimer() const { return timer; }
+    void restart() { timer.restart(); }
+
+    cycle cycles() const { return curr; }
+
 private:
     cycle curr;
+    uint32_t freq_hz;
+    QElapsedTimer timer;
 };
 
 class Cpu
@@ -27,7 +40,11 @@ public:
     {}
 
     virtual void step()=0;
+    virtual void step_no_obs()=0;
+
     virtual void reset()=0;
+
+    bool steps_to_rt(uint32_t max_steps=20000);
 
     void burn(cycle n) { clock.burn(n); }
     const Memory* getMemory() const { return memory; }
@@ -36,4 +53,6 @@ protected:
     Memory* memory;
     CpuClock clock;
 };
+
+
 }

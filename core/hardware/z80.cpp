@@ -24,6 +24,9 @@ void Z80::reset()
     di();
     i=0;
     r=0;
+
+    clock.setFrequency(3750000);
+    clock.restart();
 }
 
 void Z80::nop(byte opcode, const char* prefix)
@@ -41,7 +44,11 @@ void Z80::step()
         static Message stepMsg;
         notify(stepMsg);
     }
+    step_no_obs();
+}
 
+void Z80::step_no_obs()
+{
     CpuClock before(clock);
 
     byte opcode = getByte();

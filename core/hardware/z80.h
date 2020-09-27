@@ -93,8 +93,12 @@ public:
 public:
     Z80(Memory* memory);
 
-    virtual void step() override;
-    virtual void reset() override;
+    void step() override;
+    void step_no_obs() override;
+    void reset() override;
+
+    // Run steps until the 'real-time' is reached
+    void steps_to_rt(uint32_t max_steps=1e6);
     void irq_mode(int mode){}
     void di() {};
     registers& regs() { return R; }
@@ -174,6 +178,7 @@ private:
     reg8&	l;
     reg8&    i;
     reg8&    r;
+
 };
 
 }
