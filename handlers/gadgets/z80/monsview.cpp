@@ -4,11 +4,13 @@
 #include <iostream>
 #include <iomanip>
 
+#include <QFontDatabase>
 #include <QFile>
 #include <QTextStream>
 #include <QString>
 #include <QStringList>
 #include <QHeaderView>
+#include <QFontDialog>
 
 using namespace std;
 
@@ -16,6 +18,18 @@ MonsView::MonsView(QWidget *parent) :
     QTableView(parent),
     memory(nullptr)
 {
+    bool ok;
+
+    // TODO part of this should be user configuration
+    QFont fixedFont = QFontDatabase::systemFont(QFontDatabase::FixedFont);
+    fixedFont = QFontDialog::getFont(&ok, fixedFont, this);
+    // fixedFont.setPointSize(9);
+    setShowGrid(false);
+    setFont(fixedFont);
+    verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
+    verticalHeader()->setDefaultSectionSize(12);
+    horizontalHeader()->setStretchLastSection(true);
+    // horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
     show();
     setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -27,7 +41,7 @@ MonsView::~MonsView()
     setMemory(nullptr);
 }
 
-void MonsView::observableDies(const Memory *sender)
+void MonsView::observableDies(const Memory *)
 {
     memory = nullptr;
 }
@@ -77,6 +91,9 @@ void MonsView::setMemory(Memory *new_memory)
         // cout << hex << setw(4) << pc << (dec) << mons.decode(memory, pc) << endl;
         line++;
     }
+    // Ne fonctionne pas (ou mal)
+    // resizeColumnsToContents();
+    resizeRowsToContents();
 }
 
 void MonsView::update(Memory* memory, const Memory::Message& msg)

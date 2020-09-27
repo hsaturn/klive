@@ -56,7 +56,7 @@ Mons::Mons()
     if (opcodes.size()==0)
     {
         cout << "Opcode : " <<
-            MapReader::ReadTabFile(":/z80.txt", opcodes, formatKeyValue)
+            MapReader::ReadTabFile(":/mons/z80.txt", opcodes, formatKeyValue)
             << ", count=" << opcodes.size() << endl;
 
         loadStaticLabels();
