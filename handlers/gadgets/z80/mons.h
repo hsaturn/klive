@@ -10,10 +10,23 @@ using hw::Memory;
 class Mons
 {
 public:
+    using Labels = std::map<Memory::addr_t, std::string>;
+    using Opcodes = std::map<string,string>;
+    struct Row
+    {
+        string label;
+        string mnemo;
+    };
+
     Mons();
 
-    string decode(const Memory* memory, Memory::addr_t& addr);
+    string getLabel(const Memory::addr_t) const;
+    string getOrCreateLabel(const Memory::addr_t);
+    Row decode(const Memory* memory, Memory::addr_t& addr);
 
 private:
-   std::map<std::string, std::string> opcodes;
+    void loadStaticLabels();
+   static Opcodes opcodes;
+   static Labels rom_labels;
+   Labels dyn_labels;
 };

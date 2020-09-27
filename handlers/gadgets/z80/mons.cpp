@@ -4,12 +4,16 @@
 #include <stdio.h>
 #include <string>
 #include <iostream>
+#include <iomanip>
 #include <algorithm>
 
 #include <QFile>
 #include <QTextSTream>
 
 using namespace std;
+
+Mons::Labels Mons::rom_labels;
+Mons::Opcodes Mons::opcodes;
 
 static void formatKeyValue(long line, string& key, string& value)
 {
@@ -46,9 +50,18 @@ static void formatKeyValue(long line, string& key, string& value)
 
 Mons::Mons()
 {
-    cout << "Opcode : " <<
-        MapReader::ReadTabFile(":/z80.txt", opcodes, formatKeyValue)
-        << endl;
+    if (opcodes.size()==0)
+    {
+        cout << "Opcode : " <<
+            MapReader::ReadTabFile(":/z80.txt", opcodes, formatKeyValue)
+            << endl;
+        loadStaticLabels();
+    }
+}
+
+void Mons::loadStaticLabels()
+{
+    rom_labels[0x11CB]="START_NEW";
 }
 
 static string peek(const Memory* memory, Memory::addr_t& addr)
@@ -62,8 +75,35 @@ static string peek(const Memory* memory, Memory::addr_t& addr)
     return hexa;
 }
 
-string Mons::decode(const Memory* memory, Memory::addr_t& addr)
+string Mons::getLabel(const Memory::addr_t addr) const
 {
+    const auto& it = rom_labels.find(addr);
+    if (it != rom_labels.end())
+        return it->second;
+
+    const auto& it2 = dyn_labels.find(addr);
+    if (it2 != dyn_labels.end())
+        return it2->second;
+
+    return "";
+}
+
+string Mons::getOrCreateLabel(const Memory::addr_t addr)
+{
+    string label = getLabel(addr);
+    if (label.length())
+        return label;
+
+    stringstream lbl;
+    lbl << "L_" << setw(4) << hex << uppercase << addr;
+    dyn_labels[addr]=lbl.str();
+    return lbl.str();
+}
+
+Mons::Row Mons::decode(const Memory* memory, Memory::addr_t& addr)
+{
+    Row row;
+    row.label = getLabel(addr);
     string hexa = peek(memory, addr);
     const auto& it = opcodes.find(hexa);
     if (it != opcodes.end())
@@ -71,7 +111,10 @@ string Mons::decode(const Memory* memory, Memory::addr_t& addr)
         string sasm=it->second;
         auto post=sasm.find('\t');
         if (post == string::npos)
-            return sasm;
+        {
+            row.mnemo=sasm;
+            return row;
+        }
         else if (sasm[0] !='$')
         {
             cerr << "Mons: Error in z80.txt (" << hexa << ',' << sasm << ')' << endl;
@@ -90,14 +133,20 @@ string Mons::decode(const Memory* memory, Memory::addr_t& addr)
                     value=static_cast<int8_t>(memory->peek(addr++));
                     break;
                 case 'J':
-                    value=pc+static_cast<int8_t>(memory->peek(addr++));
+                    value=static_cast<int8_t>(memory->peek(addr++));
+                    value += addr;
+                    getOrCreateLabel(value);
+                    break;
                 case 'A':
+                    value=memory->peek(addr++)+(memory->peek(addr++)<<8);
+                    getOrCreateLabel(value);
+                    break;
                 case 'W':
                     value=memory->peek(addr++)+(memory->peek(addr++)<<8);
                     break;
                 default:
                     cerr << "Mons error: " << hexa << "Unable to decode " << it->second << " ($" << decode[1] << ")" << endl;
-                    return "??";
+                    row.mnemo="??";
                     break;
             }
             decode.erase(0,2);
@@ -105,12 +154,15 @@ string Mons::decode(const Memory* memory, Memory::addr_t& addr)
             if (poss==string::npos)
             {
                 cerr << "Mons error: cannot bind value " << decode[1] << " in (" << sasm << ")" << endl;
-                return "?? "+sasm;
+                row.mnemo = "?? "+sasm;
+                return row;
             }
             while(sasm[poss+1]=='*') sasm.erase(poss,1);
             sasm=sasm.substr(0,poss)+std::to_string(value)+sasm.substr(poss+1);
         }
-        return sasm;
+        row.mnemo = sasm;
+        return row;
     }
-    return "??";
+    row.mnemo = "??";
+    return row;
 }

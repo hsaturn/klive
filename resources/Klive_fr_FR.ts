@@ -338,7 +338,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../handlers/gadgets/z80/monsview.cpp" line="21"/>
+        <location filename="../handlers/gadgets/z80/monsview.cpp" line="24"/>
         <source>Frozen Column Example</source>
         <translation type="unfinished"></translation>
     </message>

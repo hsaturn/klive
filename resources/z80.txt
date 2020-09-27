@@ -241,7 +241,6 @@ e9	jp (hl)
 ea$a	jp pe,**
 eb	ex de,hl
 ec$a	call pe,**
-ed	-EXTD
 ee$v	xor *
 ef	rst 28h
 f0	ret p

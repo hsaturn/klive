@@ -1,5 +1,6 @@
 #include "monsview.h"
 #include <sstream>
+#include <sstream>
 #include <iostream>
 #include <iomanip>
 
@@ -16,7 +17,7 @@ MonsView::MonsView(QWidget *parent) :
 {
     model=new QStandardItemModel();
 
-    QStringList list = QString("ADDR,MNEMO").simplified().split(',');
+    QStringList list = QString("ADDR,LABEL,MNEMO").simplified().split(',');
     model->setHorizontalHeaderLabels(list);
 
     setModel(model);
@@ -54,15 +55,16 @@ void MonsView::setPointer(Memory::addr_t pc)
 
     for(int i=0; i<10; i++)
     {
+        Mons::Row row = mons.decode(memory, pc);
         stringstream h;
         h << hex << showbase << uppercase << setw(4) << pc;
 
         newItem = new QStandardItem(h.str().c_str());
         model->setItem(i, 0, newItem);
-        newItem = new QStandardItem(mons.decode(memory, pc).c_str());
+        newItem = new QStandardItem(row.label.c_str());
         model->setItem(i, 1, newItem);
+        newItem = new QStandardItem(row.mnemo.c_str());
+        model->setItem(i, 2, newItem);
         // cout << hex << setw(4) << pc << (dec) << mons.decode(memory, pc) << endl;
     }
 }
-
-// void SpectrumScreen::resizeEvent(QResizeEvent *event)
