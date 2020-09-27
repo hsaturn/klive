@@ -14,6 +14,7 @@ public:
     using Opcodes = std::map<string,string>;
     struct Row
     {
+        string hexa;
         string label;
         string mnemo;
     };
@@ -25,8 +26,9 @@ public:
     Row decode(const Memory* memory, Memory::addr_t& addr);
 
 private:
+    static void formatKeyValue(long line, string& key, string& value);
     void loadStaticLabels();
-   static Opcodes opcodes;
-   static Labels rom_labels;
-   Labels dyn_labels;
+    static Opcodes opcodes;
+    static Labels rom_labels;
+    Labels dyn_labels;
 };

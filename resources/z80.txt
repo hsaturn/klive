@@ -256,7 +256,6 @@ f9	ld sp,hl
 fa$a	jp m,**
 fb	ei
 fc$a	call m,**
-fd	-IY
 fe$v	cp *
 ff	rst 38h
 
@@ -1024,6 +1023,117 @@ ddcb$ofc	set 7,(ix+*),h
 ddcb$ofd	set 7,(ix+*),l
 ddcb$ofe	set 7,(ix+*)
 ddcb$off	set 7,(ix+*),a
+
+fd09 	add iy,bc
+
+fd19	add iy,de
+
+fd21$v	ld iy,**
+fd22$a	ld (**),iy
+fd23	inc iy
+fd24	inc iyh
+fd25	dec iyh
+fd26$v	ld iyh,*
+
+fd29	add iy,iy
+fd2a$a	ld iy,(**)
+fd2b	dec iy
+fd2c	inc iyl
+fd2d	dec iyl
+fd2e$v	ld iyl,*
+
+fd34$o	inc (iy+*)
+fd35$o	dec (iy+*)
+fd36$o	ld (iy+*),*
+
+fd39	add iy,sp
+
+fd44	ld b,iyh
+fd45	ld b,iyl
+fd46$o	ld b,(iy+*)
+
+fd4c	ld c,iyh
+fd4d	ld c,iyl
+fd4e$o	ld c,(iy+*)
+
+fd54	ld d,iyh
+fd55	ld d,iyl
+fd56$o	ld d,(iy+*)
+
+fd5c	ld e,iyh
+fd5d	ld e,iyl
+fd5e$o	ld e,(iy+*)
+
+fd60	ld iyh,b
+fd61	ld iyh,c
+fd62	ld iyh,d
+fd63	ld iyh,e
+fd64	ld iyh,iyh
+fd65	ld iyh,iyl
+fd66$o	ld h,(iy+*)
+fd67	ld iyh,a
+fd68	ld iyl,b
+fd69	ld iyl,c
+fd6a	ld iyl,d
+fd6b	ld iyl,e
+fd6c	ld iyl,iyh
+fd6d	ld iyl,iyl
+fd6e$o	ld l,(iy+*)
+fd6f	ld iyl,a
+fd70$o	ld (iy+*),b
+fd71$o	ld (iy+*),c
+fd72$o	ld (iy+*),d
+fd73$o	ld (iy+*),e
+fd74$o	ld (iy+*),h
+fd75$o	ld (iy+*),l
+
+fd77$o	ld (iy+*),a
+
+fd7c	ld a,iyh
+fd7d	ld a,iyl
+fd7e$o	ld a,(iy+*)
+
+fd84	add a,iyh
+fd85	add a,iyl
+fd86$o	add a,(iy+*)
+
+fd8c	adc a,iyh
+fd8d	adc a,iyl
+fd8e$o	adc a,(iy+*)
+
+fd94	sub iyh
+fd95	sub iyl
+fd96$o	sub (iy+*)
+
+fd9c	sbc a,iyh
+fd9d	sbc a,iyl
+fd9e$o	sbc a,(iy+*)
+
+fda4	and iyh
+fda5	and iyl
+fda6$o	and (iy+*)
+
+fdac	xor iyh
+fdad	xor iyl
+fdae$o	xor (iy+*)
+
+fdb4	or iyh
+fdb5	or iyl
+fdb6$o	or (iy+*)
+
+fdbc	cp iyh
+fdbd	cp iyl
+fdbe$o	cp (iy+*)
+
+fde1	pop iy
+
+fde3	ex (sp),iy
+
+fde5	push iy
+
+fde9	jp (iy)
+
+fdf9	ld sp,iy
 
 // $o : relative offset
 fdcb$o00	rlc (iy+*),b

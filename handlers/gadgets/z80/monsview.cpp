@@ -8,6 +8,7 @@
 #include <QTextStream>
 #include <QString>
 #include <QStringList>
+#include <QHeaderView>
 
 using namespace std;
 
@@ -23,6 +24,8 @@ MonsView::MonsView(QWidget *parent) :
     setModel(model);
     setWindowTitle(QObject::tr("Frozen Column Example"));
     show();
+    setSelectionBehavior(QAbstractItemView::SelectRows);
+    verticalHeader()->hide();
 }
 
 MonsView::~MonsView()
@@ -38,10 +41,44 @@ void MonsView::observableDies(const Memory *sender)
 void MonsView::setMemory(Memory *new_memory)
 {
     if (memory) memory->detach(this);
-
     memory = new_memory;
+    if (memory==nullptr) return;
 
-    if (memory) memory->attach(this);
+    memory->attach(this);
+
+    addr_to_table_line.clear();
+    model->clear();
+    QStandardItem *newItem;
+
+    Memory::addr_t pc=0;
+
+    // Pass 1 : compute labels
+// pc=0x55;	// TODO for debug
+    while(pc<16384)
+    {
+        mons.decode(memory, pc);
+    }
+    pc=0;
+
+    // Pass 2 : populate list
+    long line=1;
+    while(pc<16384)
+    {
+        stringstream h;
+        h << hex << showbase << uppercase << setw(4) << pc;
+
+        addr_to_table_line[pc] = line;
+        Mons::Row row = mons.decode(memory, pc);
+
+        newItem = new QStandardItem(h.str().c_str());
+        model->setItem(line, 0, newItem);
+        newItem = new QStandardItem(row.label.c_str());
+        model->setItem(line, 1, newItem);
+        newItem = new QStandardItem(row.mnemo.c_str());
+        model->setItem(line, 2, newItem);
+        // cout << hex << setw(4) << pc << (dec) << mons.decode(memory, pc) << endl;
+        line++;
+    }
 }
 
 void MonsView::update(Memory* memory, const Memory::Message& msg)
@@ -50,6 +87,17 @@ void MonsView::update(Memory* memory, const Memory::Message& msg)
 
 void MonsView::setPointer(Memory::addr_t pc)
 {
+    return;	// TODO
+    const auto& line = addr_to_table_line.find(pc);
+    if (line == addr_to_table_line.end())
+        return;
+    else
+    {
+        const QModelIndex& index=model->index(line->second, 0);
+        setCurrentIndex(index);
+       // scrollTo(index);
+    }
+    return;
     QStandardItem *newItem;
     if (memory==nullptr) return;
 
