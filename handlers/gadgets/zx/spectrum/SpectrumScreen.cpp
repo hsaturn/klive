@@ -17,14 +17,6 @@ SpectrumScreen::SpectrumScreen(QWidget *parent)
     : QWidget(parent)
 {
     setAttribute(Qt::WA_StaticContents);
-    /* QTimer *timer = new QTimer(this);
-    connect(timer, &QTimer::timeout, this, QOverload<>::of(&QWidget::update));
-    timer->start(10);  // Update interval ms
-    */
-    // TODO should be setTitle, and setTitle should call all what is
-    // needed to change the title everywhere
-    // setWindowTitle(tr("ZX SpectrumScreen"));
-
 }
 
 void SpectrumScreen::setMemory(hw::Memory *new_memory)
@@ -138,6 +130,7 @@ void SpectrumScreen::paintEvent(QPaintEvent *event)
 {
     QPainter painter(this);
     const QRect rect = event->rect();
+    painter.scale(2,2);
     painter.drawImage(rect.topLeft(), image, rect);
 }
 
