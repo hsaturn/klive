@@ -1,6 +1,5 @@
 #include <QtWidgets>
 #include "mainwindow.h"
-#include "./ui_mainwindow.h"
 
 #if defined(QT_PRINTSUPPORT_LIB)
 #include <QtPrintSupport/qtprintsupportglobal.h>
@@ -21,7 +20,6 @@ using ads::CDockWidget;
 
 MainWindow::MainWindow() : QMainWindow()
 {
-   // ui->setupUi(this);
     ads::CDockManager::setConfigFlag(ads::CDockManager::OpaqueSplitterResize, true);
     ads::CDockManager::setConfigFlag(ads::CDockManager::XmlCompressionEnabled, false);
     ads::CDockManager::setConfigFlag(ads::CDockManager::FocusHighlighting, true);
