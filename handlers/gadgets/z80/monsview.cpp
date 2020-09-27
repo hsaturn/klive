@@ -16,13 +16,7 @@ MonsView::MonsView(QWidget *parent) :
     QTableView(parent),
     memory(nullptr)
 {
-    model=new QStandardItemModel();
 
-    QStringList list = QString("ADDR,LABEL,MNEMO").simplified().split(',');
-    model->setHorizontalHeaderLabels(list);
-
-    setModel(model);
-    setWindowTitle(QObject::tr("Frozen Column Example"));
     show();
     setSelectionBehavior(QAbstractItemView::SelectRows);
     verticalHeader()->hide();
@@ -47,7 +41,11 @@ void MonsView::setMemory(Memory *new_memory)
     memory->attach(this);
 
     addr_to_table_line.clear();
-    model->clear();
+
+    model=new QStandardItemModel();
+    QStringList list = QString("ADDR,LABEL,MNEMO").simplified().split(',');
+    model->setHorizontalHeaderLabels(list);
+    setModel(model);
     QStandardItem *newItem;
 
     Memory::addr_t pc=0;

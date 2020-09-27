@@ -1,5 +1,4 @@
-#ifndef MEMORYVIEWER_H
-#define MEMORYVIEWER_H
+#pragma once
 
 #include <QAbstractScrollArea>
 #include <QBuffer>
@@ -46,4 +45,3 @@ private:
   QByteArray dataHex;
 };
 
-#endif // MEMORYVIEWER_H

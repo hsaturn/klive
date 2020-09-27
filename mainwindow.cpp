@@ -19,9 +19,7 @@
 
 using ads::CDockWidget;
 
-MainWindow::MainWindow()
-    : QMainWindow()
-   // , ui(new Ui::MainWindow)
+MainWindow::MainWindow() : QMainWindow()
 {
    // ui->setupUi(this);
     ads::CDockManager::setConfigFlag(ads::CDockManager::OpaqueSplitterResize, true);
@@ -37,14 +35,6 @@ MainWindow::MainWindow()
     CentralDockArea = DockManager->setCentralWidget(CentralDockWidget);
     CentralDockArea->setAllowedAreas(ads::DockWidgetArea::OuterDockAreas);
 
-    //ui->setupUi(this);
-    // mdiArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-    // mdiArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-    // setCentralWidget(mdiArea);
-    /*
-    connect(mdiArea, &QMdiArea::subWindowActivated,
-            this, &MainWindow::updateMenus);
-    */
     createActions();
     createStatusBar();
    // createDockWindows();
@@ -60,7 +50,6 @@ MainWindow::MainWindow()
 
 MainWindow::~MainWindow()
 {
-    // delete ui;
 }
 
 void MainWindow::print()
@@ -77,66 +66,6 @@ void MainWindow::print()
     document->print(&printer);
     statusBar()->showMessage(tr("Ready"), 2000);
 #endif
-}
-
-void MainWindow::save()
-{
-    /*
-    QMimeDatabase mimeDatabase;
-    QString fileName = QFileDialog::getSaveFileName(this,
-                        tr("Choose a file name"), ".",
-                        mimeDatabase.mimeTypeForName("text/html").filterString());
-    if (fileName.isEmpty())
-        return;
-    QFile file(fileName);
-    if (!file.open(QFile::WriteOnly | QFile::Text)) {
-        QMessageBox::warning(this, tr("Dock Widgets"),
-                             tr("Cannot write file %1:\n%2.")
-                             .arg(QDir::toNativeSeparators(fileName), file.errorString()));
-        return;
-    }
-
-    QTextStream out(&file);
-    QGuiApplication::setOverrideCursor(Qt::WaitCursor);
-    out << textEdit->toHtml();
-    QGuiApplication::restoreOverrideCursor();
-
-    statusBar()->showMessage(tr("Saved '%1'").arg(fileName), 2000);
-    */
-}
-
-void MainWindow::undo()
-{
-    /*
-    QTextDocument *document = textEdit->document();
-    document->undo();
-    */
-}
-
-void MainWindow::insertCustomer(const QString &customer)
-{
-    /*
-    if (customer.isEmpty())
-        return;
-    QStringList customerList = customer.split(", ");
-    QTextDocument *document = textEdit->document();
-    QTextCursor cursor = document->find("NAME");
-    if (!cursor.isNull()) {
-        cursor.beginEditBlock();
-        cursor.insertText(customerList.at(0));
-        QTextCursor oldcursor = cursor;
-        cursor = document->find("ADDRESS");
-        if (!cursor.isNull()) {
-            for (int i = 1; i < customerList.size(); ++i) {
-                cursor.insertBlock();
-                cursor.insertText(customerList.at(i));
-            }
-            cursor.endEditBlock();
-        }
-        else
-            oldcursor.endEditBlock();
-    }
-    */
 }
 
 void MainWindow::closeMdi()
@@ -228,8 +157,8 @@ void MainWindow::createActions()
     saveAct->setIcon(saveIcon);
     saveAct->setShortcuts(QKeySequence::Save);
     saveAct->setStatusTip(tr("Save the current form letter"));
-    connect(saveAct, &QAction::triggered, this, &MainWindow::save);
-    fileToolBar->addAction(saveAct);
+    // connect(saveAct, &QAction::triggered, this, &MainWindow::save);
+    // fileToolBar->addAction(saveAct);
 
     const QIcon printIcon = QIcon::fromTheme("document-print", QIcon(":/images/print.png"));
     QAction *printAct = addMenuEntry("&File", "&Print...");
@@ -254,8 +183,8 @@ void MainWindow::createActions()
     undoAct->setIcon(undoIcon);
     undoAct->setShortcuts(QKeySequence::Undo);
     undoAct->setStatusTip(tr("Undo the last editing action"));
-    connect(undoAct, &QAction::triggered, this, &MainWindow::undo);
-    editToolBar->addAction(undoAct);
+    // connect(undoAct, &QAction::triggered, this, &MainWindow::undo);
+    // editToolBar->addAction(undoAct);
 
     addMenuEntry("&View");
     // TODO could be nullptr
@@ -293,75 +222,6 @@ void MainWindow::restoreLayout()
 void MainWindow::createStatusBar()
 {
     statusBar()->showMessage(tr("Ready"));
-}
-
-//! [9]
-void MainWindow::createDockWindows()
-{
-    {
-        ads::CDockWidget *dock = new ads::CDockWidget(tr("Customers"), this);
-
-        dock->setMinimumSizeHintMode(ads::CDockWidget::MinimumSizeHintFromDockWidget);
-        dock->resize(250, 250);
-        dock->setMinimumSize(200,150);
-        customerList = new QListWidget(dock);
-        customerList->addItems(QStringList()
-                << "John Doe, Harmony Enterprises, 12 Lakeside, Ambleton"
-                << "Jane Doe, Memorabilia, 23 Watersedge, Beaton"
-                << "Tammy Shea, Tiblanka, 38 Sea Views, Carlton"
-                << "Tim Sheen, Caraba Gifts, 48 Ocean Way, Deal"
-                << "Sol Harvey, Chicos Coffee, 53 New Springs, Eccleston"
-                << "Sally Hobart, Tiroli Tea, 67 Long River, Fedula");
-        dock->setWidget(customerList);
-        viewMenu->addAction(dock->toggleViewAction());
-    }
-
-
-    auto dock = new QDockWidget(tr("Paragraphs"), this);
-    paragraphsList = new QListWidget(dock);
-    paragraphsList->addItems(QStringList()
-            << "Thank you for your payment which we have received today."
-            << "Your order has been dispatched and should be with you "
-               "within 28 days."
-            << "We have dispatched those items that were in stock. The "
-               "rest of your order will be dispatched once all the "
-               "remaining items have arrived at our warehouse. No "
-               "additional shipping charges will be made."
-            << "You made a small overpayment (less than $5) which we "
-               "will keep on account for you, or return at your request."
-            << "You made a small underpayment (less than $1), but we have "
-               "sent your order anyway. We'll add this underpayment to "
-               "your next bill."
-            << "Unfortunately you did not send enough money. Please remit "
-               "an additional $. Your order will be dispatched as soon as "
-               "the complete amount has been received."
-            << "You made an overpayment (more than $5). Do you wish to "
-               "buy more items, or should we return the excess to you?");
-
-    dock->setWidget(paragraphsList);
-    addDockWidget(Qt::RightDockWidgetArea, dock);
-    viewMenu->addAction(dock->toggleViewAction());
-
-    connect(customerList, &QListWidget::currentTextChanged,
-            this, &MainWindow::insertCustomer);
-
-    dock = new QDockWidget(tr("ASM"), this);
-    paragraphsList = new QListWidget(dock);
-    paragraphsList->addItems(QStringList()
-            << "LD A, (HL)"
-            << "DJNZ #label"
-    );
-
-    dock->setWidget(paragraphsList);
-    addDockWidget(Qt::RightDockWidgetArea, dock);
-    viewMenu->addAction(dock->toggleViewAction());
-/*
-    dock = new QDockWidget(tr("Clock"), this);
-    Clock* clock = new Clock();
-    dock->setWidget(clock);
-    addDockWidget(Qt::RightDockWidgetArea, dock);
-    viewMenu->addAction(dock->toggleViewAction());
-    */
 }
 
 void MainWindow::createDockWindow(Handler* handler, QWidget* widget, const std::string title)

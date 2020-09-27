@@ -34,6 +34,7 @@ void Z80::nop(byte opcode, const char* prefix)
     const char c=0;
     if (prefix==nullptr) prefix=&c;
     printf("Z80 %04x: %s%02x Unknown opcode\n", pc-1, prefix, opcode);
+    burn(4);	// Dummy
     cout << std::flush;
 }
 
@@ -485,13 +486,13 @@ uint8_t Z80::rlc(uint8_t val)
     return val;
 }
 
-uint8_t Z80::rrc(uint8_t) { nop(0, "rrc"); }
-uint8_t Z80::rl(uint8_t) { nop(0, "rl"); }
-uint8_t Z80::rr(uint8_t) { nop(0, "rr"); }
-uint8_t Z80::sla(uint8_t) { nop(0, "sla"); }
-uint8_t Z80::sra(uint8_t) { nop(0, "sra"); }
-uint8_t Z80::sll(uint8_t) { nop(0, "sll"); }
-uint8_t Z80::srl(uint8_t) { nop(0, "srl"); }
+uint8_t Z80::rrc(uint8_t) { nop(0, "rrc");  return 0; }
+uint8_t Z80::rl(uint8_t) { nop(0, "rl");  return 0; }
+uint8_t Z80::rr(uint8_t) { nop(0, "rr");  return 0; }
+uint8_t Z80::sla(uint8_t) { nop(0, "sla");  return 0; }
+uint8_t Z80::sra(uint8_t) { nop(0, "sra");  return 0; }
+uint8_t Z80::sll(uint8_t) { nop(0, "sll");  return 0; }
+uint8_t Z80::srl(uint8_t) { nop(0, "srl");  return 0; }
 
 void Z80::out(uint8_t port, uint8_t val)
 {

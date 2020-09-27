@@ -47,17 +47,12 @@
 ** $QT_END_LICENSE$
 **
 ****************************************************************************/
-
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#pragma once
 
 #include <QMainWindow>
-#include <QMdiArea>
-#include <QAction>
 #include <DockManager.h>
 
 QT_BEGIN_NAMESPACE
-namespace Ui { class MainWindow; }
 class QAction;
 class QListWidget;
 class QMenu;
@@ -81,19 +76,14 @@ public:
 private slots:
     void saveLayout();
     void restoreLayout();
-    void save();
     void print();
-    void undo();
     void about();
-    void insertCustomer(const QString &customer);
     void closeMdi();
 
 private:
     void createActions();
     void createStatusBar();
-    void createDockWindows();
 
-    // QTextEdit *textEdit;
     QListWidget *customerList;
     QListWidget *paragraphsList;
 
@@ -106,7 +96,4 @@ private:
 
     // TODO unused yet
     ads::CDockWidget* TimelineDockWidget;
-    // Ui::MainWindow ui;
 };
-
-#endif
