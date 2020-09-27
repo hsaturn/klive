@@ -4,6 +4,8 @@
 #include <cstring>
 #include <iomanip>
 #include <stdio.h>
+#include <QTextStream>
+#include <QFile>
 
 using namespace std;
 
@@ -53,12 +55,13 @@ void Memory::fill(addr_t start, Byte::value_type value, size_t size, type_t type
 void Memory::loadRomImage(string f, Memory::addr_t start, bool dump)
 {
     long bytesRead=0;
-    ifstream rom(f.c_str(), ios::in | ios::binary);
-    if (rom)
+    QFile rom(f.c_str());
+    // ifstream rom(f.c_str(), ios::in | ios::binary);
+    if (rom.open(QFile::ReadOnly))
     {
         int count=0;
         char c;
-        while(rom)
+        while(!rom.atEnd())
         {
             rom.read(&c, 1);
             poke(start, c);	// TODO rom & rdonly attributes !

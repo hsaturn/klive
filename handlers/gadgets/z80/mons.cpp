@@ -9,7 +9,6 @@
 #include <queue>
 
 #include <QFile>
-#include <QTextSTream>
 
 using namespace std;
 

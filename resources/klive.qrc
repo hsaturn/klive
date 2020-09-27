@@ -4,7 +4,7 @@
         <file>images/print.png</file>
         <file>images/save.png</file>
         <file>images/undo.png</file>
-        <file>mons/labels.txt</file>
         <file>mons/z80.txt</file>
+        <file>roms/48.rom</file>
     </qresource>
 </RCC>

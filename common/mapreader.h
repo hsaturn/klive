@@ -1,7 +1,7 @@
 #pragma once
 
 #include <QFile>
-#include <QTextSTream>
+#include <QTextStream>
 
 #include <string>
 #include <map>
@@ -19,7 +19,6 @@ public:
     {
         size_t inserted=0;
         size_t line_nr=0;
-        Q_INIT_RESOURCE(klive);
 
         QFile file(filename .c_str());
         if (file.open(QFile::ReadOnly))

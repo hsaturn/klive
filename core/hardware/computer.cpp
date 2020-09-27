@@ -17,8 +17,8 @@ Computer::Computer() : QWidget(nullptr)
 
     memory = new Memory(64*1024);
 
-    // TODO  archi
-    memory->loadRomImage("C:\\Users\\hsaturn\\Google Drive\\Spectrum\\Klive\\48.ROM", 0);
+    // TODO  archi, rom selection etc.
+    memory->loadRomImage(":/roms/48.rom", 0);
     cpu = new Z80(memory);
 }
 
