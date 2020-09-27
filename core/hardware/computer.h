@@ -26,6 +26,7 @@ public:
     Memory* memory;
     Screen* screen;
     Keyboard* keyboard;
+    QWidget* registers_form;
     std::list<Peripheral*> peripherals;
 };
 

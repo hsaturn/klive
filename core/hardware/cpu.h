@@ -1,6 +1,7 @@
 #pragma once
 #include "memory.h"
 #include <QElapsedTimer>
+#include <QWidget>
 
 namespace hw
 {
@@ -36,17 +37,25 @@ private:
 class Cpu
 {
 public:
+    struct Registers
+    {
+        Registers() = default;
+        virtual ~Registers() = default;
+        virtual void fillViewForm(QWidget*) = 0;
+        virtual QWidget* createViewForm(QWidget* parent) = 0;
+    };
+
     Cpu(Memory* memory) : memory(memory)
     {}
 
     virtual void step()=0;
     virtual void step_no_obs()=0;
-
     virtual void reset()=0;
-
     bool steps_to_rt(uint32_t max_steps=20000);
 
     void burn(cycle n) { clock.burn(n); }
+
+    virtual Registers* regs() = 0;
     const Memory* getMemory() const { return memory; }
 
 protected:

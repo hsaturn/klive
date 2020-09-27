@@ -125,6 +125,14 @@
     </message>
 </context>
 <context>
+    <name>Form</name>
+    <message>
+        <location filename="../handlers/gadgets/z80/z80_registers.ui" line="16"/>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>Gens</name>
     <message>
         <location filename="../handlers/gadgets/z80/gens.ui" line="16"/>

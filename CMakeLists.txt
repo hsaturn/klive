@@ -40,6 +40,8 @@ add_executable(Klive
     core/hardware/cpu.h
     core/hardware/z80.cpp
     core/hardware/z80.h
+    core/hardware/z80registers.h
+    core/hardware/z80registers.cpp
     core/hardware/ioports.h
 
     handlers/project/projecthandler.cpp

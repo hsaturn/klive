@@ -20,6 +20,9 @@ Computer::Computer() : QWidget(nullptr)
     // TODO  archi
     memory->loadRomImage("C:\\Users\\hsaturn\\Google Drive\\Spectrum\\Klive\\48.ROM", 0);
     cpu = new Z80(memory);
+
+    registers_form = cpu->regs()->createViewForm(this);
+    registers_form->show();
 }
 
 Computer::~Computer()
@@ -32,7 +35,7 @@ void Computer::timer()
     if (cpu)
     {
         cpu->step();
-        cpu->steps_to_rt();
+        // cpu->steps_to_rt();
     }
 }
 

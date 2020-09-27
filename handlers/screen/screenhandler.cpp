@@ -54,5 +54,7 @@ void ScreenHandler::initialize(MainWindow *main)
 
 void ScreenHandler::update(Z80* z80, const Z80::Message& msg)
 {
-    if (monsView) monsView->setPointer(z80->regs().pc);
+    // TODO
+    auto regs = dynamic_cast<Z80Registers*>(z80->regs());
+    if (monsView) monsView->setPointer(regs->pc);
 }
