@@ -1,3 +1,3 @@
-[submodule "ext/AdvancedDocking"]
-	path = ext/AdvancedDocking
+[submodule "ext/Qt-Advanced-Docking-System"]
+	path = ext/Qt-Advanced-Docking-System
 	url = https://github.com/githubuser0xFFFF/Qt-Advanced-Docking-System.git
