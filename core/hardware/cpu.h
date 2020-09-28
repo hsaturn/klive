@@ -72,10 +72,10 @@ public:
         virtual QWidget* createViewForm(QWidget* parent) = 0;
     };
 
-    Cpu(Memory* memory, reg16& pc) : pc(pc), memory(memory)
-    {}
+    Cpu(Memory* memory, reg16& pc) : pc(pc), memory(memory) {}
+    virtual ~Cpu() = default;
 
-    virtual void step()=0;
+    void step();
     virtual void step_no_obs()=0;
     virtual void reset()=0;
     bool steps_to_rt(uint32_t max_steps=20000);

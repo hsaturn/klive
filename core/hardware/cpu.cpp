@@ -1,6 +1,9 @@
 #include "cpu.h"
 
-bool hw::Cpu::steps_to_rt(uint32_t max_steps)
+namespace hw
+{
+
+bool Cpu::steps_to_rt(uint32_t max_steps)
 {
     float ns_per_cycle =1e9 / clock.getFrequency();
 
@@ -13,4 +16,17 @@ bool hw::Cpu::steps_to_rt(uint32_t max_steps)
             return false;
     }
     return true;
+}
+
+void Cpu::step()
+{
+    step_no_obs();
+    if (observersCount())
+    {
+        static Message stepMsg;
+        notify(stepMsg);
+    }
+}
+
+
 }

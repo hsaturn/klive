@@ -38,16 +38,6 @@ void Z80::nop(byte opcode, const char* prefix)
     cout << std::flush;
 }
 
-void Z80::step()
-{
-    step_no_obs();
-    if (observersCount())
-    {
-        static Message stepMsg;
-        notify(stepMsg);
-    }
-}
-
 void Z80::step_no_obs()
 {
     CpuClock before(clock);

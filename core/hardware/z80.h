@@ -18,7 +18,6 @@ class Z80: public Cpu
 public:
     Z80(Memory* memory);
 
-    void step() override;
     void step_no_obs() override;
     void reset() override;
 
