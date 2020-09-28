@@ -59,6 +59,7 @@ protected:
     void jr(bool condition);
     void call(cycle burnt);
     void ret();
+    inline void incr(){ r++; } // TODO See http://z80.info/z80info.htm
 
     void push(uint16_t, cycle burnt);
     void pop(uint16_t&, cycle burnt);

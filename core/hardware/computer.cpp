@@ -30,16 +30,8 @@ Computer::~Computer()
 void Computer::timer()
 {
     if (!cpu) return;
+    cpu->update();
 
-    if (bstep or running)
-    {
-        cpu->step();
-        bstep=false;
-    }
-    if (running)
-    {
-        cpu->steps_to_rt();
-    }
 }
 
 } // ns

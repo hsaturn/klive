@@ -32,12 +32,14 @@ FlagCheckBox::FlagCheckBox(reg8& flags, uint8_t mask, QWidget* label)
 
 void addCells(QTableView* table, int col, std::string list)
 {
-    string::size_type pos;
     int row=firstRow;
 
     auto model=dynamic_cast<QStandardItemModel*>(table->model());
-    while((pos=list.find(','))!=string::npos)
+    while(list.length())
     {
+        auto pos=list.find(',');
+        if (pos==string::npos)
+            pos=list.length();
         string reg=list.substr(0,pos)+':';
         list.erase(0, pos+1);
 
@@ -46,6 +48,36 @@ void addCells(QTableView* table, int col, std::string list)
         model->setItem(row, col, newItem);
         row++;
     }
+}
+
+bool Z80Registers::set(string reg,int32_t value)
+{
+    std::for_each(reg.begin(), reg.end(), [](char&c){ c=tolower(c); });
+
+    if (reg=="af") af.val=static_cast<uint16_t>(value);
+    else if (reg=="sp") sp=static_cast<uint16_t>(value);
+    else if (reg=="pc") pc=static_cast<uint16_t>(value);
+    else if (reg=="bc") bc.val=static_cast<uint16_t>(value);
+    else if (reg=="de") de.val=static_cast<uint16_t>(value);
+    else if (reg=="hl") hl.val=static_cast<uint16_t>(value);
+    else if (reg=="af'") af2.val=static_cast<uint16_t>(value);
+    else if (reg=="bc'") bc2.val=static_cast<uint16_t>(value);
+    else if (reg=="de'") de2.val=static_cast<uint16_t>(value);
+    else if (reg=="hl'") hl2.val=static_cast<uint16_t>(value);
+    else if (reg=="a") a=static_cast<reg8>(value);
+    else if (reg=="f") af.f=static_cast<reg8>(value);
+    else if (reg=="b") b=static_cast<reg8>(value);
+    else if (reg=="c") c=static_cast<reg8>(value);
+    else if (reg=="d") d=static_cast<reg8>(value);
+    else if (reg=="e") e=static_cast<reg8>(value);
+    else if (reg=="h") h=static_cast<reg8>(value);
+    else if (reg=="l") l=static_cast<reg8>(value);
+    else if (reg=="i") i=static_cast<reg8>(value);
+    else if (reg=="r") r=static_cast<reg8>(value);
+    else return false;
+
+    update();
+    return true;
 }
 
 QWidget* Z80Registers::createViewForm(QWidget* parent)
@@ -163,6 +195,12 @@ ostream& operator<<(ostream& out, const reg16u& u)
     return out;
 }
 
+ostream& operator<<(ostream& out, const reg8& u)
+{
+    out << (int16_t)u;
+    return out;
+}
+
 template<class T>
 void setCell(QStandardItemModel* model, T& reg, int& row, int& col)
 {
@@ -193,6 +231,7 @@ void setCells(QTableView* table, int col, reg16& top, regaf& af, reg16u& bc, reg
     setCell(model, bc, row, col);
     setCell(model, de, row, col);
     setCell(model, hl, row, col);
+    setCell(model, ii, row, col);
     setCell(model, bottom, row, col);
 }
 
@@ -210,6 +249,7 @@ void Z80Registers::update()
     flag_3->update();
     flag_n->update();
     flag_c->update();
+    flag_pv->update();
 }
 
 } // ns

@@ -4,7 +4,7 @@
 #include <core/hardware/cpu.h>
 #include <core/hardware/memory.h>
 #include <QLineEdit>
-#include <QLabel>
+#include <QTextEdit>
 #include <map>
 
 using namespace hw;
@@ -22,10 +22,11 @@ public:
 
 public slots:
     void onCmdLine();
+    void cpuStep();
 
 private:
     Computer* computer;
     QLineEdit* cmdLine;
-    QLabel* result;
+    QTextEdit* result;
     MiniGdb();
 };

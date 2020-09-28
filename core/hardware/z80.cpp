@@ -25,8 +25,13 @@ void Z80::reset()
     i=0;
     r=0;
 
+    af.f=0;	// TODO not sure at all but convenient
+
     clock.setFrequency(3750000);
     clock.restart();
+
+    Message rst;
+    notify(rst);
 }
 
 void Z80::nop(byte opcode, const char* prefix)
@@ -41,6 +46,7 @@ void Z80::nop(byte opcode, const char* prefix)
 void Z80::step_no_obs()
 {
     CpuClock before(clock);
+    incr();
 
     byte opcode = getByte();
 
@@ -222,6 +228,7 @@ void Z80::jr(bool condition)
 
 void Z80::step_cb()
 {
+    incr();
     nop(0xcb);   // TODO
 }
 
@@ -240,6 +247,7 @@ void Z80::writeMem16(uint16_t val, const cycle burnt)
 
 void Z80::step_ed()
 {
+    incr();
     uint8_t opcode=getByte();
     switch(opcode)
     {
@@ -252,7 +260,11 @@ void Z80::step_ed()
                 uint8_t carry = af.c;
                 af.c = de.val+af.c > hl.val;
                 hl.val -= de.val+carry;
+
                 af.s = h & 0x80 ? 1 : 0;
+                af.u5 = h & 0x20 ? 1 : 0;
+                af.u3 = h & 0x08 ? 1 : 0;
+
                 af.z = hl.val == 0 ? 1 : 0;
                 af.h = 0;	// TODO set if borrow from bit 12
                 af.pv = af.c; // TODO set if overflow
@@ -300,6 +312,7 @@ void Z80::step_ed()
 
 void Z80::step_dd_fd(reg16& in)
 {
+    incr();
     uint8_t opcode=getByte();
     switch(opcode)
     {
@@ -350,10 +363,7 @@ void Z80::step_dd_fd(reg16& in)
 
 inline uint8_t parity(uint8_t r)
 {
-    r ^= r>>4;
-    r ^= r>>2;
-    r ^= r>>1;
-    return r&1;
+    return (__builtin_popcount(r) & 1) ^ 1;
 }
 
 uint8_t* Z80::calc_dest_reg(uint8_t opcode)
@@ -498,7 +508,7 @@ void Z80::and_(reg8 n, cycle burnt)
     af.s = a & 0x80 ? 1 : 0;
     af.z = a == 0 ? 1 : 0;
     af.h = 1;
-    af.pv = parity(r);	// TODO, this is overflow not parity
+    af.pv = parity(a);	// TODO, this is overflow not parity
     af.n = 0;
     af.c = 0;
 }
@@ -517,13 +527,15 @@ void Z80::or_(reg8 n, cycle burnt)
 
 reg8 Z80::compare(reg8 n)
 {
-    reg8 r = (a-n) & 0xFF;
+    reg8 r = a-n;
     af.s = a & 0x80 ? 1 : 0;
     af.z = r == 0 ? 1 : 0;
-    af.h = (a & 0xf) >= (n & 0Xf) ? 1 : 0;
-    af.pv = parity(r);
+    af.h = (a ^ n ^ r) & 16 ? 1 : 0;
+    af.pv = (a^n) & 0x80 ? (r&0x80)==(n&0x80) : 0;
     af.n = 1;
     af.c = a <  n ? 1 : 0;
+    af.u5 = n & 0x20 ? 1 : 0;
+    af.u3 = n & 0x08 ? 1 : 0;
     return r;
 }
 

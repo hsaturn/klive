@@ -20,29 +20,26 @@ union reg16u
     };
 };
 
+#pragma pack (push, 1)
 union regaf
 {
     uint16_t val;
     struct
     {
-        uint8_t a;
         union
         {
             uint8_t f;
             struct
             {
-                unsigned s: 1;
-                unsigned z: 1;
-                unsigned u1: 1;
-                unsigned h: 1;
-                unsigned u2: 1;
-                unsigned pv: 1;
-                unsigned n: 1;
-                unsigned c: 1;
+                unsigned c: 1, n: 1, pv: 1, u3: 1, h: 1, u5: 1, z: 1, s: 1;
             };
         };
+        uint8_t a;
     };
+private:
+    uint16_t filler;
 };
+#pragma pack (pop)
 
 class FlagCheckBox : public QCheckBox
 {
@@ -106,6 +103,8 @@ struct Z80Registers : public Cpu::Registers
     reg8&	h;
     reg8&	l;
 
+    bool set(string reg, int32_t value) override;
+
     // TODO Design : should really not merge registers with view of registers
     void update() override;
     QWidget* createViewForm(QWidget* parent) override;
@@ -121,3 +120,4 @@ struct Z80Registers : public Cpu::Registers
 };
 
 } // ns hw
+

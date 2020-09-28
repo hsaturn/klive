@@ -1024,7 +1024,7 @@ ddcb$ofd	set 7,(ix+*),l
 ddcb$ofe	set 7,(ix+*)
 ddcb$off	set 7,(ix+*),a
 
-fd09 	add iy,bc
+fd09	add iy,bc
 
 fd19	add iy,de
 

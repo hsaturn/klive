@@ -29,6 +29,9 @@ public:
     void remove(Memory::addr_t addr) { breakpoints.erase(addr); }
     void add(Memory::addr_t addr)    { breakpoints[addr] = ENABLED; }
 
+    bool has(Memory::addr_t addr) { return breakpoints.count(addr); }
+    size_t size() const { return breakpoints.size(); }
+
 private:
     map<Memory::addr_t, Status> breakpoints;
 };
@@ -68,6 +71,7 @@ public:
         virtual ~Registers() = default;
 
         // TODO Bad design, registers should not share display responsability
+        virtual bool set(string reg, int32_t value){ return false; };
         virtual void update() = 0;
         virtual QWidget* createViewForm(QWidget* parent) = 0;
     };
@@ -75,10 +79,16 @@ public:
     Cpu(Memory* memory, reg16& pc) : pc(pc), memory(memory) {}
     virtual ~Cpu() = default;
 
+    void update();
     void step();
-    virtual void step_no_obs()=0;
+    void jp(Memory::addr_t);
     virtual void reset()=0;
+    virtual void step_no_obs()=0;
     bool steps_to_rt(uint32_t max_steps=20000);
+
+    void stop() { running=false; }
+    void start() { running=true; }
+    void run_step() { bstep=true; }
 
     void burn(cycle n) { clock.burn(n); }
 
@@ -90,6 +100,9 @@ protected:
     reg16& pc;
     Memory* memory;
     CpuClock clock;
+
+    bool running = false;
+    bool bstep = true;
 };
 
 
