@@ -2,6 +2,7 @@
 #include <string>
 #include <sstream>
 #include <iomanip>
+#include <iostream>
 
 #include <QTableView>
 #include <QHeaderView>
@@ -18,10 +19,13 @@ using namespace std;
 namespace hw
 {
 
-FlagCheckBox::FlagCheckBox(reg8& flags, uint8_t mask)
+static int firstRow=0;
+
+FlagCheckBox::FlagCheckBox(reg8& flags, uint8_t mask, QWidget* label)
     :
       flags(flags),
-      mask(mask)
+      mask(mask),
+      label(label)
 {
 
 }
@@ -29,7 +33,7 @@ FlagCheckBox::FlagCheckBox(reg8& flags, uint8_t mask)
 void addCells(QTableView* table, int col, std::string list)
 {
     string::size_type pos;
-    int row=2;
+    int row=firstRow;
 
     auto model=dynamic_cast<QStandardItemModel*>(table->model());
     while((pos=list.find(','))!=string::npos)
@@ -39,7 +43,8 @@ void addCells(QTableView* table, int col, std::string list)
 
         QStandardItem *newItem;
         newItem = new QStandardItem(reg.c_str());
-        model->setItem(row++, col, newItem);
+        model->setItem(row, col, newItem);
+        row++;
     }
 }
 
@@ -52,8 +57,8 @@ QWidget* Z80Registers::createViewForm(QWidget* parent)
     table=new QTableView;
 
     auto* model=new QStandardItemModel();
-    QStringList list = QString("REG,VAL,REG,VAL").simplified().split(',');
-    model->setHorizontalHeaderLabels(list);
+    table->horizontalHeader()->hide();
+    table->verticalHeader()->hide();
     table->setModel(model);
 
     // TODO part of this should be user configuration
@@ -85,56 +90,56 @@ QWidget* Z80Registers::createViewForm(QWidget* parent)
         label=new QLabel;
         label->setText("S");
         flag->addWidget(label);
-        flag_s = new FlagCheckBox(af.f, 0x80);
+        flag_s = new FlagCheckBox(af.f, 0x80, label);
         flag->addWidget(flag_s);
         flags->addLayout(flag);
 
         flag = new QVBoxLayout;
         label = new QLabel("Z");
         flag->addWidget(label);
-        flag_z = new FlagCheckBox(af.f, 0x40);
+        flag_z = new FlagCheckBox(af.f, 0x40, label);
         flag->addWidget(flag_z);
         flags->addLayout(flag);
 
         flag = new QVBoxLayout;
         label = new QLabel("5");
         flag->addWidget(label);
-        flag_5 = new FlagCheckBox(af.f, 0x20);
+        flag_5 = new FlagCheckBox(af.f, 0x20, label);
         flag->addWidget(flag_5);
         flags->addLayout(flag);
 
         flag = new QVBoxLayout;
         label = new QLabel("H");
         flag->addWidget(label);
-        flag_h = new FlagCheckBox(af.f, 0x10);
+        flag_h = new FlagCheckBox(af.f, 0x10, label);
         flag->addWidget(flag_h);
         flags->addLayout(flag);
 
         flag = new QVBoxLayout;
         label = new QLabel("3");
         flag->addWidget(label);
-        flag_3 = new FlagCheckBox(af.f, 0x8);
+        flag_3 = new FlagCheckBox(af.f, 0x8, label);
         flag->addWidget(flag_3);
         flags->addLayout(flag);
 
         flag = new QVBoxLayout;
         label = new QLabel("PV");
         flag->addWidget(label);
-        flag_pv = new FlagCheckBox(af.f, 0x4);
+        flag_pv = new FlagCheckBox(af.f, 0x4, label);
         flag->addWidget(flag_pv);
         flags->addLayout(flag);
 
         flag = new QVBoxLayout;
         label = new QLabel("N");
         flag->addWidget(label);
-        flag_n = new FlagCheckBox(af.f, 0x2);
+        flag_n = new FlagCheckBox(af.f, 0x2, label);
         flag->addWidget(flag_n);
         flags->addLayout(flag);
 
         flag = new QVBoxLayout;
         label = new QLabel("C");
         flag->addWidget(label);
-        flag_c = new FlagCheckBox(af.f, 0x2);
+        flag_c = new FlagCheckBox(af.f, 0x1, label);
         flag->addWidget(flag_c);
         flags->addLayout(flag);
 
@@ -161,18 +166,28 @@ ostream& operator<<(ostream& out, const reg16u& u)
 template<class T>
 void setCell(QStandardItemModel* model, T& reg, int& row, int& col)
 {
+static    int counter=0;
     stringstream r;
     r << hex << setw(4) << showbase << reg;
+    QString str=QString::fromStdString(r.str());
 
     QStandardItem *newItem;
-    newItem = new QStandardItem(r.str().c_str());
-    model->setItem(row++, col, newItem);
+    newItem = new QStandardItem(str);
+    if (model->index(row, col).data().toString()!=str)
+    {
+        newItem->setData(QColor(Qt::red), Qt::ForegroundRole);
+        counter++;
+        // old value  : model->index(row, col).data().toString()
+    }
+
+    model->setItem(row, col, newItem);
+    row++;
 }
 
 void setCells(QTableView* table, int col, reg16& top, regaf& af, reg16u& bc, reg16u& de, reg16u& hl, reg16& ii, reg8& bottom)
 {
     auto model=dynamic_cast<QStandardItemModel*>(table->model());
-    int row=2;
+    int row=firstRow;
     setCell(model, top, row, col);
     setCell(model, af, row, col);
     setCell(model, bc, row, col);
@@ -185,8 +200,8 @@ void Z80Registers::update()
 {
     if (table == nullptr) return;
 
-    setCells(table, 1, pc, af, bc, de, hl, ix, i);
-    setCells(table, 3, sp, af2, bc2, de2, hl2, ix, r);
+    setCells(table, 1, pc, af,  bc,  de,  hl,  ix, i);
+    setCells(table, 3, sp, af2, bc2, de2, hl2, iy, r);
 
     flag_s->update();
     flag_z->update();

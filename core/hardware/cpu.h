@@ -2,12 +2,36 @@
 #include "memory.h"
 #include <QElapsedTimer>
 #include <QWidget>
+#include <map>
+
+using namespace std;
 
 namespace hw
 {
 
+using reg16 = uint16_t;
 using cycle=uint64_t;
 
+class BreakPoints
+{
+public:
+
+    enum Status
+    {
+        ENABLED
+    };
+
+    bool enabled(Memory::addr_t pc) const
+    {
+        const auto& it=breakpoints.find(pc);
+        return (it!=breakpoints.end() && it->second==ENABLED);
+    }
+    void remove(Memory::addr_t addr) { breakpoints.erase(addr); }
+    void add(Memory::addr_t addr)    { breakpoints[addr] = ENABLED; }
+
+private:
+    map<Memory::addr_t, Status> breakpoints;
+};
 
 // TODO move elsewhere
 class CpuClock
@@ -37,6 +61,7 @@ private:
 class Cpu
 {
 public:
+    struct Message {};
     struct Registers
     {
         Registers() = default;
@@ -47,7 +72,7 @@ public:
         virtual QWidget* createViewForm(QWidget* parent) = 0;
     };
 
-    Cpu(Memory* memory) : memory(memory)
+    Cpu(Memory* memory, reg16& pc) : pc(pc), memory(memory)
     {}
 
     virtual void step()=0;
@@ -60,7 +85,9 @@ public:
     virtual Registers* regs() = 0;
     const Memory* getMemory() const { return memory; }
 
+    BreakPoints breaks;
 protected:
+    reg16& pc;
     Memory* memory;
     CpuClock clock;
 };

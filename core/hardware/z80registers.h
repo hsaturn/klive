@@ -8,7 +8,6 @@
 namespace hw
 {
 using reg8 = uint8_t;
-using reg16 = uint16_t;
 using byte = Memory::Byte::value_type;
 
 union reg16u
@@ -48,17 +47,26 @@ union regaf
 class FlagCheckBox : public QCheckBox
 {
 public:
-    FlagCheckBox(reg8& flags, uint8_t mask);
+    FlagCheckBox(reg8& flags, uint8_t mask, QWidget* label);
     virtual ~FlagCheckBox()=default;
 
     void update()
     {
+        QPalette pal = label->palette();
+
+        bool old = isChecked();
+        if (old != (flags & mask))
+            pal.setColor(QPalette::WindowText, Qt::red);
+        else
+            pal.setColor(QPalette::WindowText, Qt::black);
+        label->setPalette(pal);
         setChecked(flags & mask);
     }
 
 private:
     reg8& flags;
     uint8_t mask;
+    QWidget* label;
 };
 
 

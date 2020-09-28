@@ -4,6 +4,7 @@
 #include <core/hardware/computer.h>
 #include <handlers/gadgets/zx/spectrum/SpectrumScreen.h>
 #include <handlers/gadgets/z80/monsview.h>
+#include <handlers/gadgets/gdb/minigdb.h>
 
 using namespace hw;
 static ScreenHandler screen_handler_instance;
@@ -53,6 +54,10 @@ void ScreenHandler::initialize(MainWindow *main)
 
     registers_form = cpu->regs()->createViewForm(nullptr);
     main->createDockWindow(this, registers_form, "Registers");
+
+    gdb = new MiniGdb(computer);
+    main->createDockWindow(this, gdb, "Mini gdb");
+
 }
 
 void ScreenHandler::update(Z80* z80, const Z80::Message& msg)

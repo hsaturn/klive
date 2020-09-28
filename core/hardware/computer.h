@@ -17,6 +17,11 @@ class Computer : public QWidget
 {
     Q_OBJECT
 
+public slots:
+    void stop() { running=false; }
+    void start() { running=true; }
+    void step() { bstep=true; }
+
 public:
     Computer();
     virtual ~Computer();
@@ -27,6 +32,9 @@ public:
     Screen* screen;
     Keyboard* keyboard;
     std::list<Peripheral*> peripherals;
+
+    bool running = true;
+    bool bstep = true;
 };
 
 }

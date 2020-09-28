@@ -29,9 +29,15 @@ Computer::~Computer()
 
 void Computer::timer()
 {
-    if (cpu)
+    if (!cpu) return;
+
+    if (bstep or running)
     {
         cpu->step();
+        bstep=false;
+    }
+    if (running)
+    {
         cpu->steps_to_rt();
     }
 }

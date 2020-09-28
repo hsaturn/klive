@@ -7,7 +7,7 @@ using namespace std;
 namespace hw
 {
 Z80::Z80(Memory* memory)
-    : Cpu(memory),
+    : Cpu(memory, R.pc),
       pc(R.pc), sp(R.sp), ix(R.ix), iy(R.iy),
       af(R.af), bc(R.bc), de(R.de), hl(R.hl),
       af2(R.af),bc2(R.bc),de2(R.de),hl2(R.hl),
@@ -40,12 +40,12 @@ void Z80::nop(byte opcode, const char* prefix)
 
 void Z80::step()
 {
+    step_no_obs();
     if (observersCount())
     {
         static Message stepMsg;
         notify(stepMsg);
     }
-    step_no_obs();
 }
 
 void Z80::step_no_obs()

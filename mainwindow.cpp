@@ -227,7 +227,7 @@ void MainWindow::createDockWindow(Handler* handler, QWidget* widget, const std::
    ads::CDockWidget *dock = new ads::CDockWidget(tr(title.c_str()));
    dock->setWidget(widget);
    dock->resize(250, 250);
-   dock->setMinimumSize(300,250);
+   // dock->setMinimumSize(300,250);
    // dock->setMinimumSizeHintMode(ads::CDockWidget::MinimumSizeHintFromDockWidget);
    DockManager->addDockWidget(ads::DockWidgetArea::LeftDockWidgetArea, dock, CentralDockArea);
    viewMenu->addAction(dock->toggleViewAction());

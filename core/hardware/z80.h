@@ -16,11 +16,6 @@ class Z80: public Observable<Z80>, public Cpu
 {
 
 public:
-    struct Message
-    {
-    };
-
-public:
     Z80(Memory* memory);
 
     void step() override;

@@ -7,6 +7,7 @@ using hw::Z80;
 
 class MonsView;
 class SpectrumScreen;
+class MiniGdb;
 
 class ScreenHandler : public Handler,
         public Observer<Z80>
@@ -26,4 +27,5 @@ private:
     MonsView* monsView = nullptr;
     SpectrumScreen* screen = nullptr;
     QWidget* registers_form = nullptr;
+    MiniGdb* gdb = nullptr;
 };
