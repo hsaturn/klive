@@ -22,8 +22,8 @@ MonsView::MonsView(QWidget *parent) :
 
     // TODO part of this should be user configuration
     QFont fixedFont = QFontDatabase::systemFont(QFontDatabase::FixedFont);
-    fixedFont = QFontDialog::getFont(&ok, fixedFont, this);
-    // fixedFont.setPointSize(9);
+    // fixedFont = QFontDialog::getFont(&ok, fixedFont, this);
+    fixedFont.setPointSize(9);
     setShowGrid(false);
     setFont(fixedFont);
     verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
