@@ -3,27 +3,27 @@
 #include <common/observer.h>
 #include <core/hardware/z80.h>
 
-using hw::Z80;
+using hw::Cpu;
 
 class MonsView;
 class SpectrumScreen;
 class MiniGdb;
 
 class ScreenHandler : public Handler,
-        public Observer<Z80>
+        public Observer<Cpu>
 {
 public:
     ScreenHandler();
     virtual ~ScreenHandler();
 
-    virtual void update(Z80*, const Z80::Message& msg) override;
-    virtual void observableDies(const Z80* z80) override;
-    void setCpu(Z80*);
+    virtual void update(Cpu*, const Cpu::Message& msg) override;
+    virtual void observableDies(const Cpu* cpu) override;
+    void setCpu(Cpu*);
 
     virtual void initialize(MainWindow*) override;
 
 private:
-    Z80* cpu = nullptr;
+    Cpu* cpu = nullptr;
     MonsView* monsView = nullptr;
     SpectrumScreen* screen = nullptr;
     QWidget* registers_form = nullptr;

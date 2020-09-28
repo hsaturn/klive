@@ -18,12 +18,12 @@ ScreenHandler::~ScreenHandler()
     setCpu(nullptr);
 }
 
-void ScreenHandler::observableDies(const Z80* dying)
+void ScreenHandler::observableDies(const Cpu* dying)
 {
     if (cpu==dying) setCpu(nullptr);
 }
 
-void ScreenHandler::setCpu(Z80 *new_cpu)
+void ScreenHandler::setCpu(Cpu *new_cpu)
 {
     if (cpu) cpu->detach(this);
     cpu=new_cpu;
@@ -47,10 +47,7 @@ void ScreenHandler::initialize(MainWindow *main)
     monsView->setMemory(computer->memory);
     main->createDockWindow(this, monsView, "Disasm");
 
-    // TODO archi, supprimer ce downcast
-    cpu = dynamic_cast<Z80*>(computer->cpu);
-    if (cpu)
-        cpu->attach(this);
+    setCpu(computer->cpu);
 
     registers_form = cpu->regs()->createViewForm(nullptr);
     main->createDockWindow(this, registers_form, "Registers");
@@ -60,7 +57,7 @@ void ScreenHandler::initialize(MainWindow *main)
 
 }
 
-void ScreenHandler::update(Z80* z80, const Z80::Message& msg)
+void ScreenHandler::update(Cpu* z80, const Z80::Message& msg)
 {
     // TODO down cast grrr
     Z80Registers* regs = dynamic_cast<Z80Registers*>(z80->regs());

@@ -12,7 +12,7 @@ namespace hw
 {
 
 // TODO observable z80 is a bad idea for polymorphism reasons
-class Z80: public Observable<Z80>, public Cpu
+class Z80: public Cpu
 {
 
 public:

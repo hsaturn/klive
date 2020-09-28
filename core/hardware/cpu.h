@@ -58,7 +58,7 @@ private:
     QElapsedTimer timer;
 };
 
-class Cpu
+class Cpu: public Observable<Cpu>
 {
 public:
     struct Message {};
