@@ -8,8 +8,6 @@ The goal is to have ( - planned, * in progress, > done)
 Still no prompt yet. Z80 not finished.
 But the spectrum is booting.
 
-![Alt text](doc/screen.png?raw=true "Screen")
-
 * Modern all in one IDE
 - All in one tool (except the C compiler)
 - Z80 Asm included with syntax colored editor
