@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.5)
 project(klive LANGUAGES CXX)
 
 add_subdirectory(ext/Qt-Advanced-Docking-System)
-add_compile_options(-Wall)
+add_compile_options(-Wall -g)
 
 include_directories(ext/AdvancedDocking/src)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -40,6 +40,8 @@ add_executable(klive
     core/hardware/cpu.h
     core/hardware/z80.cpp
     core/hardware/z80.h
+    core/hardware/z80registers.cpp
+    core/hardware/z80registers.h
     core/hardware/ioports.h
 
     handlers/project/projecthandler.cpp

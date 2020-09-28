@@ -25,4 +25,5 @@ private:
     Z80* cpu = nullptr;
     MonsView* monsView = nullptr;
     SpectrumScreen* screen = nullptr;
+    QWidget* registers_form = nullptr;
 };

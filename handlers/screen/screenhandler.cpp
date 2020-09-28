@@ -50,9 +50,15 @@ void ScreenHandler::initialize(MainWindow *main)
     cpu = dynamic_cast<Z80*>(computer->cpu);
     if (cpu)
         cpu->attach(this);
+
+    registers_form = cpu->regs()->createViewForm(nullptr);
+    main->createDockWindow(this, registers_form, "Registers");
 }
 
 void ScreenHandler::update(Z80* z80, const Z80::Message& msg)
 {
-    if (monsView) monsView->setPointer(z80->regs().pc);
+    // TODO down cast grrr
+    Z80Registers* regs = dynamic_cast<Z80Registers*>(z80->regs());
+    if (monsView) monsView->setPointer(regs->pc);
+    regs->update();
 }
