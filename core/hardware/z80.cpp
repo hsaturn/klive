@@ -10,7 +10,7 @@ Z80::Z80(Memory* memory)
     : Cpu(memory, R.pc),
       pc(R.pc), sp(R.sp), ix(R.ix), iy(R.iy),
       af(R.af), bc(R.bc), de(R.de), hl(R.hl),
-      af2(R.af),bc2(R.bc),de2(R.de),hl2(R.hl),
+      af2(R.af2),bc2(R.bc2),de2(R.de2),hl2(R.hl2),
       a(R.a), b(R.b), c(R.c), d(R.d), e(R.e), h(R.h), l(R.l),
       i(R.i), r(R.r)
 {
@@ -283,6 +283,7 @@ void Z80::step_ed()
                 do
                 {
                     burn(bc.val ? 21 : 16);
+                    incr();
                     memory->poke(de.val, memory->peek(hl.val));
                     hl.val++;
                     de.val++;
@@ -297,6 +298,7 @@ void Z80::step_ed()
                 {
                     // TODO it seems that interrupts are taken in account
                     burn(bc.val ? 21 : 16);
+                    incr();
                     memory->poke(de.val, memory->peek(hl.val));
                     hl.val--;
                     de.val--;
