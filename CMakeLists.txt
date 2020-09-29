@@ -22,9 +22,9 @@ set(TS_FILES resources/klive_fr_FR.ts)
 
 add_executable(klive
     ${ads_SRCS}
-    main.cpp
-    mainwindow.cpp
-    mainwindow.h
+    core/main.cpp
+    core/mainwindow.cpp
+    core/mainwindow.h
 
     common/observer.h
     common/mapreader.h

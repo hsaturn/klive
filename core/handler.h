@@ -2,7 +2,7 @@
 #define HANDLER_H
 
 #include <QMenu>
-#include <mainwindow.h>
+#include <core/mainwindow.h>
 
 class Handler;
 class MainWindow;
