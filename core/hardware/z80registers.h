@@ -80,6 +80,8 @@ struct Z80Registers : public Cpu::Registers
 
     virtual ~Z80Registers() = default;
 
+    uint16_t get(const string reg) override;
+
     reg16   pc;
     reg16   sp;
     reg16   ix;

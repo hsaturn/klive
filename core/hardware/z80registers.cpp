@@ -64,6 +64,8 @@ bool Z80Registers::set(string reg,int32_t value)
     else if (reg=="bc'") bc2.val=static_cast<uint16_t>(value);
     else if (reg=="de'") de2.val=static_cast<uint16_t>(value);
     else if (reg=="hl'") hl2.val=static_cast<uint16_t>(value);
+    else if (reg=="ix") ix=static_cast<uint16_t>(value);
+    else if (reg=="iy") iy=static_cast<uint16_t>(value);
     else if (reg=="a") a=static_cast<reg8>(value);
     else if (reg=="f") af.f=static_cast<reg8>(value);
     else if (reg=="b") b=static_cast<reg8>(value);
@@ -78,6 +80,40 @@ bool Z80Registers::set(string reg,int32_t value)
 
     update();
     return true;
+}
+
+uint16_t Z80Registers::get(string regi)
+{
+    string reg(regi);	// TODO ...
+    std::for_each(reg.begin(), reg.end(), [](char&c){ c=tolower(c); });
+
+    if (reg=="af") return af.val;
+    else if (reg=="sp") return sp;
+    else if (reg=="pc") return pc;
+    else if (reg=="bc") return bc.val;
+    else if (reg=="de") return de.val;
+    else if (reg=="hl") return hl.val;
+    else if (reg=="af'") return af2.val;
+    else if (reg=="bc'") return bc2.val;
+    else if (reg=="de'") return de2.val;
+    else if (reg=="hl'") return hl2.val;
+    else if (reg=="ix") return ix;
+    else if (reg=="iy") return iy;
+    else if (reg=="a") return a;
+    else if (reg=="f") return af.f;
+    else if (reg=="b") return b;
+    else if (reg=="c") return c;
+    else if (reg=="d") return d;
+    else if (reg=="e") return e;
+    else if (reg=="h") return h;
+    else if (reg=="l") return l;
+    else if (reg=="i") return i;
+    else if (reg=="r") return r;
+    else if (reg=="carry") return af.c;
+    else if (reg=="zero") return af.z;
+    else if (reg=="pv") return af.pv;
+    else if (reg=="sign") return af.s;
+    else throw "Unknown register";
 }
 
 QWidget* Z80Registers::createViewForm(QWidget* parent)

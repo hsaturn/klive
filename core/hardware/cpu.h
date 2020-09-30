@@ -64,7 +64,11 @@ private:
 class Cpu: public Observable<Cpu>
 {
 public:
-    struct Message {};
+    struct Message {
+       enum event_t { STEP, WHILE_REACHED, UNTIL_REACHED};
+       Message(event_t event=STEP): event(event) {}
+       event_t event;
+    };
     struct Registers
     {
         Registers() = default;
@@ -72,6 +76,7 @@ public:
 
         // TODO Bad design, registers should not share display responsability
         virtual bool set(string reg, int32_t value){ return false; };
+        virtual uint16_t get(const string reg)=0;
         virtual void update() = 0;
         virtual QWidget* createViewForm(QWidget* parent) = 0;
     };
@@ -86,11 +91,14 @@ public:
     virtual void step_no_obs()=0;
     bool steps_to_rt(uint32_t max_steps=20000);
 
-    void stop() { running=false; }
-    void start() { running=true; }
-    void run_step() { bstep=true; }
+    void stop() { running=false; nsteps=0; }
+    void start() { running=true; nsteps=0;}
+    void run_steps(long steps=1) { nsteps += steps; }
 
     void burn(cycle n) { clock.burn(n); }
+
+    void setWhile(std::string s) { sWhile = s; }
+    void setUntil(std::string s) { sUntil = s; }
 
     virtual Registers* regs() = 0;
     const Memory* getMemory() const { return memory; }
@@ -102,7 +110,10 @@ protected:
     CpuClock clock;
 
     bool running = false;
-    bool bstep = true;
+    unsigned long nsteps = 1;
+
+    string sWhile;	// debugging purpose
+    string sUntil;
 };
 
 

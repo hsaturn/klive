@@ -5,7 +5,7 @@ project(klive LANGUAGES CXX)
 add_subdirectory(ext/Qt-Advanced-Docking-System)
 add_compile_options(-Wall -g)
 
-include_directories(ext/AdvancedDocking/src)
+include_directories(ext/tinyexpr)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 set(CMAKE_AUTOUIC ON)
@@ -28,6 +28,8 @@ add_executable(klive
 
     common/observer.h
     common/mapreader.h
+    common/expr.h
+    common/expr.cpp
 
     core/handler.cpp
     core/handler.h

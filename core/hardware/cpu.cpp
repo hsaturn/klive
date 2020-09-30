@@ -1,5 +1,6 @@
 #include "cpu.h"
 #include <iostream>
+#include <common/expr.h>
 
 namespace hw
 {
@@ -20,9 +21,50 @@ bool Cpu::steps_to_rt(uint32_t max_steps)
             return false;
         if (breaks.has(pc))
         {
+            nsteps=0;
             notify(stepMsg);
             running = false;
             return false;
+        }
+        else if (sUntil.length())
+        {
+            exprtype result;
+            string tmp = sUntil;
+            if (parseExpression(this, tmp, result))
+            {
+                if (result)
+                {
+                    static Message untilReached(Message::UNTIL_REACHED);
+                    cout << "Until " << sUntil << " reached." << endl;
+                    sUntil.clear();
+                    running = false;
+                    notify(untilReached);
+                }
+            }
+            else
+            {
+                cerr << "While " << sUntil << " error " << endl; // TODO check sUntil validity (setUntil)
+            }
+        }
+        else if (sWhile.length())
+        {
+            exprtype result;
+            string tmp = sWhile;
+            if (parseExpression(this, tmp, result))
+            {
+                if (result==0)
+                {
+                    static Message whileReached(Message::WHILE_REACHED);
+                    cout << "While " << sWhile << " reached." << endl;
+                    running = false;
+                    sWhile.clear();
+                    notify(whileReached);
+                }
+            }
+            else
+            {
+                cerr << "While " << sWhile << " error " << endl; // TODO check sWhile validity (setWhile)
+            }
         }
     }
     return true;
@@ -42,10 +84,15 @@ void Cpu::step()
 
 void Cpu::update()
 {
-    if (bstep or running)
+    if (nsteps or running)
     {
         step();
-        bstep=false;
+        if (nsteps) nsteps--;
+        while(nsteps)
+        {
+            step_no_obs();
+            nsteps--;
+        }
     }
     if (running)
     {

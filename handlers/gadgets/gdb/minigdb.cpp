@@ -5,8 +5,10 @@
 #include <string>
 #include <sstream>
 #include <QPushButton>
+#include <common/expr.h>
 
 using namespace std;
+
 
 MiniGdb::MiniGdb(Computer* computer)
     : computer(computer)
@@ -28,6 +30,20 @@ MiniGdb::MiniGdb(Computer* computer)
     result->setEnabled(false);
     layout->addWidget(result);
     setLayout(layout);
+
+    computer->cpu->attach(this);	// Note this could be multi cpu !
+}
+
+bool readAddr(Computer* comp, string& s, uint32_t& addr)
+{
+    exprtype result;
+    if (parseExpression(comp->cpu, s, result))
+    {
+        addr=static_cast<uint32_t>(result);
+        // TODO if addr > max ram
+        return true;
+    }
+    return false;
 }
 
 string getword(string &s, char sep=' ')
@@ -42,62 +58,29 @@ string getword(string &s, char sep=' ')
     return word;
 }
 
-bool readAddr(string &str, Memory::addr_t& addrout)
-{
-    string hexa=getword(str);
-
-    int base=10;
-    if (hexa[0]=='x')
-    {
-        base=16;
-        hexa.erase(0,1);
-    }
-    else if (hexa.length()>>2 && hexa.substr(0,2)=="0x")
-    {
-        hexa.erase(0,2);
-        base=16;
-    }
-    try
-    {
-        if (hexa.length())
-        {
-            addrout=stoul(hexa, nullptr, base);
-            cout << "hexa(" << hexa << ")=(" << addrout << ")" << endl;
-            return true;
-        }
-    }
-    catch(...)
-    {
-
-    }
-    return false;
-}
-
-bool readValue(string &value, int32_t &valout)
-{
-    bool neg=false;
-    if (value.length() && value[0]=='-')
-    {
-        neg=true;
-        value.erase(0,1);
-    }
-
-    uint32_t addr;
-    if (readAddr(value, addr))
-    {
-        if (neg)
-            valout=-static_cast<int32_t>(addr);
-        else {
-            valout=addr;
-        }
-        return true;
-    }
-    return false;
-}
-
 void MiniGdb::cpuStep()
 {
     computer->cpu->step();
+}
+
+void MiniGdb::update(Cpu* sender, const Cpu::Message& msg)
+{
+    switch(msg.event)
+    {
+        case Cpu::Message::UNTIL_REACHED:
+            result->setText("Until condition reached");
+            break;
+        case Cpu::Message::WHILE_REACHED:
+            result->setText("While condition reached");
+            break;
+        case Cpu::Message::STEP:
+            break;
+    }
+}
+
+void MiniGdb::observableDies(const Cpu *sender)
+{
+    // TODO what to do ?
 }
 
 void MiniGdb::onCmdLine()
@@ -119,12 +102,12 @@ void MiniGdb::onCmdLine()
 
     while (s.length())
     {
-        cmd=getword(s);
+        cmd=getlex(s);
         cout << "CMD " << cmd << endl;
         if (cmd=="b" || cmd=="d")
         {
             Memory::addr_t addr;
-            if (readAddr(s, addr))
+            if (readAddr(computer, s, addr))
             {
                 if (cmd=="b")
                     computer->cpu->breaks.add(addr);
@@ -140,7 +123,7 @@ void MiniGdb::onCmdLine()
         else if (cmd=="jp")
         {
             Memory::addr_t addr;
-            if (readAddr(s, addr))
+            if (readAddr(computer, s, addr))
             {
                 computer->cpu->jp(addr);
             }
@@ -154,8 +137,42 @@ void MiniGdb::onCmdLine()
                  << "set reg=value" << endl
                  << "b addr: add bp" << endl
                  << "d addr: remove bp" << endl
-                 << "n next, c continue" << endl
-                 << "s stop, r reset" << endl;
+                 << "[n]ext, [c]ontinue" << endl
+                 << "[s]tep, r reset" << endl
+                 << "?[p]rint {expr}" << endl
+                 << "[u]ntil {expr}" << endl
+                 << "[w]while {expr}" << endl
+                  ;
+        }
+        else if (cmd=="while" or cmd=="w" or cmd=="until" or cmd=="u")
+        {
+            string expr=s;
+            exprtype result;
+            if (parseExpression(computer->cpu, s, result))
+            {
+                answer << "running " << cmd << expr << endl;
+                if (cmd=="while")
+                    computer->cpu->setWhile(expr);
+                else
+                    computer->cpu->setUntil(expr);
+            }
+            else {
+                error << "Error in expression " << expr << endl;
+            }
+        }
+        else if (cmd=="p" or cmd=="print" or cmd=="?")
+        {
+            string expr(s);
+            exprtype result;
+            if (parseExpression(computer->cpu, s, result))
+            {
+                answer << expr << " = " << result
+                << ", " << showbase << hex << result << dec << endl;
+            }
+            else
+            {
+                error << "Error in expression (" << expr << ")" << endl;
+            }
         }
         else if (cmd=="set" or (cmd.find('=')!=string::npos))
         {
@@ -163,7 +180,7 @@ void MiniGdb::onCmdLine()
             string reg=getword(s,'=');
             cout << " reg=(" << reg << ") s=(" << s << ")" << endl;
             int32_t value;
-            if (readValue(s, value) && computer->cpu->regs()->set(reg, value))
+            if (parseExpression(computer->cpu, s, value) && computer->cpu->regs()->set(reg, value))
             {
                 answer << "SET " << reg  << '=' << value << endl;
             }
@@ -177,9 +194,21 @@ void MiniGdb::onCmdLine()
             computer->cpu->reset();
         }
         else if (cmd=="n")
-            computer->cpu->run_step();
+        {
+            int32_t count(1);
+            if (s.length())
+            {
+                if (!parseExpression(computer->cpu, s, count))
+                {
+                    error << "Invalid expression" << endl;
+                    count=0;
+                }
+
+            }
+            computer->cpu->run_steps(count);
+        }
         else if (cmd=="s")
-            computer->cpu->stop();
+            computer->cpu->step();	// TODO
         else if (cmd=="c")
             computer->cpu->start();
         else
