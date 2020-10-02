@@ -18,7 +18,7 @@ void MemoryViewer::init() {
   nBlockAddress = 2;
   mBytesPerLine = 16;
 
-  pxWidth = fontMetrics().width(QChar('0'));
+  pxWidth = fontMetrics().horizontalAdvance('0');
   pxHeight = fontMetrics().height();
 }
 
