@@ -18,8 +18,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets LinguistTools REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets LinguistTools REQUIRED)
 
-set(TS_FILES resources/klive_fr_FR.ts)
-
 add_executable(klive
     ${ads_SRCS}
     core/main.cpp
@@ -57,15 +55,12 @@ add_executable(klive
     handlers/gadgets/z80/mons.cpp
     handlers/gadgets/z80/mons.h
 
+
     handlers/gadgets/gdb/minigdb.cpp
     handlers/gadgets/gdb/minigdb.h
 
     handlers/screen/screenhandler.cpp
     handlers/screen/screenhandler.h
-    handlers/screen/screen.cpp
-    handlers/screen/screen.h
-    handlers/screen/linebouncer.cpp
-    handlers/screen/linebouncer.h
 
     handlers/memory/memoryhandler.cpp
     handlers/memory/memoryhandler.h
@@ -73,10 +68,16 @@ add_executable(klive
     handlers/memory/memoryviewer.cpp
     handlers/memory/memoryviewer.h
 
-    handlers/gadgets/clock/clock.cpp
-    handlers/gadgets/clock/clock.h
     handlers/gadgets/zx/spectrum/SpectrumScreen.cpp
     handlers/gadgets/zx/spectrum/SpectrumScreen.h
+
+    handlers/gadgets/clock/clock.cpp
+    handlers/gadgets/clock/clock.h
+
+    handlers/gadgets/lines/linebouncer.cpp
+    handlers/gadgets/lines/linebouncer.h
+    handlers/gadgets/lines/lines.cpp
+    handlers/gadgets/lines/lines.h
 
     resources/klive.qrc
     ${TS_FILES}
