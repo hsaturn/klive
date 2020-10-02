@@ -4,6 +4,8 @@
 using namespace std;
 hw::Cpu* cpu;	// TODO Grrrr horrible
 
+static exprtype parseLogical(string& s);
+
 static void trim(string& s)
 {
     while(s[0]==' ') s.erase(0,1);
@@ -11,7 +13,7 @@ static void trim(string& s)
 
 string getlex(string& s)
 {
-    static string alone="+-*/(){}[]^<>!?";
+    static string alone="+-*/(){}[]^<>!?=";
     string lex;
     trim(s);
     if (s.length()==0) return "";
@@ -137,6 +139,17 @@ static exprtype parseAtom(string& s)
                 return cpu->regs()->get(lex);
             throw "VAR NYI";
         }
+    }
+    else if (lex=="(")
+    {
+        exprtype e=parseLogical(s);
+        string clos=getlex(s);
+        if (clos!=")")
+        {
+            s=clos+s;
+            throw "Missing closing parenthesis";
+        }
+        return e;
     }
     return 0;
 }
@@ -278,7 +291,7 @@ static exprtype parseRelationnal(string& s)
     {
         string op=getlex(s);
 
-        if (op=="==")
+        if (op=="==" or op=="=")
             left = left == parseCompOps(s);
         else if (op=="!=")
             left = left != parseCompOps(s);
