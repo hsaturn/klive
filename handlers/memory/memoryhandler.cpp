@@ -11,9 +11,6 @@ MemoryHandler::MemoryHandler() : Handler("Memory")
 MemoryHandler::~MemoryHandler()
 {
     // TODO unique_ptr or shared_ptr
-    if (viewer)
-        delete viewer;
-    viewer=nullptr;
 }
 
 void MemoryHandler::initialize(MainWindow *main)
