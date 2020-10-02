@@ -51,7 +51,7 @@ public:
     auto getEllapsedNs() const { return timer.nsecsElapsed(); }
     auto getFrequency() const { return freq_hz; }
     auto getTimer() const { return timer; }
-    void restart() { timer.restart(); }
+    void restart() { timer.restart(); curr=0; }
 
     cycle cycles() const { return curr; }
 
@@ -65,7 +65,7 @@ class Cpu: public Observable<Cpu>
 {
 public:
     struct Message {
-       enum event_t { STEP, WHILE_REACHED, UNTIL_REACHED};
+       enum event_t { STEP, BREAK_POINT, WHILE_REACHED, UNTIL_REACHED};
        Message(event_t event=STEP): event(event) {}
        event_t event;
     };
@@ -87,7 +87,7 @@ public:
     void update();
     void step();
     void jp(Memory::addr_t);
-    virtual void reset()=0;
+    void reset();
     virtual void step_no_obs()=0;
     bool steps_to_rt(uint32_t max_steps=20000);
 
@@ -100,11 +100,15 @@ public:
     void setWhile(std::string s) { sWhile = s; }
     void setUntil(std::string s) { sUntil = s; }
 
+    const CpuClock& getClock() const { return clock; }
+
     virtual Registers* regs() = 0;
     const Memory* getMemory() const { return memory; }
 
     BreakPoints breaks;
+
 protected:
+    virtual void _reset() =0;
     reg16& pc;
     Memory* memory;
     CpuClock clock;

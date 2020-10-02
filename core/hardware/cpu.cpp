@@ -14,15 +14,16 @@ bool Cpu::steps_to_rt(uint32_t max_steps)
 
     cycle to_reach = clock.getTimer().nsecsElapsed()/ns_per_cycle;
 
-    while(max_steps && (clock.cycles() < to_reach))
+    while(running && max_steps && (clock.cycles() < to_reach))
     {
         step_no_obs();
         if (max_steps-- == 0)
             return false;
         if (breaks.has(pc))
         {
+            static Message breakMsg(Message::BREAK_POINT);
             nsteps=0;
-            notify(stepMsg);
+            notify(breakMsg);
             running = false;
             return false;
         }
@@ -30,6 +31,7 @@ bool Cpu::steps_to_rt(uint32_t max_steps)
         {
             exprtype result;
             string tmp = sUntil;
+            // TODO use an AST for speed
             if (parseExpression(this, tmp, result))
             {
                 if (result)
@@ -50,6 +52,7 @@ bool Cpu::steps_to_rt(uint32_t max_steps)
         {
             exprtype result;
             string tmp = sWhile;
+            // TODO use an AST for speed
             if (parseExpression(this, tmp, result))
             {
                 if (result==0)
@@ -68,6 +71,12 @@ bool Cpu::steps_to_rt(uint32_t max_steps)
         }
     }
     return true;
+}
+
+void Cpu::reset()
+{
+    clock.restart();
+    _reset();
 }
 
 void Cpu::jp(Memory::addr_t addr)

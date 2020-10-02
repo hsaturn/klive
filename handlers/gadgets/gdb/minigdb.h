@@ -6,6 +6,7 @@
 #include <QLineEdit>
 #include <QTextEdit>
 #include <map>
+#include <set>
 
 using namespace hw;
 using namespace std;
@@ -29,8 +30,12 @@ public slots:
     void cpuStep();
 
 private:
+    void update(ostream& out);
+    bool outexpr(ostream& out, string& expr);
     Computer* computer;
     QLineEdit* cmdLine;
     QTextEdit* result;
     MiniGdb();
+
+    std::set<string> displays;
 };

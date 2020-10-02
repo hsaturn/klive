@@ -17,7 +17,7 @@ Z80::Z80(Memory* memory)
     reset();
 }
 
-void Z80::reset()
+void Z80::_reset()
 {
     pc=0;
     irq_mode(0);
@@ -26,6 +26,16 @@ void Z80::reset()
     r=0;
 
     af.f=0;	// TODO not sure at all but convenient
+    bc.val=0;
+    de.val=0;
+    hl.val=0;
+    af2.val=0;
+    bc2.val=0;
+    de2.val=0;
+    hl2.val=0;
+    sp=0;
+    ix=0;
+    iy=0;
 
     clock.setFrequency(3750000);
     clock.restart();

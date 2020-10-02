@@ -65,17 +65,57 @@ void MiniGdb::cpuStep()
 
 void MiniGdb::update(Cpu* sender, const Cpu::Message& msg)
 {
+    stringstream d;
     switch(msg.event)
     {
+        case Cpu::Message::BREAK_POINT:
+            d << "Break point reached" << endl;
+            break;
         case Cpu::Message::UNTIL_REACHED:
-            result->setText("Until condition reached");
+            d << "Until condition reached" << endl;
             break;
         case Cpu::Message::WHILE_REACHED:
-            result->setText("While condition reached");
+            d << "While condition reached" << endl;
             break;
         case Cpu::Message::STEP:
             break;
     }
+    update(d);
+    result->setText(d.str().c_str());
+}
+
+bool MiniGdb::outexpr(ostream& out, string& expr)
+{
+    string copy(expr);
+    exprtype result;
+    if (parseExpression(computer->cpu, expr, result))
+    {
+        size_t len=copy.length()-expr.length();
+        if (len)	// Should be....
+        {
+            out << '(' << copy.substr(0,len) << ") = ";
+        }
+        out << dec << result << ", " << showbase << hex << result << endl;
+        return true;
+    }
+    else
+    {
+        out << "(error " << expr << ")";
+        return false;
+    }
+}
+
+void MiniGdb::update(ostream& out)
+{
+    char c='a';
+
+    for(const auto display: displays)
+    {
+        string expr(display);
+        outexpr(out, expr);
+        c++;
+    }
+    out << "cycles " << computer->cpu->getClock().cycles() << endl;
 }
 
 void MiniGdb::observableDies(const Cpu *sender)
@@ -86,6 +126,7 @@ void MiniGdb::observableDies(const Cpu *sender)
 void MiniGdb::onCmdLine()
 {
     static string lastCmd;
+
     string s=cmdLine->text().toStdString();
     if (s=="")
     {
@@ -97,19 +138,68 @@ void MiniGdb::onCmdLine()
     }
     stringstream error;
     stringstream answer;
-    string cmd;
     result->setText("");
+
+    // TODO better help system completion etc
+    map<string, string> cmds;
+    cmds["jp addr"] = "Jump to addr";
+    cmds["set reg=expr"] = "Change register";
+    cmds["break addr"] = "Add breakpoint";
+    cmds["delete addr"] = "Delete breakpoint";
+    cmds["next"] = "Next statement";
+    cmds["step"] = "Step";
+    cmds["continue"] = "Continue";
+    cmds["reset"] = "Reset cpu";
+    cmds["print or ? expr"] = "eval expr";
+    cmds["display expr"] = "display expr";
+    cmds["until expr"] = "Run until condition";
+    cmds["undisplay # or '*'"] = "Remove a display";
+    cmds["while cond"] = "Run while condition";
+    cmds["stop"] = "Stop cpu";
+    cmds["run"] = "Reset and run cpu";
+    cmds["help"] = "Display this help";
 
     while (s.length())
     {
-        cmd=getlex(s);
-        cout << "CMD " << cmd << endl;
-        if (cmd=="b" || cmd=="d")
+        string cmd=getlex(s);
+        string ambiguous;
+        string found;
+
+        if (cmd.length())
+        {
+            for(const auto it: cmds)
+            {
+                string command=it.first;
+                command=getword(command);
+                if (command.substr(0, cmd.length())==cmd)
+                {
+                    if (ambiguous.length() || found != "")
+                        ambiguous=command+" "+ambiguous;
+                    else if (found=="")
+                        found=command;
+                }
+            }
+        }
+
+        if (ambiguous.length())
+        {
+            s=cmd+' '+s;
+            error << "Ambiguous command : " << cmd << endl;
+            error << "Candidates: " << ambiguous << endl;
+            break;
+        }
+        else if (cmd=="")
+        {
+            s=cmd+' '+s;
+            error << "Syntax error (" << s << ")" << endl;
+            break;
+        }
+        else if (found=="delete" || found=="break")
         {
             Memory::addr_t addr;
             if (readAddr(computer, s, addr))
             {
-                if (cmd=="b")
+                if (found=="break")
                     computer->cpu->breaks.add(addr);
                 else
                     computer->cpu->breaks.remove(addr);
@@ -117,10 +207,10 @@ void MiniGdb::onCmdLine()
             }
             else
             {
-                error << "Missing argument after " << cmd << endl;
+                error << "Missing argument after " << found << endl;
             }
         }
-        else if (cmd=="jp")
+        else if (found=="jp")
         {
             Memory::addr_t addr;
             if (readAddr(computer, s, addr))
@@ -131,27 +221,24 @@ void MiniGdb::onCmdLine()
                 error << "Expected valid address" << endl;
             }
         }
-        else if (cmd=="help")
+        else if (found=="help")
         {
-            answer << "jp addr" << endl
-                 << "set reg=value" << endl
-                 << "b addr: add bp" << endl
-                 << "d addr: remove bp" << endl
-                 << "[n]ext, [c]ontinue" << endl
-                 << "[s]tep, r reset" << endl
-                 << "?[p]rint {expr}" << endl
-                 << "[u]ntil {expr}" << endl
-                 << "[w]while {expr}" << endl
-                  ;
+            for(const auto& it: cmds)
+            {
+                auto command=it.first;
+                auto description=it.second;
+                answer << command << " : " << description << endl;
+            }
+
         }
-        else if (cmd=="while" or cmd=="w" or cmd=="until" or cmd=="u")
+        else if (found=="while" or found=="until")
         {
             string expr=s;
             exprtype result;
             if (parseExpression(computer->cpu, s, result))
             {
-                answer << "running " << cmd << expr << endl;
-                if (cmd=="while")
+                answer << "running " << found << expr << endl;
+                if (found=="while")
                     computer->cpu->setWhile(expr);
                 else
                     computer->cpu->setUntil(expr);
@@ -160,40 +247,87 @@ void MiniGdb::onCmdLine()
                 error << "Error in expression " << expr << endl;
             }
         }
-        else if (cmd=="p" or cmd=="print" or cmd=="?")
+        else if (found=="stop")
+        {
+            computer->cpu->stop();
+        }
+        else if (found=="display")
         {
             string expr(s);
             exprtype result;
             if (parseExpression(computer->cpu, s, result))
             {
-                answer << expr << " = " << result
-                << ", " << showbase << hex << result << dec << endl;
+                answer << "Inserting display(" << expr << ")" << endl;
+                displays.insert(expr);
+            }
+        }
+        else if (found=="undisplay")
+        {
+            if (s.length())
+            {
+                char i=toupper(s[0]);
+                s.erase(0,1);
+                for(set<string>::iterator it=displays.begin(); it!=displays.end(); it++)
+                {
+                    if (i=='A' || i=='*')
+                    {
+                        displays.erase(it);
+                        if (i != '*')
+                            break;
+                    }
+                    else {
+                        i--;
+                    }
+                }
             }
             else
             {
-                error << "Error in expression (" << expr << ")" << endl;
+                error << "Missing argument" << endl;
             }
         }
-        else if (cmd=="set" or (cmd.find('=')!=string::npos))
+        else if (found=="print" or cmd=="?")
         {
-            if (cmd.find('=')!=string::npos) { s=cmd; cmd="set"; }
-            string reg=getword(s,'=');
-            cout << " reg=(" << reg << ") s=(" << s << ")" << endl;
+            if (cmd=="?")
+            {
+                found="print";
+            }
+            outexpr(answer, s);
+        }
+        else if (found=="set" or (s[0]=='='))
+        {
+            string reg;
+            if (s[0]=='=')
+                reg=cmd;
+            else
+                reg=getlex(s);
+            found="set";
+
+            if (s[0] != '=')
+            {
+                error << "Syntax error" << endl;
+                break;
+            }
+            s.erase(0,1);
             int32_t value;
-            if (parseExpression(computer->cpu, s, value) && computer->cpu->regs()->set(reg, value))
+            if (!parseExpression(computer->cpu, s, value))
+            {
+                error << "Bad expression" << endl;
+                break;
+            }
+            if (computer->cpu->regs()->set(reg, value))
             {
                 answer << "SET " << reg  << '=' << value << endl;
             }
             else
             {
-                error << "Unknown error (set " << reg << " ...)";
+                error << "Bad register:" << reg << endl;
             }
         }
-        else if (cmd=="reset")
+        else if (found=="reset")
         {
             computer->cpu->reset();
         }
-        else if (cmd=="n")
+        else if (found=="next")
         {
             int32_t count(1);
             if (s.length())
@@ -207,24 +341,42 @@ void MiniGdb::onCmdLine()
             }
             computer->cpu->run_steps(count);
         }
-        else if (cmd=="s")
+        else if (found=="step")
             computer->cpu->step();	// TODO
-        else if (cmd=="c")
+        else if (found=="continue")
             computer->cpu->start();
+        else if (found=="run")
+        {
+            computer->cpu->reset();
+            computer->cpu->start();
+        }
+        else if (found=="")
+        {
+            error << "Command not found: " << cmd << endl;
+            s=cmd+' '+s;
+            break;
+        }
         else
         {
-            error << "Unknown command (" << cmd << ")" << endl;
+            error << "Shouldn't arrive here found(" << found << ") s(" << s << ") cmd(" << cmd << ") amb(" << ambiguous << ")" << endl;
+            break;
         }
+        answer << found << ": ok" << endl;
     }
+    result->setStyleSheet("color: black;");
     if (error.str().length())
     {
         result->setStyleSheet("color: red;");
-        result->setText(error.str().c_str());
+        answer << "ERROR: " << error.str();
+    }
+    if (displays.size())
+    {
+        answer << "---------------------" << endl;
+        update(answer);
     }
     if (answer.str().length())
     {
-        result->setStyleSheet("color: black;");
-        result->setText(answer.str().c_str());
+        result->setText(result->toPlainText()+answer.str().c_str());
     }
     cmdLine->setText("");
 }
