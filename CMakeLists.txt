@@ -5,7 +5,7 @@ project(klive LANGUAGES CXX)
 add_subdirectory(ext/Qt-Advanced-Docking-System)
 add_compile_options(-Wall -g)
 
-include_directories(ext/tinyexpr)
+include_directories(ext/Qt-Advanced-Docking-System/src)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 set(CMAKE_AUTOUIC ON)
@@ -17,6 +17,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets LinguistTools REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets LinguistTools REQUIRED)
+# set(TS_FILES resources/Klive_fr_FR.ts)
 
 add_executable(klive
     ${ads_SRCS}
@@ -82,9 +83,7 @@ add_executable(klive
     resources/klive.qrc
     ${TS_FILES}
 )
-
+# qt5_create_translation(QMLES ${CMAKE_SOURCE_DIR} ${TS_FILES})
 
 target_link_libraries(klive PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
 target_link_libraries(klive PRIVATE qtadvanceddocking)
-
-qt5_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
