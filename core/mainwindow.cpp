@@ -175,7 +175,7 @@ void MainWindow::createActions()
     quitAct->setShortcuts(QKeySequence::Quit);
     quitAct->setStatusTip(tr("Quit the application"));
 
-    QToolBar *editToolBar = addToolBar(tr("Edit"));
+    // QToolBar *editToolBar = addToolBar(tr("Edit"));
     const QIcon undoIcon = QIcon::fromTheme("edit-undo", QIcon(":/images/undo.png"));
     QAction *undoAct = addMenuEntry("&Edit", "&Undo");
     undoAct->setIcon(undoIcon);

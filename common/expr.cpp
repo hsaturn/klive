@@ -2,7 +2,7 @@
 #include <core/hardware/cpu.h>
 
 using namespace std;
-hw::Cpu* cpu;	// TODO Grrrr horrible
+static hw::Cpu* cpu;	// TODO Grrrr horrible
 
 static exprtype parseLogical(string& s);
 
@@ -112,20 +112,19 @@ static exprtype parseAtom(string& s)
 {
     string lex=getlex(s);
 
-    if (lex.length()>2 && lex[0]=='0' && lex[1]=='b')   // binary number
+    if (lex.length()>2 && lex[0]=='0' && lex[1]=='b')   // binary scalar
     {
         long int n=0;
-        long int d=1;
         for(unsigned int i=2; i<lex.length(); i++)
         {
             n <<=1;
             if (lex[i]=='1') n+=1;
         }
-        return n;
+        return static_cast<exprtype>(n);	// ...grrr
     }
     else if (isdigit(lex[0])) // hex/dec/octal
     {
-        return strtol(lex.c_str(), nullptr, 0);
+        return static_cast<exprtype>(strtol(lex.c_str(), nullptr, 0));	// .... grrr
     }
     else if (isalpha(lex[0]))
     {

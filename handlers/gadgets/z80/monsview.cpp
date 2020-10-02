@@ -18,9 +18,6 @@ MonsView::MonsView(QWidget *parent) :
     QTableView(parent),
     memory(nullptr)
 {
-    bool ok;
-
-
     // TODO part of this should be user configuration
     QFont fixedFont = QFontDatabase::systemFont(QFontDatabase::FixedFont);
     // fixedFont = QFontDialog::getFont(&ok, fixedFont, this);
