@@ -1,5 +1,6 @@
 # klive
-Attempt to create a modern a powerful ZX Spectrum IDE
+Attempt to create a modern and powerful for
+the old and excellent ZX Spectrum IDE
 
 ![Alt text](doc/ide-state.png?raw=true "Ide Status")
 
