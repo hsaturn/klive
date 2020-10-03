@@ -68,6 +68,7 @@ public:
        enum event_t { STEP, BREAK_POINT, WHILE_REACHED, UNTIL_REACHED, UNKNOWN_OP};
        Message(event_t event=STEP): event(event) {}
        event_t event;
+       unsigned long data;
     };
     struct Registers
     {

@@ -52,12 +52,14 @@ void Z80::nop(byte opcode, const char* prefix)
     printf("Z80 %04x: %s%02x Unknown opcode\n", pc-1, prefix, opcode);
     burn(4);	// Dummy
     running=false;
+    unknown.data = opcode | ((unsigned long)last << 16);
     notify(unknown);
     cout << std::flush;
 }
 
 void Z80::step_no_obs()
 {
+    last = pc;
     CpuClock before(clock);
     incr();
 

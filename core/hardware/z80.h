@@ -80,6 +80,7 @@ protected:
     uint8_t* calc_dest_reg(uint8_t opcode);
 
 private:
+    Memory::addr_t last;	// Last address at start of step (for debug purposes)
     Z80Registers R;
 
     reg16&   pc;

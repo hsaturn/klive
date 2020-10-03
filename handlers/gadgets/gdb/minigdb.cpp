@@ -79,8 +79,12 @@ void MiniGdb::update(Cpu* sender, const Cpu::Message& msg)
             d << "While condition reached" << endl;
             break;
         case Cpu::Message::UNKNOWN_OP:
-            result->setStyleSheet("color: red;");
-            d << "Unknown opcode" << endl;
+            {
+                Memory::addr_t addr=(msg.data & 0xFFFF0000) >> 16;
+                result->setStyleSheet("color: red;");
+                d << uppercase << hex << showbase << addr;
+                d << "Unknown opcode [" << (unsigned int)(msg.data & 0xFF) << "] at " << addr << endl;
+            }
             break;
         case Cpu::Message::STEP:
             break;
