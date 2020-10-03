@@ -442,23 +442,24 @@ void Z80::step_xxcb(reg16 base_addr)
         default: // All bit functions
         {
             uint8_t bit_nr=(opcode & 0x38) >> 3;
-            std::bitset<8> b=val;
+            uint8_t mask=1 << bit_nr;
 
             // Decode bit instruction type
             switch((opcode & 0xC0)>>6)
             {
                 case 0x1:	// test bit
-                    af.z = b.test(bit_nr) ? 0 : 1;
+                    af.z = val & mask ? 0 : 1;
                     af.h = 1;
                     af.n = 0;
                     break;
 
                 case 0x2: // reset bit
-                    b.reset(bit_nr);
+                    val &= ~mask;
                     break;
 
                 case 0x3: // set bit_n;
-                    b.set(bit_nr);
+                    val |= mask;
+                    memory->poke(addr, val);
                     break;
 
                 default:
@@ -471,7 +472,6 @@ void Z80::step_xxcb(reg16 base_addr)
     }
 
     // 5 store modified value back in memory
-    memory->poke(addr, val);
 
     // 6 store modified value in register if any
     if (dest_reg)
