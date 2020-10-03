@@ -183,7 +183,10 @@ void MiniGdb::onCmdLine()
                 if (command.substr(0, cmd.length())==cmd)
                 {
                     if (ambiguous.length() || found != "")
+                    {
+                        if (ambiguous=="") ambiguous=found;
                         ambiguous=command+" "+ambiguous;
+                    }
                     else if (found=="")
                         found=command;
                 }
