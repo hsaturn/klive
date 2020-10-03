@@ -114,7 +114,7 @@ protected:
     Memory* memory;
     CpuClock clock;
 
-    bool running = false;
+    bool running = true;
     unsigned long nsteps = 1;
 
     string sWhile;	// debugging purpose
