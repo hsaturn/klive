@@ -5,17 +5,19 @@
 
 MemoryViewer::MemoryViewer(QWidget *parent) : QAbstractScrollArea(parent)
 {
-  init();
-  connect(verticalScrollBar(), &QScrollBar::valueChanged, this,
-          &MemoryViewer::adjustContent);
-  connect(horizontalScrollBar(), &QScrollBar::valueChanged, this,
-          &MemoryViewer::adjustContent);
+    lastModified.start=0;
+    lastModified.size=0;
+    init();
+    connect(verticalScrollBar(), &QScrollBar::valueChanged, this,
+            &MemoryViewer::adjustContent);
+    connect(horizontalScrollBar(), &QScrollBar::valueChanged, this,
+            &MemoryViewer::adjustContent);
 }
 
 MemoryViewer::~MemoryViewer() { setMemory(nullptr); }
 
 void MemoryViewer::init() {
-  nBlockAddress = 2;
+  nBlockAddress = 1;
   mBytesPerLine = 16;
 
   pxWidth = fontMetrics().horizontalAdvance('0');
@@ -37,6 +39,7 @@ void MemoryViewer::setMemory(Memory *mem)
 
 void MemoryViewer::update(Memory* sender , const Memory::Message& msg)
 {
+    centerViewOnAddress(msg.start+msg.size/2);
     lastModified = msg;
     // QString str = dataHex.mid(bPos * 2, 2).toUpper();
     adjustContent();	// TODO that can be optimized
@@ -77,9 +80,20 @@ void MemoryViewer::paintEvent(QPaintEvent *) {
 
   painter.setPen(viewport()->palette().color(QPalette::WindowText));
 
-  for (int row = 0; row <= dataVisible.size() / mBytesPerLine; row++) {
+  int yFocus = -1;
+
+  auto addr = startPos;
+  for (int row = 0; row <= dataVisible.size() / mBytesPerLine; row++)
+  {
+        if (memory==nullptr or addr >= memory->size()) break;
+
+    if (addr <= focusAddr)
+    {
+        yFocus=-1;
+    } else if (yFocus == -1)
+        yFocus = y-pxHeight;
     QString str = QString("%1")
-                      .arg(startPos + mBytesPerLine * row, nBlockAddress * 4,
+                      .arg(addr, nBlockAddress * 4,
                            16, QChar('0'))
                       .toUpper();
     int i = 0;
@@ -92,13 +106,13 @@ void MemoryViewer::paintEvent(QPaintEvent *) {
 
     painter.drawText(pxWidth / 2 - offsetX, y, address);
     y += pxHeight;
+    addr += mBytesPerLine;
   }
 
   int x;
   int lx = addressWidth() + pxWidth;
   painter.drawLine(lx - offsetX, 0, lx - offsetX, height());
   lx += pxWidth / 2;
-  y = pxHeight;
 
   // hex data
   x = lx - offsetX + 3 * pxWidth;
@@ -108,7 +122,11 @@ void MemoryViewer::paintEvent(QPaintEvent *) {
                      viewport()->palette().color(QPalette::AlternateBase));
     x += 6 * pxWidth;
   }
+  yFocus++;
+  painter.drawLine(0, yFocus, width(), yFocus);
+  painter.drawLine(0, yFocus-pxHeight, width() , yFocus-pxHeight);
 
+  y = pxHeight;
   int bPos = 0;
   bool red=false;
   for (int row = 0; row < nRowsVisible; row++) {
@@ -153,6 +171,21 @@ void MemoryViewer::paintEvent(QPaintEvent *) {
     }
     y += pxHeight;
   }
+}
+
+void MemoryViewer::centerViewOnAddress(qint64 addr)
+{
+  focusAddr = addr;
+  if (mBytesPerLine==0) return;
+  if (memory==nullptr) return;
+
+  uint32_t size=memory->size();
+  int lineCount = size / mBytesPerLine;
+  int range = lineCount-nRowsVisible;
+  int row = addr / mBytesPerLine;
+  row -= nRowsVisible/2;
+  long first = row*range/(lineCount-nRowsVisible);
+  verticalScrollBar()->setSliderPosition(first);
 }
 
 void MemoryViewer::adjustContent()

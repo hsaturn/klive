@@ -35,6 +35,7 @@ private:
 
   int nBlockAddress;
   int mBytesPerLine;
+  qint64 focusAddr;
 
   int pxWidth;
   int pxHeight;
@@ -43,6 +44,8 @@ private:
   qint64 endPos;
 
   int nRowsVisible;
+
+  void centerViewOnAddress(qint64 addr);
 
   QByteArray dataVisible;
   QByteArray colorLayer;
