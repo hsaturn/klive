@@ -1044,7 +1044,7 @@ fd2e$v	ld iyl,*
 
 fd34$o	inc (iy+*)
 fd35$o	dec (iy+*)
-fd36$o	ld (iy+*),*
+fd36$o$o	ld (iy+*),*
 
 fd39	add iy,sp
 

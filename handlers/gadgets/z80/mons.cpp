@@ -114,6 +114,10 @@ uint16_t peekWord(const Memory* memory, Memory::addr_t& addr)
 
 Mons::Row Mons::decode(const Memory* memory, Memory::addr_t& addr)
 {
+    if (addr==0x1287)
+    {
+        cout << "stop here" << endl;	// Easy bp set for gdb
+    }
     Row row;
     row.label = getLabel(addr);
     string hexa;
@@ -172,14 +176,10 @@ Mons::Row Mons::decode(const Memory* memory, Memory::addr_t& addr)
                         break;
                     case 'A':
                         value=peekWord(memory, addr);
-                        addr++;
-                        addr++;
                         getOrCreateLabel(value);
                         break;
                     case 'W':
                         value=peekWord(memory, addr);
-                        addr++;
-                        addr++;
                         break;
                     default:
                         cerr << "Mons error: " << hexa << "Unable to decode " << it->second << " ($" << decode[1] << ")" << endl;

@@ -53,12 +53,13 @@ protected:
     void add_hl(uint16_t, cycle burnt);
     uint8_t dec(uint8_t value);
     uint8_t inc(uint8_t value);
+    reg8 add_(reg8, reg8, cycle burnt);
     void and_(reg8, cycle burnt);
     void or_(reg8, cycle burnt);
     reg8 compare(reg8);
     void jr(bool condition);
     void call(cycle burnt);
-    void ret();
+    void ret(bool flag, cycle burn_ret, cycle burn_noret=0);
     inline void incr(){ r++; } // TODO See http://z80.info/z80info.htm
 
     void push(uint16_t, cycle burnt);
