@@ -82,7 +82,10 @@ public:
         ramtop=size-1;
         bytes.resize(size);
     };
+
     virtual ~Memory(){}
+
+    uint32_t size() const { return ramtop+1; }
 
     Byte::value_type peek(const addr_t& addr) const
     {

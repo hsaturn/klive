@@ -1,16 +1,23 @@
 #pragma once
 
+#include <core/hardware/memory.h>
 #include <QAbstractScrollArea>
 #include <QBuffer>
+#include <common/observer.h>
 
-class MemoryViewer : public QAbstractScrollArea {
+using hw::Memory;
+
+class MemoryViewer : public QAbstractScrollArea, public Observer<Memory> {
   Q_OBJECT
 public:
   MemoryViewer(QWidget *parent = 0);
   ~MemoryViewer();
 
-  void setData(const QByteArray &ba);
-  bool setData(QIODevice &device);
+  void update(qint64 addr, uint32_t size);
+  void setMemory(Memory*);
+
+  virtual void update(Memory* sender, const Memory::Message& msg);
+  virtual void observableDies(const Memory* sender);
 
 protected:
   void paintEvent(QPaintEvent *);
@@ -37,11 +44,8 @@ private:
 
   int nRowsVisible;
 
-  QBuffer buffer;
-  QIODevice *ioDevice;
-  qint64 size;
-
   QByteArray dataVisible;
   QByteArray dataHex;
+  Memory* memory = nullptr;
 };
 
