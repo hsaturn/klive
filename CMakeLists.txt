@@ -63,8 +63,6 @@ add_executable(klive
     handlers/screen/screenhandler.cpp
     handlers/screen/screenhandler.h
 
-    handlers/memory/memoryhandler.cpp
-    handlers/memory/memoryhandler.h
     handlers/memory/memory.ui
     handlers/memory/memoryviewer.cpp
     handlers/memory/memoryviewer.h
