@@ -51,8 +51,8 @@ protected:
     void writeMem16(const uint16_t, const cycle burnt);
 
     void add_hl(uint16_t, cycle burnt);
-    uint8_t dec(uint8_t value);
-    uint8_t inc(uint8_t value);
+    uint8_t dec(uint8_t value, cycle burnt);
+    uint8_t inc(uint8_t value, cycle burnt);
     reg8 add_(reg8, reg8, cycle burnt);
     void and_(reg8, cycle burnt);
     void or_(reg8, cycle burnt);
