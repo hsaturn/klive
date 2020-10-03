@@ -37,6 +37,7 @@ void MemoryViewer::setMemory(Memory *mem)
 
 void MemoryViewer::update(Memory* sender , const Memory::Message& msg)
 {
+    lastModified = msg;
     // QString str = dataHex.mid(bPos * 2, 2).toUpper();
     adjustContent();	// TODO that can be optimized
 }
@@ -109,10 +110,21 @@ void MemoryViewer::paintEvent(QPaintEvent *) {
   }
 
   int bPos = 0;
+  bool red=false;
   for (int row = 0; row < nRowsVisible; row++) {
     x = lx - offsetX;
     for (int col = 0; (col < mBytesPerLine) && (bPos < dataHex.size()); col++) {
       QString str = dataHex.mid(bPos * 2, 2).toUpper();
+      if (colorLayer.size() > bPos && colorLayer.at(bPos)=='X')
+      {
+          if (red==false) painter.setPen(QColor(Qt::red));
+          red = true;
+      }
+      else if (red)
+      {
+        red = false;
+        painter.setPen(viewport()->palette().color(QPalette::WindowText));
+      }
       painter.drawText(x, y, str);
       x += 3 * pxWidth;
       bPos += 1;
@@ -165,6 +177,16 @@ void MemoryViewer::adjustContent()
   }
   dataVisible = data(startPos, endPos - startPos + mBytesPerLine + 1);
   dataHex = dataVisible.toHex();
+
+  colorLayer = dataVisible;
+  qint64 pos=lastModified.start-startPos;
+  uint32_t count=lastModified.size;
+  while(count)
+  {
+      colorLayer.replace(pos++, 1, "X");
+      count--;
+  }
+
   viewport()->update();
 }
 

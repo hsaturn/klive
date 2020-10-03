@@ -45,7 +45,9 @@ private:
   int nRowsVisible;
 
   QByteArray dataVisible;
+  QByteArray colorLayer;
   QByteArray dataHex;
   Memory* memory = nullptr;
+  Memory::Message lastModified;
 };
 
