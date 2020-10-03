@@ -1028,7 +1028,7 @@ fd09	add iy,bc
 
 fd19	add iy,de
 
-fd21$v	ld iy,**
+fd21$w	ld iy,**
 fd22$a	ld (**),iy
 fd23	inc iy
 fd24	inc iyh
