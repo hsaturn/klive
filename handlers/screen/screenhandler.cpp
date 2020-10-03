@@ -5,6 +5,7 @@
 #include <handlers/gadgets/zx/spectrum/SpectrumScreen.h>
 #include <handlers/gadgets/z80/monsview.h>
 #include <handlers/gadgets/gdb/minigdb.h>
+#include <handlers/memory/memoryviewer.h>
 
 using namespace hw;
 static ScreenHandler screen_handler_instance;
@@ -55,6 +56,9 @@ void ScreenHandler::initialize(MainWindow *main)
     gdb = new MiniGdb(computer);
     main->createDockWindow(this, gdb, "Mini gdb");
 
+    mem_viewer = new MemoryViewer;
+    main->createDockWindow(this, mem_viewer, "Memory");
+    mem_viewer->setMemory(computer->memory);
 }
 
 void ScreenHandler::update(Cpu* z80, const Z80::Message& msg)

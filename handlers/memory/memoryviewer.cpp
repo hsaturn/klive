@@ -3,8 +3,8 @@
 #include <QPainter>
 #include <QScrollBar>
 
-MemoryViewer::MemoryViewer(QWidget *parent) : QAbstractScrollArea(parent){
-  ioDevice = new QBuffer(this);
+MemoryViewer::MemoryViewer(QWidget *parent) : QAbstractScrollArea(parent)
+{
   init();
   connect(verticalScrollBar(), &QScrollBar::valueChanged, this,
           &MemoryViewer::adjustContent);
@@ -12,7 +12,7 @@ MemoryViewer::MemoryViewer(QWidget *parent) : QAbstractScrollArea(parent){
           &MemoryViewer::adjustContent);
 }
 
-MemoryViewer::~MemoryViewer() {}
+MemoryViewer::~MemoryViewer() { setMemory(nullptr); }
 
 void MemoryViewer::init() {
   nBlockAddress = 2;
@@ -22,51 +22,46 @@ void MemoryViewer::init() {
   pxHeight = fontMetrics().height();
 }
 
-int MemoryViewer::addressWidth() {
+int MemoryViewer::addressWidth()
+{
   return (nBlockAddress * 4 + nBlockAddress - 1) * pxWidth;
+}
+
+void MemoryViewer::setMemory(Memory *mem)
+{
+    if (memory) memory->detach(this);
+    memory=mem;
+    if (memory) memory->attach(this);
+    adjustContent();
+}
+
+void MemoryViewer::update(Memory* sender , const Memory::Message& msg)
+{
+    // QString str = dataHex.mid(bPos * 2, 2).toUpper();
+    adjustContent();	// TODO that can be optimized
+}
+
+void MemoryViewer::observableDies(const Memory* sender)
+{
+    memory = nullptr;
 }
 
 int MemoryViewer::hexWidth() { return (mBytesPerLine * 3 + 1) * pxWidth; }
 
 int MemoryViewer::asciiWidth() { return (mBytesPerLine * 2 + 1) * pxWidth; }
 
-QByteArray MemoryViewer::data(qint64 pos, qint64 count) {
+QByteArray MemoryViewer::data(qint64 pos, qint64 count)
+{
   QByteArray buffer;
+  if (memory == nullptr)
+      return buffer;
 
-  if (pos >= size)
-    return buffer;
-
-  if (count < 0)
-    count = size;
-  else if ((pos + count) > size)
-    count = size - pos;
-
-  if (ioDevice->open(QIODevice::ReadOnly)) {
-    ioDevice->seek(pos);
-    buffer = ioDevice->read(count);
-    ioDevice->close();
+  while(pos<memory->size())
+  {
+      buffer.append(memory->peek(pos++));
+      if (count--==0) break;
   }
   return buffer;
-}
-
-void MemoryViewer::setData(const QByteArray &ba) {
-  buffer.setData(ba);
-  setData(buffer);
-}
-
-bool MemoryViewer::setData(QIODevice &device) {
-  ioDevice = &device;
-  bool ok = ioDevice->open(QIODevice::ReadOnly);
-  if (ok) {
-    size = ioDevice->size();
-    ioDevice->close();
-  } else {
-    QBuffer *buf = new QBuffer(this);
-    ioDevice = buf;
-  }
-  init();
-  adjustContent();
-  return ok;
 }
 
 void MemoryViewer::resizeEvent(QResizeEvent *) { adjustContent(); }
@@ -148,7 +143,9 @@ void MemoryViewer::paintEvent(QPaintEvent *) {
   }
 }
 
-void MemoryViewer::adjustContent() {
+void MemoryViewer::adjustContent()
+{
+  uint32_t size=memory ? memory->size() : 65536;
   int w = addressWidth() + hexWidth() + asciiWidth();
   horizontalScrollBar()->setRange(0, w - viewport()->width());
   horizontalScrollBar()->setPageStep(viewport()->width());
@@ -162,7 +159,8 @@ void MemoryViewer::adjustContent() {
   verticalScrollBar()->setRange(0, lineCount - nRowsVisible);
   verticalScrollBar()->setPageStep(nRowsVisible);
 
-  if (endPos >= size) {
+  if (endPos >= size)
+  {
     endPos = size - 1;
   }
   dataVisible = data(startPos, endPos - startPos + mBytesPerLine + 1);

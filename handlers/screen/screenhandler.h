@@ -8,9 +8,9 @@ using hw::Cpu;
 class MonsView;
 class SpectrumScreen;
 class MiniGdb;
+class MemoryViewer;
 
-class ScreenHandler : public Handler,
-        public Observer<Cpu>
+class ScreenHandler : public Handler, public Observer<Cpu>
 {
 public:
     ScreenHandler();
@@ -26,6 +26,7 @@ private:
     Cpu* cpu = nullptr;
     MonsView* monsView = nullptr;
     SpectrumScreen* screen = nullptr;
+    MemoryViewer* mem_viewer = nullptr;
     QWidget* registers_form = nullptr;
     MiniGdb* gdb = nullptr;
 };

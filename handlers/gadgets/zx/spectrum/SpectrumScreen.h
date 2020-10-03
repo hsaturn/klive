@@ -3,7 +3,6 @@
 #include <common/observer.h>
 #include <core/hardware/memory.h>
 
-#include <core/hardware/memory.h>
 #include <QWidget>
 #include <QPoint>
 #include <QLine>
