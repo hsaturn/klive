@@ -66,6 +66,7 @@ void MiniGdb::cpuStep()
 void MiniGdb::update(Cpu* sender, const Cpu::Message& msg)
 {
     stringstream d;
+    result->setStyleSheet("color: black;");
     switch(msg.event)
     {
         case Cpu::Message::BREAK_POINT:
@@ -76,6 +77,10 @@ void MiniGdb::update(Cpu* sender, const Cpu::Message& msg)
             break;
         case Cpu::Message::WHILE_REACHED:
             d << "While condition reached" << endl;
+            break;
+        case Cpu::Message::UNKNOWN_OP:
+            result->setStyleSheet("color: red;");
+            d << "Unknown opcode" << endl;
             break;
         case Cpu::Message::STEP:
             break;

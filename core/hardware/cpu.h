@@ -65,7 +65,7 @@ class Cpu: public Observable<Cpu>
 {
 public:
     struct Message {
-       enum event_t { STEP, BREAK_POINT, WHILE_REACHED, UNTIL_REACHED};
+       enum event_t { STEP, BREAK_POINT, WHILE_REACHED, UNTIL_REACHED, UNKNOWN_OP};
        Message(event_t event=STEP): event(event) {}
        event_t event;
     };

@@ -46,10 +46,13 @@ void Z80::_reset()
 
 void Z80::nop(byte opcode, const char* prefix)
 {
+    Message unknown(Message::UNKNOWN_OP);
     const char c=0;
     if (prefix==nullptr) prefix=&c;
     printf("Z80 %04x: %s%02x Unknown opcode\n", pc-1, prefix, opcode);
     burn(4);	// Dummy
+    running=false;
+    notify(unknown);
     cout << std::flush;
 }
 
