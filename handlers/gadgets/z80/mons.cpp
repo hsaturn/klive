@@ -99,7 +99,7 @@ string Mons::getOrCreateLabel(const Memory::addr_t addr)
         return label;
 
     stringstream lbl;
-    lbl << "L_" << setw(4) << hex << uppercase << addr;
+    lbl << "L_" << setw(4) << hex << uppercase << setfill('0') << addr;
     dyn_labels[addr]=lbl.str();
     return lbl.str();
 }
@@ -152,9 +152,9 @@ Mons::Row Mons::decode(const Memory* memory, Memory::addr_t& addr)
         // sasm=sasm.substr(postab+1);
         while(decode.length() && decode.length()>=2)
         {
+            row.hexa += peek(memory, addr, false);
             if (decode[0]=='$')
             {
-                row.hexa += peek(memory, addr, false);
                 hexa += "..";
                 int32_t value;
                 switch(decode[1])
@@ -172,21 +172,27 @@ Mons::Row Mons::decode(const Memory* memory, Memory::addr_t& addr)
                         break;
                     case 'A':
                         value=peekWord(memory, addr);
+                        addr++;
+                        addr++;
                         getOrCreateLabel(value);
                         break;
                     case 'W':
                         value=peekWord(memory, addr);
+                        addr++;
+                        addr++;
                         break;
                     default:
                         cerr << "Mons error: " << hexa << "Unable to decode " << it->second << " ($" << decode[1] << ")" << endl;
                         row.mnemo="??";
+                        addr++;
                         break;
                 }
                 values.push(value);
             }
             else
             {
-                hexa += decode.substr(0,2);
+                hexa += peek(memory, addr, false);
+                addr++;
             }
             decode.erase(0,2);	// erase $x or hexa
         }

@@ -242,7 +242,7 @@ void setCell(QStandardItemModel* model, T& reg, int& row, int& col)
 {
 static    int counter=0;
     stringstream r;
-    r << hex << setw(4) << showbase << reg;
+    r << hex << setw(4) << std::setfill('0') << showbase << reg;
     QString str=QString::fromStdString(r.str());
 
     QStandardItem *newItem;
