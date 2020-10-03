@@ -101,10 +101,10 @@ public:
 
     void loadRomImage(std::string f, addr_t start, bool dump=false);
 
-    void poke(const addr_t& start, Byte::value_type value)
+    void poke(const addr_t& start, Byte::value_type value, type_t type=UNCHANGE)
     {
-        // TODO faster implem
-        fill(start, value);
+        // TODO faster implem (exh
+        fill(start, value, 1, type);
     }
 
     void setType(addr_t start, size_t size, type_t type)
@@ -121,7 +121,7 @@ public:
 private:
     std::vector<Byte> bytes;
     bool detectBadWrites=false;     // True will send a BAD_WRITE event when occurs
-    bool mem_protection=false;           // True if write is void on unwritable areas
+    bool mem_protection=true;       // True if write is void on unwritable areas
     addr_t ramtop=0;
 };
 

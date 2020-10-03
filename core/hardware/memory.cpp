@@ -30,7 +30,7 @@ void Memory::fill(addr_t start, Byte::value_type value, size_t size, type_t type
         msg.start = start;
         Byte& byte = bytes[start];
 
-        if (byte.type()&RD_ONLY && mem_protection)
+        if ((byte.type() & RD_ONLY) && mem_protection)
         {
             if (detectBadWrites)
             {
@@ -41,8 +41,8 @@ void Memory::fill(addr_t start, Byte::value_type value, size_t size, type_t type
             }
             continue;
         }
-
-        byte = value;
+        else
+            byte = value;
         if (type != UNCHANGE)
         {
             byte.setType(type);
@@ -54,6 +54,8 @@ void Memory::fill(addr_t start, Byte::value_type value, size_t size, type_t type
 
 void Memory::loadRomImage(string f, Memory::addr_t start, bool dump)
 {
+    bool memprotect(mem_protection);
+    mem_protection = false;
     long bytesRead=0;
     QFile rom(f.c_str());
     // ifstream rom(f.c_str(), ios::in | ios::binary);
@@ -64,7 +66,7 @@ void Memory::loadRomImage(string f, Memory::addr_t start, bool dump)
         while(!rom.atEnd())
         {
             rom.read(&c, 1);
-            poke(start, c);	// TODO rom & rdonly attributes !
+            poke(start, c, RD_ONLY);
             if (dump)
             {
                 if (count==0)
@@ -84,6 +86,7 @@ void Memory::loadRomImage(string f, Memory::addr_t start, bool dump)
         cerr << "Unable to open ROM file " << f << endl;
     }
     cout << "Rom image load result: " << f << ", " << bytesRead << " bytes." << endl;
+    mem_protection=memprotect;
 }
 
 }
