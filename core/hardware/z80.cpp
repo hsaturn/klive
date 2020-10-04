@@ -118,7 +118,7 @@ void Z80::step_no_obs()
         case 0x39: add_hl(sp, 11); break;
         case 0x3d: a=dec(a, 4); break;
         case 0x3e: a = getByte(); burn(7); break; // ld a, n
-        case 0x3f: af.c = af.c ? 0 : 1; af.n=0; burn(4); break;	// ccf
+        case 0x3f: af.c = af.c ? 0 : 1; af.n=0; burn(4); break;	// ccf	TODO f.u5=a.5 f.u3=a.3
         case 0x47: b = a; burn(4); break; 	// ld b,a
         case 0x4e: c = memory->peek(hl.val); burn(7); break;  // ld c,(hl)
         case 0x4f: c = a; burn(4); break;
@@ -166,7 +166,7 @@ void Z80::step_no_obs()
         case 0xA5: and_(l, 4); break; 					// and l
         case 0xA6: and_(memory->peek(hl.val), 7); break;// and (HL)
         case 0xA7: and_(a, 4); break;	// and a
-        case 0xAE: a=a^memory->peek(hl.val); burn(7); break;	// xor (hl)
+        case 0xAE: xor_(memory->peek(hl.val), 7); break;	// xor (hl)
         case 0xAF: a=0; af.c=0; af.pv=1; af.z=1; af.n=0; af.s=0; burn(4); break; // xor a
         case 0xb0: or_(b, 4); break; // or b
         case 0xb1: or_(c, 4); break; // or c
@@ -530,6 +530,7 @@ void Z80::step_xxcb(reg16 base_addr)
 
                 case 0x2: // reset bit
                     val &= ~mask;
+                    memory->poke(addr, val);
                     break;
 
                 case 0x3: // set bit_n;
@@ -603,6 +604,16 @@ void Z80::and_(reg8 n, cycle burnt)
     af.c = 0;
 }
 
+void Z80::xor_(reg8 n, cycle burnt)
+{
+    burn(burnt);
+    a = a^n;
+    af.f=0;
+    af.s = a & 0x80 ? 1 : 0;
+    af.z = a == 0;
+    af.pv = parity(a);
+}
+
 void Z80::or_(reg8 n, cycle burnt)
 {
     burn(burnt);
@@ -615,15 +626,25 @@ void Z80::or_(reg8 n, cycle burnt)
     af.c = 0;
 }
 
+static int16_t to_int16(uint8_t v)
+{
+    return static_cast<int16_t>(static_cast<int8_t>(v));
+}
+static int16_t to_uint16(uint8_t v)
+{
+    return static_cast<uint16_t>(v);
+}
+
 reg8 Z80::add_(reg8 a, reg8 n, cycle burnt)
 {
     reg8 r = a+n;
-    af.s = a & 0x80 ? 1 : 0;
+    af.s = r & 0x80 ? 1 : 0;
     af.z = r == 0 ? 1 : 0;
     af.h = (a & n & 0x10) ? 1 : 0;
-    af.pv = (a^n) & 0x80 ? (r&0x80)==(n&0x80) : 0;	// TODO probably false
+    int16_t r16 = to_int16(a)-to_int16(n);
+    af.pv = (r16< -128 || r > 127) ? 1 : 0;
     af.n = 0;
-    af.c = (a & n & 0x80) ? 1 : 0;
+    af.c = (to_uint16(a)+to_uint16(n) > 255) ? 1 : 0;	// Simpler ?
     af.u5 = r & 0x20 ? 1 : 0;
     af.u3 = r & 0x08 ? 1 : 0;
     burn(burnt);
@@ -636,10 +657,12 @@ reg8 Z80::compare(reg8 n)
     af.s = a & 0x80 ? 1 : 0;
     af.z = r == 0 ? 1 : 0;
     af.h = (a ^ n ^ r) & 16 ? 1 : 0;
-    af.pv = (a^n) & 0x80 ? (r&0x80)==(n&0x80) : 0;
+    // af.pv = (a^n) & 0x80 ? (r&0x80)==(n&0x80) : 0;
+    int16_t r16 = to_int16(a)-to_int16(n);
+    af.pv = (r16< -128 || r > 127) ? 1 : 0;
     af.n = 1;
     af.c = a <  n ? 1 : 0;
-    af.u5 = n & 0x20 ? 1 : 0;
+    af.u5 = n & 0x20 ? 1 : 0;	// TODO set for SUB/SBC but not for CP
     af.u3 = n & 0x08 ? 1 : 0;
     return r;
 }

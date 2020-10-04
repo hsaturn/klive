@@ -55,6 +55,7 @@ protected:
     uint8_t inc(uint8_t value, cycle burnt);
     reg8 add_(reg8, reg8, cycle burnt);
     void and_(reg8, cycle burnt);
+    void xor_(reg8, cycle burnt);
     void or_(reg8, cycle burnt);
     reg8 compare(reg8);
     void jr(bool condition);
