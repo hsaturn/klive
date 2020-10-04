@@ -34,7 +34,6 @@ void Memory::fill(addr_t start, Byte::value_type value, size_t size, type_t type
         {
             if (detectBadWrites)
             {
-                Message msg;
                 msg.event = Message::BAD_WRITE;
                 notify(msg);
                 msg.event = Message::WRITTEN;

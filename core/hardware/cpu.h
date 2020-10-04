@@ -4,8 +4,6 @@
 #include <QWidget>
 #include <map>
 
-using namespace std;
-
 namespace hw
 {
 
@@ -33,7 +31,7 @@ public:
     size_t size() const { return breakpoints.size(); }
 
 private:
-    map<Memory::addr_t, Status> breakpoints;
+    std::map<Memory::addr_t, Status> breakpoints;
 };
 
 // TODO move elsewhere
@@ -64,25 +62,27 @@ private:
 class Cpu: public Observable<Cpu>
 {
 public:
+
     struct Message {
        enum event_t { STEP, BREAK_POINT, WHILE_REACHED, UNTIL_REACHED, UNKNOWN_OP};
-       Message(event_t event=STEP): event(event) {}
+       Message(event_t event_in=STEP): event(event_in) {}
        event_t event;
        unsigned long data;
     };
+
     struct Registers
     {
         Registers() = default;
         virtual ~Registers() = default;
 
         // TODO Bad design, registers should not share display responsability
-        virtual bool set(string reg, int32_t value){ return false; };
-        virtual uint16_t get(const string reg)=0;
+        virtual bool set(std::string reg, int32_t value)=0;
+        virtual uint16_t get(const std::string reg)=0;
         virtual void update() = 0;
         virtual QWidget* createViewForm(QWidget* parent) = 0;
     };
 
-    Cpu(Memory* memory, reg16& pc) : pc(pc), memory(memory) {}
+    Cpu(Memory* memory_, reg16& pc_in) : pc(pc_in), memory(memory_) {}
     virtual ~Cpu() = default;
 
     void update();
@@ -113,12 +113,12 @@ protected:
     reg16& pc;
     Memory* memory;
     CpuClock clock;
+    long nsteps = 1;
 
-    bool running = true;
-    unsigned long nsteps = 1;
+    std::string sWhile;	// debugging purpose
+    std::string sUntil;
 
-    string sWhile;	// debugging purpose
-    string sUntil;
+    bool running = false;
 };
 
 

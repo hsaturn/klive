@@ -22,13 +22,13 @@ public:
 
     // Run steps until the 'real-time' is reached
     void steps_to_rt(uint32_t max_steps=1e6);
-    void irq_mode(int mode){}
-    void di() {};
+    void irq_mode(int /*mode*/){}
+    void di() {}
     Registers* regs() override { return &R; }
 
 protected:
     void _reset() override;
-    inline void burn(cycle cycles) { clock.burn(cycles); };
+    inline void burn(cycle cycles) { clock.burn(cycles); }
     void step_ed();
     void step_cb();
     void step_dd_fd(reg16&);
@@ -40,8 +40,8 @@ protected:
 
     inline uint16_t getWord(const cycle t=0)
     {
-        uint16_t lo =memory->peek(pc++);
-        uint16_t hi=memory->peek(pc++);
+        uint16_t lo = memory->peek(pc++);
+        uint16_t hi = memory->peek(pc++);
         burn(t);
         return (hi<<8)+lo;
     }

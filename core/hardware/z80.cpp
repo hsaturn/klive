@@ -6,8 +6,8 @@ using namespace std;
 
 namespace hw
 {
-Z80::Z80(Memory* memory)
-    : Cpu(memory, R.pc),
+Z80::Z80(Memory* mem)
+    : Cpu(mem, R.pc),
       pc(R.pc), sp(R.sp), ix(R.ix), iy(R.iy),
       af(R.af), bc(R.bc), de(R.de), hl(R.hl),
       af2(R.af2),bc2(R.bc2),de2(R.de2),hl2(R.hl2),
@@ -52,7 +52,7 @@ void Z80::nop(byte opcode, const char* prefix)
     printf("Z80 %04x: %s%02x Unknown opcode\n", pc-1, prefix, opcode);
     burn(4);	// Dummy
     running=false;
-    unknown.data = opcode | ((unsigned long)last << 16);
+    unknown.data = opcode | (static_cast<uint32_t>(last) << 16);
     notify(unknown);
     cout << std::flush;
 }
@@ -124,7 +124,7 @@ void Z80::step_no_obs()
         case 0x4f: c = a; burn(4); break;
         case 0x50: d = b; burn(4); break;
         case 0x51: d = c; burn(4); break;
-        case 0x52: d = d; burn(4); break;
+        case 0x52: burn(4); break;	// ld d=d
         case 0x53: d = e; burn(4); break;
         case 0x54: d = h; burn(4); break;
         case 0x55: d = l; burn(4); break;
@@ -133,7 +133,7 @@ void Z80::step_no_obs()
         case 0x58: e = b; burn(4); break;
         case 0x59: e = c; burn(4); break;
         case 0x5a: e = d; burn(4); break;
-        case 0x5b: e = e; burn(4); break;
+        case 0x5b: burn(4); break;	// ld e,e
         case 0x5c: e = h; burn(4); break;
         case 0x5d: e = l; burn(4); break;
         case 0x5e: e = memory->peek(hl.val); burn(7); break;  // ld e,(hl)

@@ -11,7 +11,6 @@ class Lines : public QWidget
 
 public:
     Lines(QWidget* parent = nullptr);
-    ~Lines() = default;
 
 protected:
     void paintEvent(QPaintEvent* event) override;

@@ -76,11 +76,11 @@ struct Z80Registers : public Cpu::Registers
           d(de.hi),
           e(de.lo),
           h(hl.hi),
-          l(hl.lo) {};
+          l(hl.lo) {}
 
-    virtual ~Z80Registers() = default;
+    virtual ~Z80Registers() override = default;
 
-    uint16_t get(const string reg) override;
+    uint16_t get(const std::string reg) override;
 
     reg16   pc;
     reg16   sp;
@@ -105,7 +105,7 @@ struct Z80Registers : public Cpu::Registers
     reg8&	h;
     reg8&	l;
 
-    bool set(string reg, int32_t value) override;
+    bool set(std::string reg, int32_t value) override;
 
     // TODO Design : should really not merge registers with view of registers
     void update() override;

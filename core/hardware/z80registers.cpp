@@ -21,11 +21,11 @@ namespace hw
 
 static int firstRow=0;
 
-FlagCheckBox::FlagCheckBox(reg8& flags, uint8_t mask, QWidget* label)
+FlagCheckBox::FlagCheckBox(reg8& flags_, uint8_t mask_, QWidget* label_)
     :
-      flags(flags),
-      mask(mask),
-      label(label)
+      flags(flags_),
+      mask(mask_),
+      label(label_)
 {
 
 }
@@ -85,7 +85,7 @@ bool Z80Registers::set(string reg,int32_t value)
 uint16_t Z80Registers::get(string regi)
 {
     string reg(regi);	// TODO ...
-    std::for_each(reg.begin(), reg.end(), [](char&c){ c=tolower(c); });
+    std::for_each(reg.begin(), reg.end(), [](char& chr){ chr=tolower(chr); });
 
     if (reg=="af") return af.val;
     else if (reg=="sp") return sp;
@@ -219,26 +219,26 @@ QWidget* Z80Registers::createViewForm(QWidget* parent)
     return form;
 }
 
-ostream& operator<<(ostream& out, const regaf& af)
+static ostream& operator<<(ostream& out, const regaf& af)
 {
     out << af.val;
     return out;
 }
 
-ostream& operator<<(ostream& out, const reg16u& u)
+static ostream& operator<<(ostream& out, const reg16u& u)
 {
     out << u.val;
     return out;
 }
 
-ostream& operator<<(ostream& out, const reg8& u)
+static ostream& operator<<(ostream& out, const reg8& u)
 {
     out << (int16_t)u;
     return out;
 }
 
 template<class T>
-void setCell(QStandardItemModel* model, T& reg, int& row, int& col)
+static void setCell(QStandardItemModel* model, T& reg, int& row, int& col)
 {
 static    int counter=0;
     stringstream r;
@@ -258,7 +258,7 @@ static    int counter=0;
     row++;
 }
 
-void setCells(QTableView* table, int col, reg16& top, regaf& af, reg16u& bc, reg16u& de, reg16u& hl, reg16& ii, reg8& bottom)
+static void setCells(QTableView* table, int col, reg16& top, regaf& af, reg16u& bc, reg16u& de, reg16u& hl, reg16& ii, reg8& bottom)
 {
     auto model=dynamic_cast<QStandardItemModel*>(table->model());
     int row=firstRow;

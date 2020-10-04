@@ -19,7 +19,7 @@ bool Cpu::steps_to_rt(uint32_t max_steps)
         step_no_obs();
         if (max_steps-- == 0)
             return false;
-        if (breaks.has(pc))
+        if (breaks.has(pc))	// TODO is it really working (z80 has a pc member conflicting with cpu::pc)
         {
             static Message breakMsg(Message::BREAK_POINT);
             nsteps=0;

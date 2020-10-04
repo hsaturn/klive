@@ -13,10 +13,10 @@ int LineBouncer::delta()
     return d;
 }
 
-LineBouncer::LineBouncer(QWidget* widget, int min_speed, int max_speed)
+LineBouncer::LineBouncer(QWidget* widget, int min_speed_, int max_speed_)
     : widget(widget),
-      min_speed(min_speed),
-      max_speed(max_speed)
+      min_speed(min_speed_),
+      max_speed(max_speed_)
 {
     if (min_speed > max_speed)
     {
@@ -46,7 +46,7 @@ void LineBouncer::advance(QPoint& p, QPoint& speed)
         speed.setY(abs(speed.y()));
 }
 
-void LineBouncer::paintEvent(QPaintEvent* event)
+void LineBouncer::paintEvent(QPaintEvent*)
 {
     QPainter painter(widget);
 
@@ -58,10 +58,9 @@ void LineBouncer::paintEvent(QPaintEvent* event)
 
     advance(p1, d1);
     advance(p2, d2);
-    QLine line(p1,p2);
 
     painter.setPen(QPen(color, 1));
-    lines.push_front(line);
+    lines.push_front(QLine(p1, p2));
 
     for(const auto& line: lines)
         painter.drawLine(line);

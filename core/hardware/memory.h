@@ -28,13 +28,13 @@ public:
     public:
         using value_type=unsigned char;
 
-        explicit Byte(value_type byte, type_t type)
-            : byte(byte) { flags = type; }
+        explicit Byte(value_type bytein, type_t type)
+            : byte(bytein) { flags = type; }
 
-        explicit Byte(value_type byte)
-            : Byte(byte, RAM){}
+        explicit Byte(value_type bytein)
+            : Byte(bytein, RAM){}
 
-        Byte() : Byte(0, RAM){};
+        Byte() : Byte(0, RAM){}
 
 
         bool isWritable() const
@@ -81,9 +81,7 @@ public:
     {
         ramtop=size-1;
         bytes.resize(size);
-    };
-
-    virtual ~Memory(){}
+    }
 
     uint32_t size() const { return ramtop+1; }
 
@@ -123,9 +121,9 @@ public:
 
 private:
     std::vector<Byte> bytes;
+    addr_t ramtop=0;
     bool detectBadWrites=false;     // True will send a BAD_WRITE event when occurs
     bool mem_protection=true;       // True if write is void on unwritable areas
-    addr_t ramtop=0;
 };
 
 }

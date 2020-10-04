@@ -90,7 +90,7 @@ QAction* MainWindow::addMenuEntry(
     before_key.erase(std::remove(before_key.begin(), before_key.end(), '&'), before_key.end());
 
     QMenu* menu;
-    QAction* action;
+    QAction* action = nullptr;
 
     // TODO what happens if QMenu* diseaper between calls...
     if (menus.find(menu_key) == menus.end())
@@ -222,7 +222,7 @@ void MainWindow::createStatusBar()
     statusBar()->showMessage(tr("Ready"));
 }
 
-void MainWindow::createDockWindow(Handler* handler, QWidget* widget, const std::string title)
+void MainWindow::createDockWindow(Handler*, QWidget* widget, const std::string title)
 {
    ads::CDockWidget *dock = new ads::CDockWidget(tr(title.c_str()));
    dock->setWidget(widget);

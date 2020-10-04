@@ -30,7 +30,7 @@ public:
     const std::string name() const { return name_; }
     virtual ~Handler();
 
-    virtual void initialize(MainWindow*) {};
+    virtual void initialize(MainWindow*) {}
 
 private:
     std::string name_;

@@ -71,7 +71,7 @@ void MonsView::setMemory(Memory *new_memory)
     pc=0;
 
     // Pass 2 : populate list
-    long line=1;
+    int line=1;
     while(pc<16384)
     {
         stringstream h;
@@ -94,7 +94,7 @@ void MonsView::setMemory(Memory *new_memory)
     resizeRowsToContents();
 }
 
-void MonsView::update(Memory* memory, const Memory::Message& msg)
+void MonsView::update(Memory* , const Memory::Message&)
 {
 }
 
@@ -109,7 +109,7 @@ void MonsView::setPointer(Memory::addr_t pc)
         setCurrentIndex(index);
        // scrollTo(index);
     }
-    return;
+    return;	// TODO manage memory update
     QStandardItem *newItem;
     if (memory==nullptr) return;
 
