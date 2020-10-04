@@ -214,7 +214,7 @@ void MemoryViewer::adjustContent()
   colorLayer = dataVisible;
   qint64 pos=lastModified.start-startPos;
   uint32_t count=lastModified.size;
-  while(count)
+  while(count && pos>=0 && pos < colorLayer.size())
   {
       colorLayer.replace(pos++, 1, "X");
       count--;
