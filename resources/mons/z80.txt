@@ -207,7 +207,6 @@ c7	rst 00h
 c8	ret z
 c9	ret
 ca$a	jp z,**
-cb	-BITS
 cc$a	call z,**
 cd$a	call **
 ce$v	adc a,*

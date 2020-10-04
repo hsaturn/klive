@@ -315,12 +315,6 @@ void Z80::jr(bool condition)
         burn(7);
 }
 
-void Z80::step_cb()
-{
-    incr();
-    nop(0xcb);   // TODO
-}
-
 uint16_t Z80::readMem16(const cycle burnt)
 {
     Memory::addr_t dest=getWord(burnt);
@@ -493,6 +487,60 @@ uint8_t* Z80::calc_dest_reg(uint8_t opcode)
         case 0x07: return &a;
     }
     return nullptr;
+}
+
+void Z80::step_cb()
+{
+    incr();
+    bool ismem=false;
+    uint8_t mem;
+    uint8_t opcode=getByte();
+
+    uint8_t* reg = calc_dest_reg(opcode);
+    if (reg==nullptr)
+    {
+        burn(15);
+        ismem=true;
+        reg=&mem;
+        mem=memory->peek(hl.val);
+    }
+    else {
+        burn(8);
+    }
+
+    switch(opcode>>3)
+    {
+    case 0: *reg=rlc(*reg); break;
+    case 1: *reg=rrc(*reg); break;
+    case 2: *reg=rl(*reg); break;
+    case 3: *reg=rr(*reg); break;
+    case 4: *reg=sla(*reg); break;
+    case 5: *reg=sra(*reg); break;
+    case 6: *reg=sll(*reg); break;
+    case 7: *reg=srl(*reg); break;
+    default:
+        uint8_t bit_nr=(opcode & 0x38) >> 3;
+        uint8_t mask=1 << bit_nr;
+
+        if (opcode<0x80)		// bit x, reg
+        {
+            af.z = (*reg & mask) ? 0 : 1;
+        }
+        else if (opcode<0xC0) 	// res x, reg
+        {
+            *reg &= ~mask;
+        } 						// set x, reg
+        else
+        {
+            *reg |= mask;
+        }
+        break;
+    }
+
+    if (ismem)
+    {
+        memory->poke(hl.val, *reg);
+    }
 }
 
 void Z80::step_xxcb(reg16 base_addr)

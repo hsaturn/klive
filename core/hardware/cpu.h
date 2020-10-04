@@ -118,7 +118,7 @@ protected:
     std::string sWhile;	// debugging purpose
     std::string sUntil;
 
-    bool running = false;
+    bool running = true;
 };
 
 
