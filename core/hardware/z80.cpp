@@ -349,11 +349,13 @@ void Z80::step_ed()
             break;
         case 0xb0: // ldir
             {
+                r-=2;
                 // TODO it seems that interrupts are taken in account
                 af.h=0; af.pv= (bc.val==1); af.n=0;
                 do
                 {
                     burn(bc.val ? 21 : 16);
+                    incr();
                     incr();
                     memory->poke(de.val, memory->peek(hl.val));
                     hl.val++;
@@ -364,11 +366,13 @@ void Z80::step_ed()
             break;
         case 0xb8: // lddr
             {
+                r-=2;
                 af.h=0; af.pv=0; af.n=0;
                 do
                 {
                     // TODO it seems that interrupts are taken in account
                     burn(bc.val ? 21 : 16);
+                    incr();
                     incr();
                     memory->poke(de.val, memory->peek(hl.val));
                     hl.val--;
