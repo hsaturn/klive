@@ -76,6 +76,7 @@ bool Cpu::steps_to_rt(uint32_t max_steps)
 void Cpu::reset()
 {
     clock.restart();
+    running = false;
     _reset();
 }
 
