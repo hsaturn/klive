@@ -58,7 +58,9 @@ protected:
     void xor_(reg8, cycle burnt);
     void or_(reg8, cycle burnt);
     reg8 compare(reg8);
+    void rlca();
     void jr(bool condition);
+    void rst(uint8_t addr);
     void call(cycle burnt);
     void ret(bool flag, cycle burn_ret, cycle burn_noret=0);
     inline void incr(){ r=(r+1) & 0x7F; } // TODO See http://z80.info/z80info.htm

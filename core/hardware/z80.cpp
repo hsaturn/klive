@@ -72,6 +72,7 @@ void Z80::step_no_obs()
         case 0x01: bc.val = getWord(10); break; 		// ld bc, **
         case 0x04: b=inc(b, 4); break;
         case 0x06: b=getByte(); burn(7); break;			// ld b, *
+        case 0x07: rlca(); break;
         case 0x09: add_hl(bc.val, 11); break;
         case 0x0D: d=dec(d, 4); break;					// dec d
         case 0x0E: c=getByte(7); break;
@@ -119,6 +120,13 @@ void Z80::step_no_obs()
         case 0x3d: a=dec(a, 4); break;
         case 0x3e: a = getByte(); burn(7); break; // ld a, n
         case 0x3f: af.c = af.c ? 0 : 1; af.n=0; burn(4); break;	// ccf	TODO f.u5=a.5 f.u3=a.3
+        case 0x40: burn(4); break;	//ld b,b
+        case 0x41: b = c; burn(4); break;
+        case 0x42: b = d; burn(4); break;
+        case 0x43: b = e; burn(4); break;
+        case 0x44: b = h; burn(4); break;
+        case 0x45: b = l; burn(4); break;
+        case 0x46: b = memory->peek(hl.val); burn(7); break;
         case 0x47: b = a; burn(4); break; 	// ld b,a
         case 0x4e: c = memory->peek(hl.val); burn(7); break;  // ld c,(hl)
         case 0x4f: c = a; burn(4); break;
@@ -194,6 +202,8 @@ void Z80::step_no_obs()
         case 0xD3: out(getByte(), a); burn(11); break;
         case 0xD9: swap(hl,hl2); swap(de,de2); swap(bc,bc2); burn(4); break;
         case 0xD5: push(de.val, 11); break;		// push de
+        case 0xD6: a=compare(getByte(7)); break;		// sub *
+        case 0xD7: rst(0x10); break;
         case 0xDD: step_dd_fd(ix); break;
         case 0xE1: pop(hl.val, 11); break;
         case 0xE5: push(hl.val, 11); break;		// push hl
@@ -206,10 +216,11 @@ void Z80::step_no_obs()
             cerr << "z80: DI nyi" << endl; burn(4); break;
         case 0xF5: push(af.val, 11); break;		// push hl
         case 0xf6: or_(getByte(), 7); break;
+        case 0xF9: sp=hl.val; burn(6); break; // ld sp,hl
         case 0xFB: // EI
             cerr << "z80: EI nyi" << endl; burn(4); break;
         case 0xFD: step_dd_fd(iy); break;
-        case 0xF9: sp=hl.val; burn(6); break; // ld sp,hl
+        case 0xFE: compare(getByte(7)); break;	// cp *
         default: nop(opcode); break;
     }
     if (clock == before)
@@ -223,6 +234,12 @@ void Z80::call(cycle burnt)
     reg16 next_pc = getWord();
     push(pc, burnt);
     pc = next_pc;
+}
+
+void Z80::rst(uint8_t addr)
+{
+    push(pc, 11);
+    pc = addr;
 }
 
 void Z80::ret(bool flag, cycle burn_ret, cycle burn_noret)
@@ -249,6 +266,7 @@ void Z80::push(uint16_t value, cycle burnt)
 void Z80::pop(uint16_t& reg, cycle burnt)
 {
      reg = memory->peek(sp)+(memory->peek(sp+1)<<8);
+     sp+=2;
      burn(burnt);
 }
 
@@ -445,7 +463,13 @@ void Z80::step_dd_fd(reg16& in)
                 memory->poke(in+offset, *reg);
             }
             break;
-
+        case 0x86:	// add a, (ii+*)
+            {
+                burn(19);
+                int8_t offset = static_cast<int8_t>(getByte());
+                a=add_(a, memory->peek(in+offset), 19);
+            }
+            break;
         case 0xCB: step_xxcb(in); break;
         default: nop(opcode, "0xdd/fd "); break;
     }
@@ -665,6 +689,15 @@ reg8 Z80::compare(reg8 n)
     af.u5 = n & 0x20 ? 1 : 0;	// TODO set for SUB/SBC but not for CP
     af.u3 = n & 0x08 ? 1 : 0;
     return r;
+}
+
+void Z80::rlca()
+{
+    a = (a<<1) | (a&80 ? 1:0);
+    af.h=0;
+    af.n=0;
+    af.c= (a & 1) ? 1 : 0;
+    burn(4);
 }
 
 
