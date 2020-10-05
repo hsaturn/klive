@@ -29,7 +29,6 @@ add_executable(klive
     common/mapreader.h
     common/expr.h
     common/expr.cpp
-    common/crc32.cpp
 
     core/handler.cpp
     core/handler.h
