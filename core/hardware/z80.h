@@ -54,14 +54,19 @@ protected:
     uint8_t dec(uint8_t value, cycle burnt);
     uint8_t inc(uint8_t value, cycle burnt);
     reg8 add_(reg8, reg8, cycle burnt);
+    reg8 adc_(reg8, cycle burnt=4);
     void and_(reg8, cycle burnt);
     void xor_(reg8, cycle burnt);
     void or_(reg8, cycle burnt);
+    void ex_word_at_sp(uint16_t& val);
     reg8 compare(reg8);
+    void sbc(uint8_t val, cycle burnt);
     void rlca();
     void jr(bool condition);
     void rst(uint8_t addr);
-    void call(cycle burnt);
+    void jp_if(bool flag);
+    void call_if(bool flag);
+    void call();
     void ret(bool flag, cycle burn_ret, cycle burn_noret=0);
     inline void incr(){ r=(r+1) & 0x7F; } // TODO See http://z80.info/z80info.htm
 
@@ -69,6 +74,7 @@ protected:
     void pop(uint16_t&, cycle burnt);
 
     void rrca();
+    void rra();
     uint8_t rlc(uint8_t);
     uint8_t rrc(uint8_t);
     uint8_t rl(uint8_t);

@@ -68,32 +68,48 @@ void Z80::step_no_obs()
     switch(opcode)
     {
         case 0x00: burn(4); break; 						// Nop
-        case 0x03: bc.val++; burn(6);					// inc bc
         case 0x01: bc.val = getWord(10); break; 		// ld bc, **
+        case 0x02: memory->poke(bc.val, a); burn(7); break;
+        case 0x03: bc.val++; burn(6); break;					// inc bc
         case 0x04: b=inc(b, 4); break;
+        case 0x05: b=dec(b, 4); break;
         case 0x06: b=getByte(); burn(7); break;			// ld b, *
         case 0x07: rlca(); break;
+        case 0x08: std::swap(af.val, af2.val); burn(4); break;
         case 0x09: add_hl(bc.val, 11); break;
-        case 0x0D: d=dec(d, 4); break;					// dec d
+        case 0x0a: a=memory->peek(bc.val); burn(7); break;	// ld a, (bc)
+        case 0x0B: bc.val--; burn(6); break;
+        case 0x0C: c=inc(c, 4); break;
+        case 0x0D: c=dec(c, 4); break;					// dec c
         case 0x0E: c=getByte(7); break;
         case 0x0F: rrca(); break;
         case 0x10: burn(1); b--; jr(b); break; 			// djnz
         case 0x11: de.val = getWord(10); break; 		// ld de, nn
-        case 0x13: de.val++; burn(6);					// inc de
+        case 0x12: memory->poke(de.val, a); burn(7); break;
+        case 0x13: de.val++; burn(6); break;					// inc de
+        case 0x14: d=inc(d, 4); break;
+        case 0x15: d=dec(d, 4); break;
         case 0x16: d=getByte(7); break;					// ld d,*
         case 0x18: jr(true); break;
         case 0x19: add_hl(de.val, 11); break;
-        case 0x1b: de.val--; burn(6); break;			// dec de
+        case 0x1A: a=memory->peek(de.val); burn(7); break;	// ld a, (de)
+        case 0x1B: de.val--; burn(6); break;			// dec de
+        case 0x1C: e=inc(e, 4); break;
+        case 0x1D: e=dec(e, 4); break;
+        case 0x1F: rra(); break;
         case 0x20: jr(!af.z); break;					// jr nz
         case 0x21: hl.val=getWord(10); break;			// ld hl, (nn)
         case 0x22: writeMem16(hl.val, 16); break;		// ld (**), hl
         case 0x23: hl.val++; burn(6); break;
         case 0x24: h=inc(h, 4); break;
+        case 0x25: h=dec(h, 4); break;
         case 0x26: h=getByte(); burn(7); break;			// ld h, *
         case 0x28: jr(af.z); break;
         case 0x29: add_hl(hl.val, 11); break;
         case 0x2A: hl.val=readMem16(16); break; 		// ld hl, (nn)
         case 0x2B: hl.val--; burn(6); break; 			// dec hl
+        case 0x2C: l=inc(l, 4); break;
+        case 0x2D: l=dec(l, 4); break;
         case 0x30:
                     jr(!af.c); break;
         case 0x31: sp=readMem16(10); break;				// ld sp, **
@@ -117,6 +133,9 @@ void Z80::step_no_obs()
         case 0x37: af.c=1; af.h=0; af.n=0; burn(4); break;		// scf
         case 0x38: jr(af.c); break;
         case 0x39: add_hl(sp, 11); break;
+        case 0x3a: a=memory->peek(getWord(13)); break;
+        case 0x3b: sp--; burn(6); break;
+        case 0X3c: a=inc(a, 4); break;
         case 0x3d: a=dec(a, 4); break;
         case 0x3e: a = getByte(); burn(7); break; // ld a, n
         case 0x3f: af.c = af.c ? 0 : 1; af.n=0; burn(4); break;	// ccf	TODO f.u5=a.5 f.u3=a.3
@@ -128,6 +147,12 @@ void Z80::step_no_obs()
         case 0x45: b = l; burn(4); break;
         case 0x46: b = memory->peek(hl.val); burn(7); break;
         case 0x47: b = a; burn(4); break; 	// ld b,a
+        case 0x48: c = b; burn(4); break;
+        case 0x49: burn(4); break;	// ld c,c
+        case 0x4a: c = d; burn(4); break;
+        case 0x4b: c = e; burn(4); break;
+        case 0x4c: c = h; burn(4); break;
+        case 0x4d: c = l; burn(4); break;
         case 0x4e: c = memory->peek(hl.val); burn(7); break;  // ld c,(hl)
         case 0x4f: c = a; burn(4); break;
         case 0x50: d = b; burn(4); break;
@@ -146,10 +171,20 @@ void Z80::step_no_obs()
         case 0x5d: e = l; burn(4); break;
         case 0x5e: e = memory->peek(hl.val); burn(7); break;  // ld e,(hl)
         case 0x5F: e = a; burn(4); break; 	// ld e,a
+        case 0x60: h = b; burn(4); break; 	// ld h,b
+        case 0x61: h = c; burn(4); break; 	// ld h,c
         case 0x62: h = d; burn(4); break; 	// ld h,d
         case 0x63: h = e; burn(4); break; 	// ld h,e
+        case 0x64: burn(4); break; 			// ld h,h
+        case 0x65: h = l; burn(4); break; 	// ld h,l
+        case 0x66: h = memory->peek(hl.val); burn(7); break;	// ld h, (hl)
         case 0x67: h = a; burn(4); break; 	// ld h,a
+        case 0x68: l = b; burn(4); break; 	// ld l,b
+        case 0x69: l = c; burn(4); break; 	// ld l,c
+        case 0x6a: l = d; burn(4); break; 	// ld l,d
         case 0x6b: l = e; burn(4); break; 	// ld l,e
+        case 0x6c: l = h; burn(4); break; 	// ld l,h
+        case 0x6d: burn(4); break; 	// ld l,l
         case 0x6e: l = memory->peek(hl.val); burn(7); break;	// ld l, (hl)
         case 0x6f: l = a; burn(4); break; 	// ld l,a
         case 0x70: memory->poke(hl.val, b); burn(7); break;	// ld (hl),b
@@ -161,11 +196,38 @@ void Z80::step_no_obs()
 
         case 0x77: memory->poke(hl.val, a); burn(7); break; // ld (hl), a)
         case 0x78: a = b; burn(4); break;
+        case 0x79: a = c; burn(4); break;
         case 0x7a: a = d; burn(4); break;		// ld a,d
+        case 0x7b: a = e; burn(4); break;		// ld a,e
+        case 0x7c: a = h; burn(4); break;		// ld a,h
+        case 0x7d: a = l; burn(4); break;		// ld a,l
         case 0x7e: a = memory->peek(hl.val); burn(7); break; // ld a, (hl)
+        case 0x7f: burn(4); break;							// ld a,a
         case 0x87: a=add_(a,a,4); break;	// add a,a
-        case 0x90: a=compare(b); burn(4); break;		// sub b
-        case 0x91: a=compare(c); burn(4); break;	// sub c
+        case 0x88: adc_(b); break;
+        case 0x89: adc_(c); break;
+        case 0x8a: adc_(d); break;
+        case 0x8b: adc_(e); break;
+        case 0x8c: adc_(h); break;
+        case 0x8d: adc_(l); break;
+        case 0x8e: adc_(memory->peek(hl.val),7); break;
+        case 0x8f: adc_(a); break;
+        case 0x90: a=compare(b); burn(4); break;		// sub r
+        case 0x91: a=compare(c); burn(4); break;
+        case 0x92: a=compare(d); burn(4); break;
+        case 0x93: a=compare(e); burn(4); break;
+        case 0x94: a=compare(h); burn(4); break;
+        case 0x95: a=compare(l); burn(4); break;
+        case 0x96: a=compare(memory->peek(hl.val)); burn(7); break;
+        case 0x97: a=compare(a); burn(4); break;
+        case 0x98: sbc(b, 4); break;
+        case 0x99: sbc(c, 4); break;
+        case 0x9A: sbc(d, 4); break;
+        case 0x9B: sbc(e, 4); break;
+        case 0x9C: sbc(h, 4); break;
+        case 0x9D: sbc(l, 4); break;
+        case 0x9E: sbc(memory->peek(hl.val), 7); break;
+        case 0x9F: sbc(a, 4); break;
         case 0xA0: and_(b, 4); break;					// and b
         case 0xA1: and_(c, 4); break; 					// and c
         case 0xA2: and_(d, 4); break; 					// and d
@@ -174,6 +236,12 @@ void Z80::step_no_obs()
         case 0xA5: and_(l, 4); break; 					// and l
         case 0xA6: and_(memory->peek(hl.val), 7); break;// and (HL)
         case 0xA7: and_(a, 4); break;	// and a
+        case 0xA8: xor_(b, 4); break;
+        case 0xA9: xor_(c, 4); break;
+        case 0xAA: xor_(d, 4); break;
+        case 0xAB: xor_(e, 4); break;
+        case 0xAC: xor_(h, 4); break;
+        case 0xAD: xor_(l, 4); break;
         case 0xAE: xor_(memory->peek(hl.val), 7); break;	// xor (hl)
         case 0xAF: a=0; af.c=0; af.pv=1; af.z=1; af.n=0; af.s=0; burn(4); break; // xor a
         case 0xb0: or_(b, 4); break; // or b
@@ -189,23 +257,34 @@ void Z80::step_no_obs()
         case 0xBA: compare(d); burn(4); break;	// cp d
         case 0xBB: compare(e); burn(4); break;	// cp e
         case 0xBC: compare(h); burn(4); break;	// cp h
+        case 0xC0: ret(not af.z, 11,5); break;
         case 0xc1: pop(bc.val, 11); break;
+        case 0xC2: jp_if(not af.z); break;
         case 0xC3: pc = getWord(10); break; // Jump
+        case 0xC4: call_if(not af.z); break;
         case 0xc5: push(bc.val, 11); break; 	// push bc
         case 0xc6: a=add_(a, getByte(), 7); break;	// add a, *
         case 0xc8: ret(af.z, 11, 5); break; // ret z
         case 0xC9: ret(true, 10); break;
+        case 0xCA: jp_if(af.z); break;
         case 0xCB: step_cb(); break;
-        case 0xCD: call(17); break;
-        case 0xD0: ret(not af.c, 11,5);
+        case 0xCC: call_if(af.z); break;
+        case 0xCD: call(); break;
+        case 0xD0: ret(not af.c, 11,5); break;
         case 0xD1: pop(de.val, 11); break;
         case 0xD3: out(getByte(), a); burn(11); break;
+        case 0xD4: call_if(not af.c); break;
         case 0xD9: swap(hl,hl2); swap(de,de2); swap(bc,bc2); burn(4); break;
+        case 0xD2: jp_if(not af.c); break;
         case 0xD5: push(de.val, 11); break;		// push de
         case 0xD6: a=compare(getByte(7)); break;		// sub *
         case 0xD7: rst(0x10); break;
+        case 0xD8: ret(af.c, 11, 5); break;
+        case 0xDA: jp_if(af.c); break;
+        case 0xDC: call_if(af.c); break;
         case 0xDD: step_dd_fd(ix); break;
         case 0xE1: pop(hl.val, 11); break;
+        case 0xE3: ex_word_at_sp(hl.val); break;	// ex (sp); hl
         case 0xE5: push(hl.val, 11); break;		// push hl
         case 0xE6: and_(getByte(), 7); break; // and n
         case 0xE9: pc=hl.val; burn(4); break;	// jp (hl)
@@ -229,10 +308,39 @@ void Z80::step_no_obs()
     }
 }
 
-void Z80::call(cycle burnt)
+void Z80::ex_word_at_sp(uint16_t &val)
+{
+    uint8_t lo = memory->peek(sp);
+    uint8_t hi = memory->peek(sp+1);
+    memory->poke(sp  , val & 0xFF);
+    memory->poke(sp+1, val >> 8);
+    val = (hi<<8)|lo;
+    burn(19);
+}
+
+void Z80::jp_if(bool flag)
+{
+    burn(10);
+    Memory::addr_t addr=getWord();
+    if (flag) pc=addr;
+}
+
+void Z80::call_if(bool flag)
 {
     reg16 next_pc = getWord();
-    push(pc, burnt);
+    if (flag)
+    {
+        push(pc, 17);
+        pc = next_pc;
+    }
+    else
+        burn(10);
+}
+
+void Z80::call()
+{
+    reg16 next_pc = getWord();
+    push(pc, 17);
     pc = next_pc;
 }
 
@@ -246,6 +354,7 @@ void Z80::ret(bool flag, cycle burn_ret, cycle burn_noret)
 {
     if (flag)
     {
+        std::cout << hex << "return, sp=" << sp << ", pc=" << pc << endl;
         pc = memory->peek(sp)+(memory->peek(sp+1)<<8);
         sp += 2;
         burn(burn_ret);
@@ -337,6 +446,13 @@ void Z80::step_ed()
         case 0x43: writeMem16(bc.val, 20); break;
 
         case 0x47: i=a; burn(9); break; // ld i,a
+        case 0x4B: // ld bc, (**)
+            {
+                Memory::addr_t addr=getWord(20);
+                c=memory->peek(addr);
+                b=memory->peek(addr+1);
+                break;
+            }
         case 0x52:	// sbc hl, de
             burn(15);
             {
@@ -359,7 +475,14 @@ void Z80::step_ed()
             cout << "z80: IM1 nyi" << endl;
             burn(8);
             break;
-        case 0xb0: // ldir
+        case 0x5B:	// ld de, (**)
+            {
+                Memory::addr_t addr=getWord(20);
+                e=memory->peek(addr);
+                d=memory->peek(addr+1);
+                break;
+            }
+        case 0xB0: // ldir
             {
                 r-=2;
                 // TODO it seems that interrupts are taken in account
@@ -418,6 +541,12 @@ void Z80::step_dd_fd(reg16& in)
                 Memory::addr_t addr=in+static_cast<int8_t>(getByte());
                 memory->poke(addr, getByte());
                 burn(19);
+            }
+            break;
+        case 0x46:	// ld b, (ii+*)
+            {
+                Memory::addr_t addr=in+static_cast<int8_t>(getByte(19));
+                b = memory->peek(addr);
             }
             break;
         case 0x60:	// ld i?h, reg
@@ -638,6 +767,17 @@ void Z80::rrca()
     burn(4);
 }
 
+void Z80::rra()
+{
+    auto a0 = a;
+    af.h=0;
+    af.n=0;
+    a=a>>1;
+    if (af.c) a=a|0x80;
+    af.c=a0&1;
+    burn(4);
+}
+
 uint8_t Z80::rlc(uint8_t val)
 {
     val=(val<<1)|(val>>7);
@@ -674,6 +814,8 @@ void Z80::and_(reg8 n, cycle burnt)
     af.pv = parity(a);	// TODO, this is overflow not parity
     af.n = 0;
     af.c = 0;
+    af.u5 = a & 0x20 ? 1 : 0;	// TODO set for SUB/SBC but not for CP
+    af.u3 = a & 0x08 ? 1 : 0;
 }
 
 void Z80::xor_(reg8 n, cycle burnt)
@@ -684,6 +826,7 @@ void Z80::xor_(reg8 n, cycle burnt)
     af.s = a & 0x80 ? 1 : 0;
     af.z = a == 0;
     af.pv = parity(a);
+    af.u3 = a & 0x08 ? 1 : 0;
 }
 
 void Z80::or_(reg8 n, cycle burnt)
@@ -696,6 +839,7 @@ void Z80::or_(reg8 n, cycle burnt)
     af.pv = parity(a);
     af.n = 0;
     af.c = 0;
+    af.u3 = a & 0x08 ? 1 : 0;
 }
 
 static int16_t to_int16(uint8_t v)
@@ -723,10 +867,26 @@ reg8 Z80::add_(reg8 a, reg8 n, cycle burnt)
     return r;
 }
 
+reg8 Z80::adc_(reg8 n, cycle burnt)
+{
+    reg8 r = a+n+ (af.c ? 1: 0);
+    af.s = r & 0x80 ? 1 : 0;
+    af.z = r == 0 ? 1 : 0;
+    af.h = (a & n & 0x10) ? 1 : 0;
+    int16_t r16 = to_int16(a)-to_int16(n);
+    af.pv = (r16< -128 || r > 127) ? 1 : 0;
+    af.n = 0;
+    af.c = (to_uint16(a)+to_uint16(n) > 255) ? 1 : 0;	// Simpler ?
+    af.u5 = r & 0x20 ? 1 : 0;
+    af.u3 = r & 0x08 ? 1 : 0;
+    burn(burnt);
+    return r;
+}
+
 reg8 Z80::compare(reg8 n)
 {
     reg8 r = a-n;
-    af.s = a & 0x80 ? 1 : 0;
+    af.s = r & 0x80 ? 1 : 0;
     af.z = r == 0 ? 1 : 0;
     af.h = (a ^ n ^ r) & 16 ? 1 : 0;
     // af.pv = (a^n) & 0x80 ? (r&0x80)==(n&0x80) : 0;
@@ -737,6 +897,12 @@ reg8 Z80::compare(reg8 n)
     af.u5 = n & 0x20 ? 1 : 0;	// TODO set for SUB/SBC but not for CP
     af.u3 = n & 0x08 ? 1 : 0;
     return r;
+}
+
+void Z80::sbc(uint8_t val, cycle burnt)
+{
+    a=compare(val + (af.c ? 1 : 0));
+    burn(burnt);
 }
 
 void Z80::rlca()
