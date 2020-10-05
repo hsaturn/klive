@@ -11,7 +11,7 @@ using namespace std;
 
 namespace hw
 {
-void Memory::fill(addr_t start, Byte::value_type value, size_t size, type_t type)
+void Memory::fill(addr_t start, byte_t value, size_t size, attrib type)
 {
     Message msg;
     msg.event = Message::WRITTEN;
@@ -28,9 +28,8 @@ void Memory::fill(addr_t start, Byte::value_type value, size_t size, type_t type
     while(size--)
     {
         msg.start = start;
-        Byte& byte = bytes[start];
 
-        if ((byte.type() & RD_ONLY) && mem_protection)
+        if ((attribs[start] & RD_ONLY) && mem_protection)
         {
             if (detectBadWrites)
             {
@@ -41,10 +40,10 @@ void Memory::fill(addr_t start, Byte::value_type value, size_t size, type_t type
             continue;
         }
         else
-            byte = value;
+            bytes[start] = value;
         if (type != UNCHANGE)
         {
-            byte.setType(type);
+            attribs[start] = type;
         }
         notify(msg);
         start++;

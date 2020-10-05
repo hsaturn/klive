@@ -8,7 +8,7 @@
 namespace hw
 {
 using reg8 = uint8_t;
-using byte = Memory::Byte::value_type;
+using byte = Memory::byte_t;
 
 union reg16u
 {

@@ -13,7 +13,7 @@ class Memory : public Observable<Memory>
 {
 public:
 
-    enum type_t
+    enum attrib
     {
         RAM      = 0,    // Byte belongs to RAM
         ROM      = 1,    // Byte belongs to ROM
@@ -23,36 +23,7 @@ public:
         UNCHANGE = 255, // Special value for fill set etc.. functions, UNCHANGE means do not change the type
     };
 
-    class Byte
-    {
-    public:
-        using value_type=unsigned char;
-
-        explicit Byte(value_type bytein, type_t type)
-            : byte(bytein) { flags = type; }
-
-        explicit Byte(value_type bytein)
-            : Byte(bytein, RAM){}
-
-        Byte() : Byte(0, RAM){}
-
-
-        bool isWritable() const
-        {
-            return (flags & (RD_ONLY) )==0;
-        }
-
-        type_t type() const { return flags; }
-        void setType(type_t type) { flags=type; }
-
-        operator value_type() const { return byte; }
-        value_type operator=(value_type value) { byte=value; return byte; }
-
-    private:
-        value_type byte;
-        type_t     flags;
-    };
-
+    using byte_t = unsigned char;
     using size_t = uint32_t;
     using addr_t = uint32_t;
 
@@ -81,13 +52,14 @@ public:
     {
         ramtop=size-1;
         bytes.resize(size);
+        attribs.resize(size);
     }
 
     uint32_t size() const { return ramtop+1; }
 
-    Byte::value_type peek(const addr_t& addr) const
+    byte_t peek(const addr_t& addr) const
     {
-        if (addr < bytes.size())
+        if (addr <= ramtop)
         {
             return bytes[addr];
         }
@@ -98,29 +70,19 @@ public:
         }
     }
 
-    void fill(addr_t start, Byte::value_type value, size_t size=1, type_t type=UNCHANGE);
+    void fill(addr_t start, byte_t value, size_t size=1, attrib type=UNCHANGE);
 
     void loadRomImage(std::string f, addr_t start, bool dump=false);
 
-    void poke(const addr_t& start, Byte::value_type value, type_t type=UNCHANGE)
+    void poke(const addr_t& start, byte_t value, attrib type=UNCHANGE)
     {
         // TODO faster implem (exh
         fill(start, value, 1, type);
     }
 
-    void setType(addr_t start, size_t size, type_t type)
-    {
-        if (bytes.size() < start+size) bytes.resize(bytes.size());
-
-        while(size--)
-        {
-            bytes[start++].setType(type);
-        }
-    }
-
-
 private:
-    std::vector<Byte> bytes;
+    std::vector<uint8_t> bytes;
+    std::vector<uint8_t> attribs;
     addr_t ramtop=0;
     bool detectBadWrites=false;     // True will send a BAD_WRITE event when occurs
     bool mem_protection=true;       // True if write is void on unwritable areas
