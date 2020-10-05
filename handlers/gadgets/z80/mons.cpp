@@ -64,7 +64,18 @@ Mons::Mons()
 
 void Mons::loadStaticLabels()
 {
+    rom_labels[0x0D4D]="TEMPS";
+    rom_labels[0x0E44]="CL_LINE";
+    rom_labels[0x0E9B]="CL_ADDR";
     rom_labels[0x11CB]="START_NEW";
+    rom_labels[0x1601]="CHAN_OPEN";
+    rom_labels[0x162D]="CHANCODE";
+    rom_labels[0x1642]="CHAN_S";
+    rom_labels[0x16DB]="INDEXER_1";
+    rom_labels[0x16DC]="INDEXER";
+
+    rom_labels[0x5C51]="CURCHL";
+
 }
 
 static string peek(const Memory* memory, Memory::addr_t& addr, bool increment=true)
@@ -164,7 +175,7 @@ Mons::Row Mons::decode(const Memory* memory, Memory::addr_t& addr)
                 switch(decode[1])
                 {
                     case 'V':
-                        value=memory->peek(addr++);
+                       value=memory->peek(addr++);
                        break;
                     case 'O':
                         value=static_cast<int8_t>(memory->peek(addr++));

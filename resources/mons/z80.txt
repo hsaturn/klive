@@ -37,7 +37,7 @@
 1e$v	ld e,*
 1f	rra
 20$j	jr nz,*
-21$w	ld hl,**
+21$a	ld hl,**
 22$a	ld (**),hl
 23	inc hl
 24	inc h
