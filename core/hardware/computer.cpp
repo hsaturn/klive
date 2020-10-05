@@ -20,6 +20,8 @@ Computer::Computer() : QWidget(nullptr)
     // TODO  archi, rom selection etc.
     memory->loadRomImage(":/roms/48.rom", 0);
     cpu = new Z80(memory);
+
+    cpu->start();
 }
 
 Computer::~Computer()

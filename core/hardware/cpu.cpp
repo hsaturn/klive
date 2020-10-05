@@ -83,7 +83,7 @@ void Cpu::reset()
 void Cpu::jp(Memory::addr_t addr)
 {
     pc=addr;
-    notify(stepMsg);
+    notify(stepMsg);	// TODO really ?
 }
 
 void Cpu::step()
