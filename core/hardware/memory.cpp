@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <QTextStream>
 #include <QFile>
+#include <common/crc.h>
 
 using namespace std;
 
@@ -48,6 +49,13 @@ void Memory::fill(addr_t start, byte_t value, size_t size, attrib type)
         notify(msg);
         start++;
     }
+}
+
+uint16_t Memory::crc16() const
+{
+    Crc16 crc;
+    crc.add(bytes.data(), bytes.size());
+    return crc;
 }
 
 void Memory::loadRomImage(string f, Memory::addr_t start, bool dump)

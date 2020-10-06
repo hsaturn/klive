@@ -42,9 +42,9 @@ public:
         };
 
         Event event;
-        uint8_t flags;   // Flag (ored)
-        addr_t start;   // Start of memory range modified
         size_t size;
+        addr_t start;   // Start of memory range modified
+        uint32_t flags;   // Flag (ored)
     };
 
 
@@ -56,6 +56,7 @@ public:
     }
 
     uint32_t size() const { return ramtop+1; }
+    uint16_t crc16() const;
 
     byte_t peek(const addr_t& addr) const
     {
