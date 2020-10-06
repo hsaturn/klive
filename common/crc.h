@@ -2,12 +2,12 @@
 #include <cstdint>
 #include <string>
 
-
 class Crc16
 {
     public:
 
-        friend Crc16& operator<< (Crc16& crc16, char c)
+        template<typename T, typename _ = typename std::enable_if<sizeof(T)==1>::type>
+        friend Crc16& operator<< (Crc16& crc16, T c)
         {
             uint16_t& crc=crc16.crc;
             uint16_t x=((crc>>8)^c)&0xff;
@@ -19,7 +19,9 @@ class Crc16
             for(const auto& c: s) crc16 << c;
             return crc16;
         }
-        uint16_t add(const char* buff, uint32_t len)
+
+        template<typename T, typename _ = typename std::enable_if<sizeof(T)==1>::type>
+        uint16_t add(const T* buff, uint32_t len)
         {
             while(len--)
                 (*this)<<*buff++;
