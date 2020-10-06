@@ -50,17 +50,17 @@ public:
 
     Memory(size_t size)
     {
-        ramtop=size-1;
+        ramtop=size;
         bytes.resize(size);
         attribs.resize(size);
     }
 
-    uint32_t size() const { return ramtop+1; }
+    uint32_t size() const { return ramtop; }
     uint16_t crc16() const;
 
     byte_t peek(const addr_t& addr) const
     {
-        if (addr <= ramtop)
+        if (addr < ramtop)
         {
             return bytes[addr];
         }
@@ -81,10 +81,12 @@ public:
         fill(start, value, 1, type);
     }
 
+    void zero() { fill(0, 0, ramtop); }
+
 private:
     std::vector<uint8_t> bytes;
     std::vector<uint8_t> attribs;
-    addr_t ramtop=0;
+    addr_t ramtop=0;				// size of memory, or first non writable byte
     bool detectBadWrites=false;     // True will send a BAD_WRITE event when occurs
     bool mem_protection=true;       // True if write is void on unwritable areas
 };

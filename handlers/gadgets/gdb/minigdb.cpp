@@ -4,6 +4,7 @@
 #include <QTextEdit>
 #include <string>
 #include <sstream>
+#include <fstream>
 #include <QPushButton>
 #include <common/expr.h>
 
@@ -70,7 +71,19 @@ void MiniGdb::update(Cpu* , const Cpu::Message& msg)
     switch(msg.event)
     {
         case Cpu::Message::BREAK_POINT:
-            d << "Break point reached" << endl;
+            if (msg.brk->isEnabled())
+            {
+                switch(msg.brk->type())
+                {
+                    case hw::BreakPoints::BreakPoint::ALWAYS:
+                        computer->cpu->stop();
+                        d << "Break point reached" << endl;
+                        break;
+                    default:
+                        d << "Unknown breakpoint type" << endl;
+                        break;
+                }
+            }
             break;
         case Cpu::Message::UNTIL_REACHED:
             d << "Until condition reached" << endl;
@@ -149,14 +162,22 @@ void MiniGdb::onCmdLine()
         lastCmd=s;
     }
     stringstream error;
-    stringstream answer;
+    stringstream output;
     result->setText("");
 
     // TODO better help system completion etc
     map<string, string> cmds;
     cmds["jp addr"] = "Jump to addr";
     cmds["set reg=expr"] = "Change register";
-    cmds["break addr"] = "Add breakpoint";
+
+    // Write machine state to checkpoints.dat
+    cmds["checkpoint"] = "Build a checkpoint";
+
+    // Read checkpoints.dat and create checkpoints
+    // that'll be checked while the computer is running
+    cmds["test"] = "Test on/off";
+
+    cmds["break addr"] = "Add breakpoint [if...]";
     cmds["delete addr"] = "Delete breakpoint";
     cmds["next"] = "Next statement";
     cmds["step"] = "Step";
@@ -209,16 +230,66 @@ void MiniGdb::onCmdLine()
             error << "Syntax error (" << s << ")" << endl;
             break;
         }
+        else if (found=="checkpoint")
+        {
+            std::string cp = computer->buildCheckPoint();
+            std::ofstream checkpoints;
+            checkpoints.open("checkpoints.dat", std::ios_base::app);
+            checkpoints << cp << endl;
+            output << cp << endl;
+            output << "Checkpoint written" << endl;
+        }
+        else if (found=="test")
+        {
+            string state=getlex(s);
+            if (state=="off")
+            {
+                error << "TODO" << endl;
+            }
+            else
+            {
+                std::string cp = computer->buildCheckPoint();
+                std::ofstream checkpoints;
+                checkpoints.open("checkpoints.dat");
+                if (checkpoints.good())
+                {
+                    computer->reset();
+                    while(checkpoints.good())
+                    {
+                        computer->cpu->breaks.add(0);
+                        error << "TODO" << endl;
+                    }
+                }
+                else
+                {
+                    error << "Unable to open checkpoints.dat" << endl;
+                }
+            }
+        }
+        else if (found=="delete")
+        {
+            Memory::addr_t addr;
+            if (readAddr(computer, s, addr))
+            {
+                computer->cpu->breaks.remove(addr);
+            }
+        }
         else if (found=="delete" || found=="break")
         {
             Memory::addr_t addr;
             if (readAddr(computer, s, addr))
             {
-                if (found=="break")
-                    computer->cpu->breaks.add(addr);
-                else
-                    computer->cpu->breaks.remove(addr);
-                answer << "ok, breaks: " << computer->cpu->breaks.size() << endl;
+                hw::BreakPoints::BreakPoint bp;
+                if (s[0]=='i' && s[1]=='f' && s[2]==' ')
+                {
+                    getlex(s);	// remove if
+                    bp.type(hw::BreakPoints::BreakPoint::CONDITIONAL);
+                    bp.setString(s);
+                    s="";
+                }
+
+                computer->cpu->breaks.add(addr, bp);
+                output << "ok, breaks: " << computer->cpu->breaks.size() << endl;
             }
             else
             {
@@ -242,7 +313,7 @@ void MiniGdb::onCmdLine()
             {
                 auto command=it.first;
                 auto description=it.second;
-                answer << command << " : " << description << endl;
+                output << command << " : " << description << endl;
             }
 
         }
@@ -252,7 +323,7 @@ void MiniGdb::onCmdLine()
             exprtype eval;
             if (parseExpression(computer->cpu, s, eval))
             {
-                answer << "running " << found << expr << endl;
+                output << "running " << found << expr << endl;
                 if (found=="while")
                     computer->cpu->setWhile(expr);
                 else
@@ -272,7 +343,7 @@ void MiniGdb::onCmdLine()
             exprtype eval;
             if (parseExpression(computer->cpu, s, eval))
             {
-                answer << "Inserting display(" << expr << ")" << endl;
+                output << "Inserting display(" << expr << ")" << endl;
                 displays.insert(expr);
             }
         }
@@ -306,7 +377,7 @@ void MiniGdb::onCmdLine()
             {
                 found="print";
             }
-            outexpr(answer, s);
+            outexpr(output, s);
         }
         else if (found=="set" or (s[0]=='='))
         {
@@ -331,7 +402,7 @@ void MiniGdb::onCmdLine()
             }
             if (computer->cpu->regs()->set(reg, value))
             {
-                answer << "SET " << reg  << '=' << value << endl;
+                output << "SET " << reg  << '=' << value << endl;
             }
             else
             {
@@ -340,7 +411,7 @@ void MiniGdb::onCmdLine()
         }
         else if (found=="reset")
         {
-            computer->cpu->reset();
+            computer->reset();
         }
         else if (found=="next")
         {
@@ -376,22 +447,22 @@ void MiniGdb::onCmdLine()
             error << "Shouldn't arrive here found(" << found << ") s(" << s << ") cmd(" << cmd << ") amb(" << ambiguous << ")" << endl;
             break;
         }
-        answer << found << ": ok" << endl;
+        output << found << ": ok" << endl;
     }
     result->setStyleSheet("color: black;");
     if (error.str().length())
     {
         result->setStyleSheet("color: red;");
-        answer << "ERROR: " << error.str();
+        output << "ERROR: " << error.str();
     }
     if (displays.size())
     {
-        answer << "---------------------" << endl;
-        update(answer);
+        output << "---------------------" << endl;
+        update(output);
     }
-    if (answer.str().length())
+    if (output.str().length())
     {
-        result->setText(result->toPlainText()+answer.str().c_str());
+        result->setText(result->toPlainText()+output.str().c_str());
     }
     cmdLine->setText("");
 }

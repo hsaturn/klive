@@ -82,6 +82,30 @@ bool Z80Registers::set(string reg,int32_t value)
     return true;
 }
 
+std::string Z80Registers::serialize() const
+{
+    std::stringstream out;
+
+    out << hex << showbase << '{';
+    out << " sp:" << sp;
+    out << " ix:" << ix;
+    out << " iy:" << iy;
+    out << " af:" << af.val;
+    out << " bc:" << bc.val;
+    out << " de:" << de.val;
+    out << " hl:" << hl.val;
+    out << " af':" << af2.val;
+    out << " bc':" << bc2.val;
+    out << " de':" << de2.val;
+    out << " hl':" << hl2.val;
+    out << " i:" << (uint16_t)i;
+    out << " r:" << (uint16_t)i;
+
+    out << '}';
+
+    return out.str();
+}
+
 uint16_t Z80Registers::get(string regi)
 {
     string reg(regi);	// TODO ...

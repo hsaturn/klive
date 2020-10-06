@@ -19,7 +19,7 @@ void Memory::fill(addr_t start, byte_t value, size_t size, attrib type)
     msg.flags = Message::DATA | (type==UNCHANGE ? 0 : Message::TYPE);
     msg.size = 1;
 
-    if (start+size-1>ramtop)
+    if (start+size>ramtop)
     {
         msg.event = Message::BAD_WRITE;
         notify(msg);
@@ -38,6 +38,7 @@ void Memory::fill(addr_t start, byte_t value, size_t size, attrib type)
                 notify(msg);
                 msg.event = Message::WRITTEN;
             }
+            start++;
             continue;
         }
         else

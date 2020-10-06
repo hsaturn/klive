@@ -107,6 +107,8 @@ struct Z80Registers : public Cpu::Registers
 
     bool set(std::string reg, int32_t value) override;
 
+    std::string serialize() const;
+
     // TODO Design : should really not merge registers with view of registers
     void update() override;
     QWidget* createViewForm(QWidget* parent) override;

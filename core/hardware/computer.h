@@ -21,13 +21,15 @@ public:
     Computer();
     virtual ~Computer();
     void timer();
+    void reset();
+
+    std::string buildCheckPoint();
 
     Cpu* cpu;
     Memory* memory;
     Screen* screen;
     Keyboard* keyboard;
     std::list<Peripheral*> peripherals;
-
 };
 
 }

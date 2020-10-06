@@ -5,6 +5,8 @@
 #include <core/hardware/z80.h>
 #include <core/hardware/cpu.h>
 #include <iostream>
+#include <iomanip>
+#include <sstream>
 
 namespace hw
 {
@@ -35,5 +37,24 @@ void Computer::timer()
     cpu->update();
 
 }
+
+void Computer::reset()
+{
+    if (cpu) cpu->reset();
+    if (memory) memory->zero();
+}
+
+std::string Computer::buildCheckPoint()
+{
+    std::stringstream cp;
+    cp << std::hex << std::showbase << cpu->getPc() << ':';
+
+    cp << cpu->regs()->serialize();
+
+    cp << " mem:" << cpu->getMemory()->crc16();
+
+    return cp.str();
+}
+
 
 } // ns

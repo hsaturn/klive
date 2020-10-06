@@ -3,6 +3,8 @@
 #include <QElapsedTimer>
 #include <QWidget>
 #include <map>
+#include <unordered_map>
+#include <string>
 
 namespace hw
 {
@@ -14,24 +16,44 @@ class BreakPoints
 {
 public:
 
-    enum Status
+    class BreakPoint
     {
-        ENABLED
+    public:
+        enum type_t
+        {
+            ALWAYS,
+            CONDITIONAL,
+            CHECKPOINT
+        };
+
+        BreakPoint(type_t type_) : enabled(true), typex(type_) {}
+        BreakPoint() : BreakPoint(ALWAYS) {}
+
+        bool isEnabled() const { return enabled; }
+
+        std::string getString() const { return use; }
+        void setString(const std::string str) { use=str; }
+
+        void type(type_t t) { typex=t; }
+        type_t type() const { return typex; }
+
+    private:
+        type_t typex;
+        std::string use;	// depends of breakpoint type
+        uint16_t flags;	// bit 0: enabled bit 1: if bit 2: checkpoint
+
+        bool enabled;
     };
 
-    bool enabled(Memory::addr_t pc) const
-    {
-        const auto& it=breakpoints.find(pc);
-        return (it!=breakpoints.end() && it->second==ENABLED);
-    }
     void remove(Memory::addr_t addr) { breakpoints.erase(addr); }
-    void add(Memory::addr_t addr)    { breakpoints[addr] = ENABLED; }
+    void add(Memory::addr_t addr, BreakPoint bp = {})    { breakpoints[addr] = bp; }
 
-    bool has(Memory::addr_t addr) { return breakpoints.count(addr); }
+    const BreakPoint* get(Memory::addr_t addr) const;
     size_t size() const { return breakpoints.size(); }
+    void clearAll() { breakpoints.clear(); }
 
 private:
-    std::map<Memory::addr_t, Status> breakpoints;
+    std::unordered_map<Memory::addr_t, BreakPoint> breakpoints;
 };
 
 // TODO move elsewhere
@@ -63,11 +85,16 @@ class Cpu: public Observable<Cpu>
 {
 public:
 
-    struct Message {
+    struct Message
+    {
        enum event_t { STEP, BREAK_POINT, WHILE_REACHED, UNTIL_REACHED, UNKNOWN_OP};
        Message(event_t event_in=STEP): event(event_in) {}
        event_t event;
-       unsigned long data;
+       union
+       {
+         unsigned long data;
+         const BreakPoints::BreakPoint* brk;
+       };
     };
 
     struct Registers
@@ -80,6 +107,7 @@ public:
         virtual uint16_t get(const std::string reg)=0;
         virtual void update() = 0;
         virtual QWidget* createViewForm(QWidget* parent) = 0;
+        virtual std::string serialize() const = 0;
     };
 
     Cpu(Memory* memory_, reg16& pc_in) : pc_(pc_in), memory(memory_) {}
@@ -105,6 +133,8 @@ public:
 
     virtual Registers* regs() = 0;
     const Memory* getMemory() const { return memory; }
+
+    reg16 getPc() const { return pc_; }
 
     BreakPoints breaks;
 

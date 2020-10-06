@@ -8,6 +8,18 @@ namespace hw
 using namespace std;
 static Cpu::Message stepMsg;
 
+
+const BreakPoints::BreakPoint* BreakPoints::get(Memory::addr_t addr) const
+{
+    const auto& it=breakpoints.find(addr);
+
+    if (it != breakpoints.end())
+    {
+        return &it->second;
+    }
+    return nullptr;
+}
+
 Cpu::~Cpu(){}
 
 bool Cpu::steps_to_rt(uint32_t max_steps)
@@ -18,16 +30,20 @@ bool Cpu::steps_to_rt(uint32_t max_steps)
 
     while(running && max_steps && (clock.cycles() < to_reach))
     {
+        static Message breakMsg(Message::BREAK_POINT);
         step_no_obs();
         if (max_steps-- == 0)
             return false;
-        if (breaks.has(pc_))	// TODO is it really working (z80 has a pc member conflicting with cpu::pc)
+
+        breakMsg.brk = breaks.get(pc_);
+        if (breakMsg.brk)
         {
-            static Message breakMsg(Message::BREAK_POINT);
-            nsteps=0;
+            // Observers should take decision: stop or continue
             notify(breakMsg);
-            running = false;
-            return false;
+            if (!running)
+            {
+                return false;
+            }
         }
         else if (sUntil.length())
         {
