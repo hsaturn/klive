@@ -28,7 +28,7 @@ void SpectrumScreen::setMemory(hw::Memory *new_memory)
     if (memory) memory->attach(this);
 }
 
-void SpectrumScreen::update(Memory* memory, const Memory::Message& msg)
+void SpectrumScreen::update(Memory* mem, const Memory::Message& msg)
 {
     constexpr int dx=20;
     constexpr int dy=20;
@@ -40,10 +40,10 @@ void SpectrumScreen::update(Memory* memory, const Memory::Message& msg)
         int start = msg.start-16384;
         int x = 8*(start%32);
         int y = 64*(start / 2048)+8*((start%256)/32) +(start%2048)/256;
-        uint16_t pixels=memory->peek(msg.start);
+        uint16_t pixels=mem->peek(msg.start);
 
         Memory::addr_t attr_ptr=16384+6144+int(x/8)+32*int(y/8);
-        int attr=memory->peek(attr_ptr);
+        int attr=mem->peek(attr_ptr);
         int bright=attr&0x40 ? 8 : 0;   // Bright
 
         uint32_t on_color  = colors[(attr & 7) + bright];
@@ -66,7 +66,7 @@ void SpectrumScreen::update(Memory* memory, const Memory::Message& msg)
         // int on_color=0x0000;   // TODO get real color
         // int off_color=0xFFFFffff;  // TODO get real color
 
-        int attr=memory->peek(msg.start);
+        int attr=mem->peek(msg.start);
         int start = msg.start-16384-6144;
         int y=8*(start/32);
         int x=8*(start%32);
@@ -83,7 +83,7 @@ void SpectrumScreen::update(Memory* memory, const Memory::Message& msg)
         y+=dy;  // Margin (todo, center)
         for(int yy=y; yy<y+8; yy++)
         {
-            uint16_t pixels=memory->peek(hl);
+            uint16_t pixels=mem->peek(hl);
             hl+=256;
             for(int xx=x; xx<x+8; xx++)
             {

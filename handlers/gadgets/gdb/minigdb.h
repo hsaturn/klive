@@ -8,11 +8,10 @@
 #include <map>
 #include <set>
 
-using namespace hw;
-using namespace std;
+using hw::Memory;
+using hw::Computer;
+using hw::Cpu;
 
-
-class te_expr;
 // TODO miniGdb should be responsible of all cpu related operations
 // This should be the z80 observer that may forward to monsview register view etc etc
 class MiniGdb : public QWidget, Observer<Cpu>
@@ -30,12 +29,12 @@ public slots:
     void cpuStep();
 
 private:
-    void update(ostream& out);
-    bool outexpr(ostream& out, string& expr);
+    void update(std::ostream& out);
+    bool outexpr(std::ostream& out, std::string& expr);
     Computer* computer;
     QLineEdit* cmdLine;
     QTextEdit* result;
     MiniGdb();
 
-    std::set<string> displays;
+    std::set<std::string> displays;
 };

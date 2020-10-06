@@ -55,8 +55,8 @@ public:
 
 private:
     cycle curr;
-    uint32_t freq_hz;
     QElapsedTimer timer;
+    uint32_t freq_hz;
 };
 
 class Cpu: public Observable<Cpu>
@@ -82,8 +82,8 @@ public:
         virtual QWidget* createViewForm(QWidget* parent) = 0;
     };
 
-    Cpu(Memory* memory_, reg16& pc_in) : pc(pc_in), memory(memory_) {}
-    virtual ~Cpu() = default;
+    Cpu(Memory* memory_, reg16& pc_in) : pc_(pc_in), memory(memory_) {}
+    virtual ~Cpu();
 
     void update();
     void step();
@@ -110,7 +110,7 @@ public:
 
 protected:
     virtual void _reset() =0;
-    reg16& pc;
+    reg16& pc_;
     Memory* memory;
     CpuClock clock;
     long nsteps = 1;

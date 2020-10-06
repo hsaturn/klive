@@ -10,8 +10,8 @@
 using namespace std;
 
 
-MiniGdb::MiniGdb(Computer* computer)
-    : computer(computer)
+MiniGdb::MiniGdb(Computer* computer_)
+    : computer(computer_)
 {
     QVBoxLayout* layout=new QVBoxLayout;
 
@@ -34,7 +34,7 @@ MiniGdb::MiniGdb(Computer* computer)
     computer->cpu->attach(this);	// Note this could be multi cpu !
 }
 
-bool readAddr(Computer* comp, string& s, uint32_t& addr)
+static bool readAddr(Computer* comp, string& s, uint32_t& addr)
 {
     exprtype result;
     if (parseExpression(comp->cpu, s, result))
@@ -46,7 +46,7 @@ bool readAddr(Computer* comp, string& s, uint32_t& addr)
     return false;
 }
 
-string getword(string &s, char sep=' ')
+static string getword(string &s, char sep=' ')
 {
     string word;
     while(s.length() && s[0]!=sep)
@@ -63,7 +63,7 @@ void MiniGdb::cpuStep()
     computer->cpu->step();
 }
 
-void MiniGdb::update(Cpu* sender, const Cpu::Message& msg)
+void MiniGdb::update(Cpu* , const Cpu::Message& msg)
 {
     stringstream d;
     result->setStyleSheet("color: black;");
@@ -82,8 +82,8 @@ void MiniGdb::update(Cpu* sender, const Cpu::Message& msg)
             {
                 Memory::addr_t addr=(msg.data & 0xFFFF0000) >> 16;
                 result->setStyleSheet("color: red;");
-                d << uppercase << hex << showbase << addr;
-                d << "Unknown opcode [" << (unsigned int)(msg.data & 0xFF) << "] at " << addr << endl;
+                d << uppercase << hex << showbase;
+                d << "Unknown opcode [" << (msg.data & 0xFF) << "] at " << addr << endl;
             }
             break;
         case Cpu::Message::STEP:
@@ -96,15 +96,15 @@ void MiniGdb::update(Cpu* sender, const Cpu::Message& msg)
 bool MiniGdb::outexpr(ostream& out, string& expr)
 {
     string copy(expr);
-    exprtype result;
-    if (parseExpression(computer->cpu, expr, result))
+    exprtype eval;
+    if (parseExpression(computer->cpu, expr, eval))
     {
         size_t len=copy.length()-expr.length();
         if (len)	// Should be....
         {
             out << '(' << copy.substr(0,len) << ") = ";
         }
-        out << dec << result << ", " << showbase << hex << result << endl;
+        out << dec << eval << ", " << showbase << hex << eval << endl;
         return true;
     }
     else
@@ -118,16 +118,19 @@ void MiniGdb::update(ostream& out)
 {
     char c='a';
 
-    for(const auto display: displays)
+    for(const auto& display: displays)
     {
         string expr(display);
         outexpr(out, expr);
         c++;
     }
-    out << "cycles " << computer->cpu->getClock().cycles() << endl;
+    if (computer)
+    {
+        out << "cycles " << computer->cpu->getClock().cycles() << endl;
+    }
 }
 
-void MiniGdb::observableDies(const Cpu *sender)
+void MiniGdb::observableDies(const Cpu *)
 {
     // TODO what to do ?
 }
@@ -176,7 +179,7 @@ void MiniGdb::onCmdLine()
 
         if (cmd.length())
         {
-            for(const auto it: cmds)
+            for(const auto& it: cmds)
             {
                 string command=it.first;
                 command=getword(command);
@@ -246,8 +249,8 @@ void MiniGdb::onCmdLine()
         else if (found=="while" or found=="until")
         {
             string expr=s;
-            exprtype result;
-            if (parseExpression(computer->cpu, s, result))
+            exprtype eval;
+            if (parseExpression(computer->cpu, s, eval))
             {
                 answer << "running " << found << expr << endl;
                 if (found=="while")
@@ -266,8 +269,8 @@ void MiniGdb::onCmdLine()
         else if (found=="display")
         {
             string expr(s);
-            exprtype result;
-            if (parseExpression(computer->cpu, s, result))
+            exprtype eval;
+            if (parseExpression(computer->cpu, s, eval))
             {
                 answer << "Inserting display(" << expr << ")" << endl;
                 displays.insert(expr);
@@ -277,7 +280,7 @@ void MiniGdb::onCmdLine()
         {
             if (s.length())
             {
-                char i=toupper(s[0]);
+                char i=static_cast<char>(toupper(s[0]));
                 s.erase(0,1);
                 for(set<string>::iterator it=displays.begin(); it!=displays.end(); it++)
                 {

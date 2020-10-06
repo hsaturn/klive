@@ -15,7 +15,7 @@ class MonsView : public QTableView,
 
 public:
     explicit MonsView(QWidget *parent = nullptr);
-    virtual ~MonsView();
+    virtual ~MonsView() override;
 
     virtual void update(Memory* sender, const Memory::Message& msg) override;
     virtual void observableDies(const Memory* sender) override;

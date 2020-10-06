@@ -8,6 +8,8 @@ namespace hw
 using namespace std;
 static Cpu::Message stepMsg;
 
+Cpu::~Cpu(){}
+
 bool Cpu::steps_to_rt(uint32_t max_steps)
 {
     float ns_per_cycle =1e9 / clock.getFrequency();
@@ -19,7 +21,7 @@ bool Cpu::steps_to_rt(uint32_t max_steps)
         step_no_obs();
         if (max_steps-- == 0)
             return false;
-        if (breaks.has(pc))	// TODO is it really working (z80 has a pc member conflicting with cpu::pc)
+        if (breaks.has(pc_))	// TODO is it really working (z80 has a pc member conflicting with cpu::pc)
         {
             static Message breakMsg(Message::BREAK_POINT);
             nsteps=0;
@@ -82,7 +84,7 @@ void Cpu::reset()
 
 void Cpu::jp(Memory::addr_t addr)
 {
-    pc=addr;
+    pc_=addr;
     notify(stepMsg);	// TODO really ?
 }
 

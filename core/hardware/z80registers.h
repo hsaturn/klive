@@ -61,9 +61,9 @@ public:
     }
 
 private:
+    QWidget* label;
     reg8& flags;
     uint8_t mask;
-    QWidget* label;
 };
 
 

@@ -583,7 +583,7 @@ void Z80::step_dd_fd(reg16& in)
                 uint8_t* reg = calc_dest_reg(opcode);
                 if (reg==nullptr) { cerr << "z80: step_dd_fd Should never occur, unable to compute reg" << endl;  return; }
                 int8_t offset = static_cast<int8_t>(getByte());
-                memory->poke(in+offset, *reg);
+                memory->poke(static_cast<uint16_t>(in+offset), *reg);
             }
             break;
         case 0x86:	// add a, (ii+*)

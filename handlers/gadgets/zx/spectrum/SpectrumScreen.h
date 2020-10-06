@@ -17,7 +17,7 @@ class SpectrumScreen : public QWidget, public Observer<Memory>
 
 public:
     SpectrumScreen(QWidget* parent = nullptr);
-    virtual ~SpectrumScreen();
+    virtual ~SpectrumScreen() override;
 
     virtual void update(Memory* sender, const Memory::Message& msg) override;
     virtual void observableDies(const Memory* sender) override;
