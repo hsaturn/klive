@@ -23,9 +23,9 @@ static int firstRow=0;
 
 FlagCheckBox::FlagCheckBox(reg8& flags_, uint8_t mask_, QWidget* label_)
     :
+      label(label_),
       flags(flags_),
-      mask(mask_),
-      label(label_)
+      mask(mask_)
 {
 
 }
