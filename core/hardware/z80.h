@@ -110,6 +110,7 @@ private:
     reg8&	c;
     reg8&	d;
     reg8&	e;
+    flags&	f;
     reg8&	h;
     reg8&	l;
     reg8&    i;

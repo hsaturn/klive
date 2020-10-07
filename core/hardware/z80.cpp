@@ -11,7 +11,7 @@ Z80::Z80(Memory* mem)
       pc(R.pc), sp(R.sp), ix(R.ix), iy(R.iy),
       af(R.af), bc(R.bc), de(R.de), hl(R.hl),
       af2(R.af2),bc2(R.bc2),de2(R.de2),hl2(R.hl2),
-      a(R.a), b(R.b), c(R.c), d(R.d), e(R.e), h(R.h), l(R.l),
+      a(R.a), b(R.b), c(R.c), d(R.d), e(R.e), f(R.f), h(R.h), l(R.l),
       i(R.i), r(R.r)
 {
     reset();
@@ -25,7 +25,7 @@ void Z80::_reset()
     i=0;
     r=0;
 
-    af.f=0;	// TODO not sure at all but convenient
+    f.f=0;	// TODO not sure at all but convenient
     bc.val=0;
     de.val=0;
     hl.val=0;
@@ -97,21 +97,21 @@ void Z80::step_no_obs()
         case 0x1C: e=inc(e, 4); break;
         case 0x1D: e=dec(e, 4); break;
         case 0x1F: rra(); break;
-        case 0x20: jr(!af.z); break;					// jr nz
+        case 0x20: jr(!f.z); break;					// jr nz
         case 0x21: hl.val=getWord(10); break;			// ld hl, (nn)
         case 0x22: writeMem16(hl.val, 16); break;		// ld (**), hl
         case 0x23: hl.val++; burn(6); break;
         case 0x24: h=inc(h, 4); break;
         case 0x25: h=dec(h, 4); break;
         case 0x26: h=getByte(); burn(7); break;			// ld h, *
-        case 0x28: jr(af.z); break;
+        case 0x28: jr(f.z); break;
         case 0x29: add_hl(hl.val, 11); break;
         case 0x2A: hl.val=readMem16(16); break; 		// ld hl, (nn)
         case 0x2B: hl.val--; burn(6); break; 			// dec hl
         case 0x2C: l=inc(l, 4); break;
         case 0x2D: l=dec(l, 4); break;
         case 0x30:
-                    jr(!af.c); break;
+                    jr(!f.c); break;
         case 0x31: sp=readMem16(10); break;				// ld sp, **
         case 0x32: memory->poke(getWord(13), a); break;	// ld (nn), a
         case 0x33: sp++; burn(6); break;				// inc sp
@@ -130,15 +130,15 @@ void Z80::step_no_obs()
             }
             break;
         case 0x36: memory->poke(hl.val, getByte()); burn(10); break; // ld(hl), n
-        case 0x37: af.c=1; af.h=0; af.n=0; burn(4); break;		// scf
-        case 0x38: jr(af.c); break;
+        case 0x37: f.c=1; f.h=0; f.n=0; burn(4); break;		// scf
+        case 0x38: jr(f.c); break;
         case 0x39: add_hl(sp, 11); break;
         case 0x3a: a=memory->peek(getWord(13)); break;
         case 0x3b: sp--; burn(6); break;
         case 0X3c: a=inc(a, 4); break;
         case 0x3d: a=dec(a, 4); break;
         case 0x3e: a = getByte(); burn(7); break; // ld a, n
-        case 0x3f: af.c = af.c ? 0 : 1; af.n=0; burn(4); break;	// ccf	TODO f.u5=a.5 f.u3=a.3
+        case 0x3f: f.c = f.c ? 0 : 1; f.n=0; burn(4); break;	// ccf	TODO f.u5=a.5 f.u3=a.3
         case 0x40: burn(4); break;	//ld b,b
         case 0x41: b = c; burn(4); break;
         case 0x42: b = d; burn(4); break;
@@ -243,7 +243,7 @@ void Z80::step_no_obs()
         case 0xAC: xor_(h, 4); break;
         case 0xAD: xor_(l, 4); break;
         case 0xAE: xor_(memory->peek(hl.val), 7); break;	// xor (hl)
-        case 0xAF: a=0; af.c=0; af.pv=1; af.z=1; af.n=0; af.s=0; burn(4); break; // xor a
+        case 0xAF: a=0; f.c=0; f.pv=1; f.z=1; f.n=0; f.s=0; burn(4); break; // xor a
         case 0xb0: or_(b, 4); break; // or b
         case 0xb1: or_(c, 4); break; // or c
         case 0xb2: or_(d, 4); break; // or d
@@ -257,31 +257,31 @@ void Z80::step_no_obs()
         case 0xBA: compare(d); burn(4); break;	// cp d
         case 0xBB: compare(e); burn(4); break;	// cp e
         case 0xBC: compare(h); burn(4); break;	// cp h
-        case 0xC0: ret(not af.z, 11,5); break;
+        case 0xC0: ret(not f.z, 11,5); break;
         case 0xc1: pop(bc.val, 11); break;
-        case 0xC2: jp_if(not af.z); break;
+        case 0xC2: jp_if(not f.z); break;
         case 0xC3: pc = getWord(10); break; // Jump
-        case 0xC4: call_if(not af.z); break;
+        case 0xC4: call_if(not f.z); break;
         case 0xc5: push(bc.val, 11); break; 	// push bc
         case 0xc6: a=add_(a, getByte(), 7); break;	// add a, *
-        case 0xc8: ret(af.z, 11, 5); break; // ret z
+        case 0xc8: ret(f.z, 11, 5); break; // ret z
         case 0xC9: ret(true, 10); break;
-        case 0xCA: jp_if(af.z); break;
+        case 0xCA: jp_if(f.z); break;
         case 0xCB: step_cb(); break;
-        case 0xCC: call_if(af.z); break;
+        case 0xCC: call_if(f.z); break;
         case 0xCD: call(); break;
-        case 0xD0: ret(not af.c, 11,5); break;
+        case 0xD0: ret(not f.c, 11,5); break;
         case 0xD1: pop(de.val, 11); break;
         case 0xD3: out(getByte(), a); burn(11); break;
-        case 0xD4: call_if(not af.c); break;
+        case 0xD4: call_if(not f.c); break;
         case 0xD9: swap(hl,hl2); swap(de,de2); swap(bc,bc2); burn(4); break;
-        case 0xD2: jp_if(not af.c); break;
+        case 0xD2: jp_if(not f.c); break;
         case 0xD5: push(de.val, 11); break;		// push de
         case 0xD6: a=compare(getByte(7)); break;		// sub *
         case 0xD7: rst(0x10); break;
-        case 0xD8: ret(af.c, 11, 5); break;
-        case 0xDA: jp_if(af.c); break;
-        case 0xDC: call_if(af.c); break;
+        case 0xD8: ret(f.c, 11, 5); break;
+        case 0xDA: jp_if(f.c); break;
+        case 0xDC: call_if(f.c); break;
         case 0xDD: step_dd_fd(ix); break;
         case 0xE1: pop(hl.val, 11); break;
         case 0xE3: ex_word_at_sp(hl.val); break;	// ex (sp); hl
@@ -380,24 +380,24 @@ void Z80::pop(uint16_t& reg, cycle burnt)
 
 uint8_t Z80::inc(uint8_t val, cycle burnt)
 {
-    af.pv= val==0x7F ? 1 : 0;
-    af.h = (val&0x0F)==0x0F;	// TODO borrow from bit 3
+    f.pv= val==0x7F ? 1 : 0;
+    f.h = (val&0x0F)==0x0F;	// TODO borrow from bit 3
     val++;
-    af.s = val & 0x80 ? 1 : 0;
-    af.z = val == 0 ? 1 : 0;
-    af.n = 0;
+    f.s = val & 0x80 ? 1 : 0;
+    f.z = val == 0 ? 1 : 0;
+    f.n = 0;
     burn(burnt);
     return val;
 }
 
 uint8_t Z80::dec(uint8_t val, cycle burnt)
 {
-    af.pv= val==0x80 ? 1 : 0;
-    af.h = (val&0x10)==0x10;	// TODO borrow from bit 4
+    f.pv= val==0x80 ? 1 : 0;
+    f.h = (val&0x10)==0x10;	// TODO borrow from bit 4
     val--;
-    af.s = val & 0x80 ? 1 : 0;
-    af.z = val == 0 ? 1 : 0;
-    af.n = 1;
+    f.s = val & 0x80 ? 1 : 0;
+    f.z = val == 0 ? 1 : 0;
+    f.n = 1;
     burn(burnt);
     return val;
 }
@@ -406,8 +406,8 @@ void Z80::add_hl(uint16_t val, cycle burnt)
 {
     burn(burnt);
     hl.val += val;
-    af.h = hl.val & 0x800;	// TODO 1 if carry from bit 11
-    af.n = 0;
+    f.h = hl.val & 0x800;	// TODO 1 if carry from bit 11
+    f.n = 0;
 }
 
 void Z80::jr(bool condition)
@@ -455,18 +455,18 @@ void Z80::step_ed()
         case 0x52:	// sbc hl, de
             burn(15);
             {
-                uint8_t carry = af.c;
-                af.c = de.val+af.c > hl.val;
+                uint8_t carry = f.c;
+                f.c = de.val+f.c > hl.val;
                 hl.val -= de.val+carry;
 
-                af.s = h & 0x80 ? 1 : 0;
-                af.u5 = h & 0x20 ? 1 : 0;
-                af.u3 = h & 0x08 ? 1 : 0;
+                f.s = h & 0x80 ? 1 : 0;
+                f.u5 = h & 0x20 ? 1 : 0;
+                f.u3 = h & 0x08 ? 1 : 0;
 
-                af.z = hl.val == 0 ? 1 : 0;
-                af.h = 0;	// TODO set if borrow from bit 12
-                af.pv = af.c; // TODO set if overflow
-                af.n = 1;
+                f.z = hl.val == 0 ? 1 : 0;
+                f.h = 0;	// TODO set if borrow from bit 12
+                f.pv = f.c; // TODO set if overflow
+                f.n = 1;
             }
             break;
         case 0x53: writeMem16(de.val, 20); break;	// ld(**), de
@@ -485,7 +485,7 @@ void Z80::step_ed()
             {
                 r-=2;
                 // TODO it seems that interrupts are taken in account
-                af.h=0; af.pv= (bc.val==1); af.n=0;
+                f.h=0; f.pv= (bc.val==1); f.n=0;
                 do
                 {
                     burn(bc.val ? 21 : 16);
@@ -501,7 +501,7 @@ void Z80::step_ed()
         case 0xb8: // lddr
             {
                 r-=2;
-                af.h=0; af.pv=0; af.n=0;
+                f.h=0; f.pv=0; f.n=0;
                 do
                 {
                     // TODO it seems that interrupts are taken in account
@@ -652,7 +652,7 @@ void Z80::step_cb()
 
         if (opcode<0x80)		// bit x, reg
         {
-            af.z = (*reg & mask) ? 0 : 1;
+            f.z = (*reg & mask) ? 0 : 1;
         }
         else if (opcode<0xC0) 	// res x, reg
         {
@@ -723,9 +723,9 @@ void Z80::step_xxcb(reg16 base_addr)
             switch((opcode & 0xC0)>>6)
             {
                 case 0x1:	// test bit
-                    af.z = val & mask ? 0 : 1;
-                    af.h = 1;
-                    af.n = 0;
+                    f.z = val & mask ? 0 : 1;
+                    f.h = 1;
+                    f.n = 0;
                     break;
 
                 case 0x2: // reset bit
@@ -759,9 +759,9 @@ void Z80::step_xxcb(reg16 base_addr)
 
 void Z80::rrca()
 {
-    af.h=0;
-    af.n=0;
-    af.c=a&1;
+    f.h=0;
+    f.n=0;
+    f.c=a&1;
     a=((a&1)<<7)|(a>>1);
     burn(4);
 }
@@ -769,22 +769,22 @@ void Z80::rrca()
 void Z80::rra()
 {
     auto a0 = a;
-    af.h=0;
-    af.n=0;
+    f.h=0;
+    f.n=0;
     a=a>>1;
-    if (af.c) a=a|0x80;
-    af.c=a0&1;
+    if (f.c) a=a|0x80;
+    f.c=a0&1;
     burn(4);
 }
 
 uint8_t Z80::rlc(uint8_t val)
 {
     val=(val<<1)|(val>>7);
-    af.c=val & 1;
-    af.s=val & 0x80;
-    af.h=0;
-    af.pv=parity(val);
-    af.n=0;
+    f.c=val & 1;
+    f.s=val & 0x80;
+    f.h=0;
+    f.pv=parity(val);
+    f.n=0;
     return val;
 }
 
@@ -807,38 +807,38 @@ void Z80::and_(reg8 n, cycle burnt)
 {
     burn(burnt);
     a = a & n;
-    af.s = a & 0x80 ? 1 : 0;
-    af.z = a == 0 ? 1 : 0;
-    af.h = 1;
-    af.pv = parity(a);	// TODO, this is overflow not parity
-    af.n = 0;
-    af.c = 0;
-    af.u5 = a & 0x20 ? 1 : 0;	// TODO set for SUB/SBC but not for CP
-    af.u3 = a & 0x08 ? 1 : 0;
+    f.s = a & 0x80 ? 1 : 0;
+    f.z = a == 0 ? 1 : 0;
+    f.h = 1;
+    f.pv = parity(a);	// TODO, this is overflow not parity
+    f.n = 0;
+    f.c = 0;
+    f.u5 = a & 0x20 ? 1 : 0;	// TODO set for SUB/SBC but not for CP
+    f.u3 = a & 0x08 ? 1 : 0;
 }
 
 void Z80::xor_(reg8 n, cycle burnt)
 {
     burn(burnt);
     a = a^n;
-    af.f=0;
-    af.s = a & 0x80 ? 1 : 0;
-    af.z = a == 0;
-    af.pv = parity(a);
-    af.u3 = a & 0x08 ? 1 : 0;
+    f.f=0;
+    f.s = a & 0x80 ? 1 : 0;
+    f.z = a == 0;
+    f.pv = parity(a);
+    f.u3 = a & 0x08 ? 1 : 0;
 }
 
 void Z80::or_(reg8 n, cycle burnt)
 {
     burn(burnt);
     a = a | n;
-    af.s = a & 0x80 ? 1 : 0;
-    af.z = a == 0;
-    af.h = 0;
-    af.pv = parity(a);
-    af.n = 0;
-    af.c = 0;
-    af.u3 = a & 0x08 ? 1 : 0;
+    f.s = a & 0x80 ? 1 : 0;
+    f.z = a == 0;
+    f.h = 0;
+    f.pv = parity(a);
+    f.n = 0;
+    f.c = 0;
+    f.u3 = a & 0x08 ? 1 : 0;
 }
 
 static int16_t to_int16(uint8_t v)
@@ -853,31 +853,31 @@ static int16_t to_uint16(uint8_t v)
 reg8 Z80::add_(reg8 a, reg8 n, cycle burnt)
 {
     reg8 r = a+n;
-    af.s = r & 0x80 ? 1 : 0;
-    af.z = r == 0 ? 1 : 0;
-    af.h = (a & n & 0x10) ? 1 : 0;
+    f.s = r & 0x80 ? 1 : 0;
+    f.z = r == 0 ? 1 : 0;
+    f.h = (a & n & 0x10) ? 1 : 0;
     int16_t r16 = to_int16(a)-to_int16(n);
-    af.pv = (r16< -128 || r > 127) ? 1 : 0;
-    af.n = 0;
-    af.c = (to_uint16(a)+to_uint16(n) > 255) ? 1 : 0;	// Simpler ?
-    af.u5 = r & 0x20 ? 1 : 0;
-    af.u3 = r & 0x08 ? 1 : 0;
+    f.pv = (r16< -128 || r > 127) ? 1 : 0;
+    f.n = 0;
+    f.c = (to_uint16(a)+to_uint16(n) > 255) ? 1 : 0;	// Simpler ?
+    f.u5 = r & 0x20 ? 1 : 0;
+    f.u3 = r & 0x08 ? 1 : 0;
     burn(burnt);
     return r;
 }
 
 reg8 Z80::adc_(reg8 n, cycle burnt)
 {
-    reg8 r = a+n+ (af.c ? 1: 0);
-    af.s = r & 0x80 ? 1 : 0;
-    af.z = r == 0 ? 1 : 0;
-    af.h = (a & n & 0x10) ? 1 : 0;
+    reg8 r = a+n+ (f.c ? 1: 0);
+    f.s = r & 0x80 ? 1 : 0;
+    f.z = r == 0 ? 1 : 0;
+    f.h = (a & n & 0x10) ? 1 : 0;
     int16_t r16 = to_int16(a)-to_int16(n);
-    af.pv = (r16< -128 || r > 127) ? 1 : 0;
-    af.n = 0;
-    af.c = (to_uint16(a)+to_uint16(n) > 255) ? 1 : 0;	// Simpler ?
-    af.u5 = r & 0x20 ? 1 : 0;
-    af.u3 = r & 0x08 ? 1 : 0;
+    f.pv = (r16< -128 || r > 127) ? 1 : 0;
+    f.n = 0;
+    f.c = (to_uint16(a)+to_uint16(n) > 255) ? 1 : 0;	// Simpler ?
+    f.u5 = r & 0x20 ? 1 : 0;
+    f.u3 = r & 0x08 ? 1 : 0;
     burn(burnt);
     return r;
 }
@@ -885,31 +885,31 @@ reg8 Z80::adc_(reg8 n, cycle burnt)
 reg8 Z80::compare(reg8 n)
 {
     reg8 r = a-n;
-    af.s = r & 0x80 ? 1 : 0;
-    af.z = r == 0 ? 1 : 0;
-    af.h = (a ^ n ^ r) & 16 ? 1 : 0;
-    // af.pv = (a^n) & 0x80 ? (r&0x80)==(n&0x80) : 0;
+    f.s = r & 0x80 ? 1 : 0;
+    f.z = r == 0 ? 1 : 0;
+    f.h = (a ^ n ^ r) & 16 ? 1 : 0;
+    // f.pv = (a^n) & 0x80 ? (r&0x80)==(n&0x80) : 0;
     int16_t r16 = to_int16(a)-to_int16(n);
-    af.pv = (r16< -128 || r > 127) ? 1 : 0;
-    af.n = 1;
-    af.c = a <  n ? 1 : 0;
-    af.u5 = n & 0x20 ? 1 : 0;	// TODO set for SUB/SBC but not for CP
-    af.u3 = n & 0x08 ? 1 : 0;
+    f.pv = (r16< -128 || r > 127) ? 1 : 0;
+    f.n = 1;
+    f.c = a <  n ? 1 : 0;
+    f.u5 = n & 0x20 ? 1 : 0;	// TODO set for SUB/SBC but not for CP
+    f.u3 = n & 0x08 ? 1 : 0;
     return r;
 }
 
 void Z80::sbc(uint8_t val, cycle burnt)
 {
-    a=compare(val + (af.c ? 1 : 0));
+    a=compare(val + (f.c ? 1 : 0));
     burn(burnt);
 }
 
 void Z80::rlca()
 {
     a = (a<<1) | (a&80 ? 1:0);
-    af.h=0;
-    af.n=0;
-    af.c= (a & 1) ? 1 : 0;
+    f.h=0;
+    f.n=0;
+    f.c= (a & 1) ? 1 : 0;
     burn(4);
 }
 

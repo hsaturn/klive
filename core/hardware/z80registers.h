@@ -10,36 +10,31 @@ namespace hw
 using reg8 = uint8_t;
 using byte = Memory::byte_t;
 
-union reg16u
+struct reg16u
 {
+    reg16u();
+
     uint16_t val;
+    uint8_t& hi() { return *(reinterpret_cast<uint8_t*>(&val)+1); }
+    uint8_t& lo() { return *(reinterpret_cast<uint8_t*>(&val)); }
+
+};
+
+union flags
+{
+    uint8_t f;
     struct
     {
-        uint8_t lo;
-        uint8_t hi;
+        unsigned c: 1, n: 1, pv: 1, u3: 1, h: 1, u5: 1, z: 1, s: 1;
     };
 };
 
-#pragma pack (push, 1)
-union regaf
+struct regaf
 {
     uint16_t val;
-    struct
-    {
-        union
-        {
-            uint8_t f;
-            struct
-            {
-                unsigned c: 1, n: 1, pv: 1, u3: 1, h: 1, u5: 1, z: 1, s: 1;
-            };
-        };
-        uint8_t a;
-    };
-private:
-    uint16_t filler;
+    uint8_t& a() { return *((uint8_t*)(&val)+1); }
+    flags& f() { return *((flags*)(&val)); }
 };
-#pragma pack (pop)
 
 class FlagCheckBox : public QCheckBox
 {
@@ -70,13 +65,14 @@ private:
 struct Z80Registers : public Cpu::Registers
 {
     Z80Registers() :
-          a(af.a),
-          b(bc.hi),
-          c(bc.lo),
-          d(de.hi),
-          e(de.lo),
-          h(hl.hi),
-          l(hl.lo) {}
+          a(af.a()),
+          b(bc.hi()),
+          c(bc.lo()),
+          d(de.hi()),
+          e(de.lo()),
+          f(af.f()),
+          h(hl.hi()),
+          l(hl.lo()) {}
 
     virtual ~Z80Registers() override = default;
 
@@ -102,6 +98,7 @@ struct Z80Registers : public Cpu::Registers
     reg8&	c;
     reg8&	d;
     reg8&	e;
+    flags&   f;
     reg8&	h;
     reg8&	l;
 

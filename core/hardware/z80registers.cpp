@@ -67,7 +67,7 @@ bool Z80Registers::set(string reg,int32_t value)
     else if (reg=="ix") ix=static_cast<uint16_t>(value);
     else if (reg=="iy") iy=static_cast<uint16_t>(value);
     else if (reg=="a") a=static_cast<reg8>(value);
-    else if (reg=="f") af.f=static_cast<reg8>(value);
+    else if (reg=="f") f.f=static_cast<reg8>(value);
     else if (reg=="b") b=static_cast<reg8>(value);
     else if (reg=="c") c=static_cast<reg8>(value);
     else if (reg=="d") d=static_cast<reg8>(value);
@@ -124,7 +124,7 @@ uint16_t Z80Registers::get(string regi)
     else if (reg=="ix") return ix;
     else if (reg=="iy") return iy;
     else if (reg=="a") return a;
-    else if (reg=="f") return af.f;
+    else if (reg=="f") return f.f;
     else if (reg=="b") return b;
     else if (reg=="c") return c;
     else if (reg=="d") return d;
@@ -133,10 +133,10 @@ uint16_t Z80Registers::get(string regi)
     else if (reg=="l") return l;
     else if (reg=="i") return i;
     else if (reg=="r") return r;
-    else if (reg=="carry") return af.c;
-    else if (reg=="zero") return af.z;
-    else if (reg=="pv") return af.pv;
-    else if (reg=="sign") return af.s;
+    else if (reg=="carry") return f.c;
+    else if (reg=="zero") return f.z;
+    else if (reg=="pv") return f.pv;
+    else if (reg=="sign") return f.s;
     else throw "Unknown register";
 }
 
@@ -182,56 +182,56 @@ QWidget* Z80Registers::createViewForm(QWidget* parent)
         label=new QLabel;
         label->setText("S");
         flag->addWidget(label);
-        flag_s = new FlagCheckBox(af.f, 0x80, label);
+        flag_s = new FlagCheckBox(f.f, 0x80, label);
         flag->addWidget(flag_s);
         flags->addLayout(flag);
 
         flag = new QVBoxLayout;
         label = new QLabel("Z");
         flag->addWidget(label);
-        flag_z = new FlagCheckBox(af.f, 0x40, label);
+        flag_z = new FlagCheckBox(f.f, 0x40, label);
         flag->addWidget(flag_z);
         flags->addLayout(flag);
 
         flag = new QVBoxLayout;
         label = new QLabel("5");
         flag->addWidget(label);
-        flag_5 = new FlagCheckBox(af.f, 0x20, label);
+        flag_5 = new FlagCheckBox(f.f, 0x20, label);
         flag->addWidget(flag_5);
         flags->addLayout(flag);
 
         flag = new QVBoxLayout;
         label = new QLabel("H");
         flag->addWidget(label);
-        flag_h = new FlagCheckBox(af.f, 0x10, label);
+        flag_h = new FlagCheckBox(f.f, 0x10, label);
         flag->addWidget(flag_h);
         flags->addLayout(flag);
 
         flag = new QVBoxLayout;
         label = new QLabel("3");
         flag->addWidget(label);
-        flag_3 = new FlagCheckBox(af.f, 0x8, label);
+        flag_3 = new FlagCheckBox(f.f, 0x8, label);
         flag->addWidget(flag_3);
         flags->addLayout(flag);
 
         flag = new QVBoxLayout;
         label = new QLabel("PV");
         flag->addWidget(label);
-        flag_pv = new FlagCheckBox(af.f, 0x4, label);
+        flag_pv = new FlagCheckBox(f.f, 0x4, label);
         flag->addWidget(flag_pv);
         flags->addLayout(flag);
 
         flag = new QVBoxLayout;
         label = new QLabel("N");
         flag->addWidget(label);
-        flag_n = new FlagCheckBox(af.f, 0x2, label);
+        flag_n = new FlagCheckBox(f.f, 0x2, label);
         flag->addWidget(flag_n);
         flags->addLayout(flag);
 
         flag = new QVBoxLayout;
         label = new QLabel("C");
         flag->addWidget(label);
-        flag_c = new FlagCheckBox(af.f, 0x1, label);
+        flag_c = new FlagCheckBox(f.f, 0x1, label);
         flag->addWidget(flag_c);
         flags->addLayout(flag);
 
@@ -310,6 +310,18 @@ void Z80Registers::update()
     flag_n->update();
     flag_c->update();
     flag_pv->update();
+}
+
+reg16u::reg16u()
+{
+    lo() = 0x34;
+    hi() = 0x12;
+
+    if (val != 0x1234)
+    {
+        std::cerr << "ERROR: Auto check indianess failed. The cpu won't work." << std::endl;
+    }
+    val=0;
 }
 
 } // ns

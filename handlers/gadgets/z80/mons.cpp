@@ -7,6 +7,7 @@
 #include <iomanip>
 #include <algorithm>
 #include <queue>
+#include <set>
 
 #include <QFile>
 
@@ -38,12 +39,12 @@ void Mons::formatKeyValue(long line, string& key, string& value)
 
         if (pos != string::npos)
         {
-            cout << "Convert (" << key << ") ";
+            // cout << "Convert (" << key << ") ";
             key[pos]='.';
             key[pos+1]='.';
             opcodes[hexa.substr(0,pos)] = hexa.substr(pos)+'\t'+value;
-            cout << " fix (" << hexa.substr(0,pos) << '=' << opcodes[hexa.substr(0,pos)]  << ") ";
-            cout << '[' << key << "=" << value << ']' << endl;
+            // cout << " fix (" << hexa.substr(0,pos) << '=' << opcodes[hexa.substr(0,pos)]  << ") ";
+            // cout << '[' << key << "=" << value << ']' << endl;
         }
         else
             key=hexa;
@@ -210,7 +211,12 @@ Mons::Row Mons::decode(const Memory* memory, Memory::addr_t& addr)
         auto it=opcodes.find(hexa);
         if (it == opcodes.end())
         {
-            cout << "Mons, cannot find complex hexa (" << hexa << ')' << endl;
+            static std::set<decltype(hexa)> mem;
+            if (mem.count(hexa)==0)
+            {
+                mem.insert(hexa);
+                std::cerr << "Mons, cannot find complex hexa (" << hexa << ')' << std::endl;
+            }
             row.mnemo="?? "+hexa;
             return row;
         }
