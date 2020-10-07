@@ -44,10 +44,19 @@ void Computer::reset()
     if (memory) memory->zero();
 }
 
-std::string Computer::buildCheckPoint()
+std::string Computer::checkPoint(bool addCycleAddr) const
 {
     std::stringstream cp;
-    cp << std::hex << std::showbase << cpu->getPc() << ':';
+
+    if (addCycleAddr)
+    {
+            // Machine state is 'cycle' dependant
+            // Store cycle addr for performance reasons
+            cp << std::dec << cpu->getClock().cycles();
+            cp << ' ' << std::showbase << cpu->getPc();
+
+            cp << ':';
+    }
 
     cp << cpu->regs()->serialize();
 

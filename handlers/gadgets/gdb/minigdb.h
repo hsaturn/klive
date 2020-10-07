@@ -1,6 +1,7 @@
 #pragma once
 
 #include <core/hardware/computer.h>
+#include <core/hardware/checkpoints.h>
 #include <core/hardware/cpu.h>
 #include <core/hardware/memory.h>
 #include <QLineEdit>
@@ -37,4 +38,5 @@ private:
     MiniGdb();
 
     std::set<std::string> displays;
+    CheckPoints checkpoints;
 };

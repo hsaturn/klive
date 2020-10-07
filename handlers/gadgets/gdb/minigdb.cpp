@@ -79,6 +79,19 @@ void MiniGdb::update(Cpu* , const Cpu::Message& msg)
                         computer->cpu->stop();
                         d << "Break point reached" << endl;
                         break;
+                    case hw::BreakPoints::BreakPoint::CHECKPOINT:
+                        if (checkpoints.check(computer))
+                        {
+                            d << "Checkpoint " << computer->cpu->getPc() << ", ok" << endl;
+                        }
+                        else
+                        {
+                            d << "ERROR checkpoint (cycle/addr)=(" <<
+                                 computer->cpu->getClock().cycles() << ", " << computer->cpu->getPc() <<
+                                 ')' << endl;
+                            computer->cpu->stop();
+                        }
+
                     default:
                         d << "Unknown breakpoint type" << endl;
                         break;
@@ -232,38 +245,31 @@ void MiniGdb::onCmdLine()
         }
         else if (found=="checkpoint")
         {
-            std::string cp = computer->buildCheckPoint();
-            std::ofstream checkpoints;
-            checkpoints.open("checkpoints.dat", std::ios_base::app);
-            checkpoints << cp << endl;
-            output << cp << endl;
+            output << checkpoints.takeSnapshot(computer) << endl;
             output << "Checkpoint written" << endl;
         }
         else if (found=="test")
         {
+            error << "NOT FINISHED" << endl;
             string state=getlex(s);
             if (state=="off")
             {
                 error << "TODO" << endl;
             }
-            else
+            else if (state=="on")
             {
-                std::string cp = computer->buildCheckPoint();
-                std::ofstream checkpoints;
-                checkpoints.open("checkpoints.dat");
-                if (checkpoints.good())
+                if (checkpoints.start(computer))
                 {
-                    computer->reset();
-                    while(checkpoints.good())
-                    {
-                        computer->cpu->breaks.add(0);
-                        error << "TODO" << endl;
-                    }
+                    output << "Started auto check" << endl;
                 }
                 else
                 {
-                    error << "Unable to open checkpoints.dat" << endl;
+                    error << "Unknown error" << endl;
                 }
+            }
+            else
+            {
+                error << "on or off expected " << endl;
             }
         }
         else if (found=="delete")

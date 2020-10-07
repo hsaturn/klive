@@ -354,7 +354,6 @@ void Z80::ret(bool flag, cycle burn_ret, cycle burn_noret)
 {
     if (flag)
     {
-        std::cout << hex << "return, sp=" << sp << ", pc=" << pc << endl;
         pc = memory->peek(sp)+(memory->peek(sp+1)<<8);
         sp += 2;
         burn(burn_ret);

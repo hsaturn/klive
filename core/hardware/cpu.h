@@ -10,7 +10,7 @@ namespace hw
 {
 
 using reg16 = uint16_t;
-using cycle=uint64_t;
+using cycle=uint64_t;	// TODO not an obvious place for this
 
 class BreakPoints
 {
@@ -26,7 +26,7 @@ public:
             CHECKPOINT
         };
 
-        BreakPoint(type_t type_) : enabled(true), typex(type_) {}
+        BreakPoint(type_t type_) : typex(type_) {}
         BreakPoint() : BreakPoint(ALWAYS) {}
 
         bool isEnabled() const { return enabled; }
@@ -40,9 +40,8 @@ public:
     private:
         type_t typex;
         std::string use;	// depends of breakpoint type
-        uint16_t flags;	// bit 0: enabled bit 1: if bit 2: checkpoint
 
-        bool enabled;
+        bool enabled=true;
     };
 
     void remove(Memory::addr_t addr) { breakpoints.erase(addr); }

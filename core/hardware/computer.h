@@ -23,13 +23,15 @@ public:
     void timer();
     void reset();
 
-    std::string buildCheckPoint();
+    // TODO, not sure that computer should be responsible of
+    // handle that...
+    std::string checkPoint(bool addCycleAddr=true) const;
 
     Cpu* cpu;
     Memory* memory;
     Screen* screen;
     Keyboard* keyboard;
-    std::list<Peripheral*> peripherals;
+    std::list<Peripheral*> peripherals;	// TODO aren't screen and keyboard some kind of peripherals ???
 };
 
 }
