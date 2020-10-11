@@ -4,6 +4,9 @@
 
 #include <QTableView>
 #include <QCheckBox>
+#include <QVBoxLayout>
+#include <QHBoxLayout>
+#include <QLabel>
 
 namespace hw
 {
@@ -36,29 +39,46 @@ struct regaf
     flags& f() { return *((flags*)(&val)); }
 };
 
-class FlagCheckBox : public QCheckBox
+class FlagWidget: public QVBoxLayout
 {
+    Q_OBJECT
 public:
-    FlagCheckBox(reg8& flags, uint8_t mask, QWidget* label);
-    virtual ~FlagCheckBox()=default;
+    FlagWidget(const char*, reg8& flags, uint8_t mask);
+    virtual ~FlagWidget() override {}
 
-    void update()
-    {
-        QPalette pal = label->palette();
+public slots:
+    void update();
 
-        bool old = isChecked();
-        if (old != (flags & mask))
-            pal.setColor(QPalette::WindowText, Qt::red);
-        else
-            pal.setColor(QPalette::WindowText, Qt::black);
-        label->setPalette(pal);
-        setChecked(flags & mask);
-    }
+    void onClick();
+    void repaint();
+
+signals:
+    void stateChanged();
 
 private:
-    QWidget* label;
+    QLabel* label;
+    QCheckBox* checkbox;
     reg8& flags;
     uint8_t mask;
+    bool disableSignal = false;
+};
+
+class Z80Registers;
+
+class Z80RegisterWidgets: public QWidget
+{
+public:
+    Z80RegisterWidgets(Z80Registers* regs);
+    void update();
+    void onFlagChange();
+
+private:
+    void addFlag(FlagWidget*);
+    QTableView* table = nullptr;
+    Z80Registers* r;
+    std::vector<FlagWidget*> flags;
+
+    QHBoxLayout* flagsLayout;
 };
 
 
@@ -108,16 +128,10 @@ struct Z80Registers : public Cpu::Registers
 
     // TODO Design : should really not merge registers with view of registers
     void update() override;
-    QWidget* createViewForm(QWidget* parent) override;
-    QTableView* table = nullptr;
-    FlagCheckBox* flag_s;
-    FlagCheckBox* flag_z;
-    FlagCheckBox* flag_5;
-    FlagCheckBox* flag_h;
-    FlagCheckBox* flag_3;
-    FlagCheckBox* flag_pv;
-    FlagCheckBox* flag_n;
-    FlagCheckBox* flag_c;
+    Z80RegisterWidgets* createViewForm(QWidget* parent) override;
+
+private:
+    Z80RegisterWidgets* view = nullptr;
 };
 
 } // ns hw

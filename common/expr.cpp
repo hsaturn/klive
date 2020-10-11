@@ -49,6 +49,11 @@ string getlex(string& s)
             s.erase(0,1);
             c=s[0];
         }
+        if (s[0]=='\'')	// z80, last quote allowed for af' hl' ...
+        {
+            lex += s[0];
+            s.erase(0,1);
+        }
     }
     // =?
     else if (s[1]=='=' &&

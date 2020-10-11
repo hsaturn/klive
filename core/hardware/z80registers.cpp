@@ -21,13 +21,43 @@ namespace hw
 
 static int firstRow=0;
 
-FlagCheckBox::FlagCheckBox(reg8& flags_, uint8_t mask_, QWidget* label_)
-    :
-      label(label_),
-      flags(flags_),
-      mask(mask_)
+FlagWidget::FlagWidget(const char* text, reg8& flags_, uint8_t mask_)
+    : flags(flags_), mask(mask_)
 {
+    label = new QLabel(text);
+    addWidget(label);
+    checkbox = new QCheckBox;
+    addWidget(checkbox);
 
+    connect(checkbox, &QCheckBox::stateChanged, this, &FlagWidget::onClick);
+}
+
+void FlagWidget::onClick()
+{
+    if (disableSignal)
+        return;
+
+    emit stateChanged();
+}
+
+void FlagWidget::repaint()
+{
+    QPalette pal = label->palette();
+
+    bool old = checkbox->isChecked();
+    if (old != (flags & mask))
+        pal.setColor(QPalette::WindowText, Qt::red);
+    else
+        pal.setColor(QPalette::WindowText, Qt::black);
+    label->setPalette(pal);
+}
+
+void FlagWidget::update()
+{
+    disableSignal = true;
+    repaint();
+    checkbox->setChecked(flags & mask);
+    disableSignal = false;
 }
 
 void addCells(QTableView* table, int col, std::string list)
@@ -140,11 +170,24 @@ uint16_t Z80Registers::get(string regi)
     else throw "Unknown register";
 }
 
-QWidget* Z80Registers::createViewForm(QWidget* parent)
+void Z80RegisterWidgets::onFlagChange()
+{
+    cout << "ON FLAG CHANGE (AT LEAST)" << endl;
+}
+
+void Z80RegisterWidgets::addFlag(FlagWidget* flag)
+{
+    flagsLayout->addLayout(flag);
+    flags.push_back(flag);
+    connect(flag, &FlagWidget::stateChanged, this, &Z80RegisterWidgets::onFlagChange);
+}
+
+
+Z80RegisterWidgets::Z80RegisterWidgets(Z80Registers* regs)
+    : r(regs)
 {
     QVBoxLayout* layout=new QVBoxLayout;
-    QWidget* form=new QWidget;
-    form->setLayout(layout);
+    setLayout(layout);
 
     table=new QTableView;
 
@@ -169,96 +212,26 @@ QWidget* Z80Registers::createViewForm(QWidget* parent)
     layout->addWidget(table);
 
     { // flags
-        QHBoxLayout* flags = new QHBoxLayout;
+        flagsLayout  = new QHBoxLayout;
 
         QLabel* label;
         label=new QLabel;
         label->setText("Flags:");
-        flags->addWidget(label);
+        flagsLayout->addWidget(label);
 
         //  ----
 
-        QVBoxLayout* flag = new QVBoxLayout;
-        label=new QLabel;
-        label->setText("S");
-        flag->addWidget(label);
-        flag_s = new FlagCheckBox(f.f, 0x80, label);
-        flag->addWidget(flag_s);
-        flags->addLayout(flag);
+        addFlag(new FlagWidget("S", r->f.f, 0x80));
+        addFlag(new FlagWidget("Z", r->f.f, 0x40));
+        addFlag(new FlagWidget("5", r->f.f, 0x20));
+        addFlag(new FlagWidget("H", r->f.f, 0x10));
+        addFlag(new FlagWidget("3", r->f.f,  0x8));
+        addFlag(new FlagWidget("PV", r->f.f, 0x4));
+        addFlag(new FlagWidget("N", r->f.f,  0x2));
+        addFlag(new FlagWidget("C", r->f.f,  0x1));
 
-        flag = new QVBoxLayout;
-        label = new QLabel("Z");
-        flag->addWidget(label);
-        flag_z = new FlagCheckBox(f.f, 0x40, label);
-        flag->addWidget(flag_z);
-        flags->addLayout(flag);
-
-        flag = new QVBoxLayout;
-        label = new QLabel("5");
-        flag->addWidget(label);
-        flag_5 = new FlagCheckBox(f.f, 0x20, label);
-        flag->addWidget(flag_5);
-        flags->addLayout(flag);
-
-        flag = new QVBoxLayout;
-        label = new QLabel("H");
-        flag->addWidget(label);
-        flag_h = new FlagCheckBox(f.f, 0x10, label);
-        flag->addWidget(flag_h);
-        flags->addLayout(flag);
-
-        flag = new QVBoxLayout;
-        label = new QLabel("3");
-        flag->addWidget(label);
-        flag_3 = new FlagCheckBox(f.f, 0x8, label);
-        flag->addWidget(flag_3);
-        flags->addLayout(flag);
-
-        flag = new QVBoxLayout;
-        label = new QLabel("PV");
-        flag->addWidget(label);
-        flag_pv = new FlagCheckBox(f.f, 0x4, label);
-        flag->addWidget(flag_pv);
-        flags->addLayout(flag);
-
-        flag = new QVBoxLayout;
-        label = new QLabel("N");
-        flag->addWidget(label);
-        flag_n = new FlagCheckBox(f.f, 0x2, label);
-        flag->addWidget(flag_n);
-        flags->addLayout(flag);
-
-        flag = new QVBoxLayout;
-        label = new QLabel("C");
-        flag->addWidget(label);
-        flag_c = new FlagCheckBox(f.f, 0x1, label);
-        flag->addWidget(flag_c);
-        flags->addLayout(flag);
-
-        layout->addLayout(flags);
+        layout->addLayout(flagsLayout);
     }
-
-
-    // TODO flags, IM, cycles (?)
-    return form;
-}
-
-static ostream& operator<<(ostream& out, const regaf& af)
-{
-    out << af.val;
-    return out;
-}
-
-static ostream& operator<<(ostream& out, const reg16u& u)
-{
-    out << u.val;
-    return out;
-}
-
-static ostream& operator<<(ostream& out, const reg8& u)
-{
-    out << (int16_t)u;
-    return out;
 }
 
 template<class T>
@@ -295,21 +268,46 @@ static void setCells(QTableView* table, int col, reg16& top, regaf& af, reg16u& 
     setCell(model, bottom, row, col);
 }
 
-void Z80Registers::update()
+void Z80RegisterWidgets::update()
 {
     if (table == nullptr) return;
 
-    setCells(table, 1, pc, af,  bc,  de,  hl,  ix, i);
-    setCells(table, 3, sp, af2, bc2, de2, hl2, iy, r);
+    setCells(table, 1, r->pc, r->af,  r->bc,  r->de,  r->hl,  r->ix, r->i);
+    setCells(table, 3, r->sp, r->af2, r->bc2, r->de2, r->hl2, r->iy, r->r);
 
-    flag_s->update();
-    flag_z->update();
-    flag_5->update();
-    flag_h->update();
-    flag_3->update();
-    flag_n->update();
-    flag_c->update();
-    flag_pv->update();
+    for(FlagWidget* flag : flags)
+        flag->update();
+}
+
+Z80RegisterWidgets* Z80Registers::createViewForm(QWidget *parent)
+{
+    if (view == nullptr)
+    view = new Z80RegisterWidgets(this);
+
+    return view;
+}
+
+static ostream& operator<<(ostream& out, const regaf& af)
+{
+    out << af.val;
+    return out;
+}
+
+static ostream& operator<<(ostream& out, const reg16u& u)
+{
+    out << u.val;
+    return out;
+}
+
+static ostream& operator<<(ostream& out, const reg8& u)
+{
+    out << (int16_t)u;
+    return out;
+}
+
+void Z80Registers::update()
+{
+    view->update();
 }
 
 reg16u::reg16u()
