@@ -1,4 +1,5 @@
 #include "computer.h"
+#include "keyboard.h"
 #include <QTimer>
 
 #include <core/hardware/memory.h>
@@ -22,6 +23,9 @@ Computer::Computer() : QWidget(nullptr)
     // TODO  archi, rom selection etc.
     memory->loadRomImage(":/roms/48.rom", 0);
     cpu = new Z80(memory);
+
+    keyboard = new Keyboard(cpu);
+    cpu->attach(keyboard);
 
     cpu->start();
 }

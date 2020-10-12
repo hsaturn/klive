@@ -45,6 +45,7 @@ add_executable(klive
     core/hardware/z80registers.h
     core/hardware/ioports.h
     core/hardware/checkpoints.cpp
+    core/hardware/keyboard.cpp
 
     handlers/project/projecthandler.cpp
     handlers/project/projecthandler.h
