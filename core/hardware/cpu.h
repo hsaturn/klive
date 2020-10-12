@@ -100,6 +100,11 @@ private:
     cycle next_irq = 0;
 };
 
+struct CpuPort
+{
+    Memory::addr_t port;
+    uint8_t value;
+    bool filled;	// Set to true if answered
 };
 
 class Cpu: public Observable<Cpu>
@@ -108,13 +113,16 @@ public:
 
     struct Message
     {
-       enum event_t { STEP, BREAK_POINT, WHILE_REACHED, UNTIL_REACHED, UNKNOWN_OP};
+       enum event_t { STEP, BREAK_POINT, WHILE_REACHED, UNTIL_REACHED, UNKNOWN_OP,
+                  INPORT,
+                    };
        Message(event_t event_in=STEP): event(event_in) {}
        event_t event;
        union
        {
-         unsigned long data;
+         unsigned long data = 0;
          const BreakPoints::BreakPoint* brk;
+         CpuPort* port;
        };
     };
 

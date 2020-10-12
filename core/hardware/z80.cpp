@@ -318,7 +318,7 @@ void Z80::step_no_obs()
         case 0xCD: call(); break;
         case 0xD0: ret(not f.c, 11,5); break;
         case 0xD1: pop(de.val, 11); break;
-        case 0xD3: out(getByte(), a); burn(11); break;
+        case 0xD3: out((a<<8) + getByte(), a, 11); break;
         case 0xD4: call_if(not f.c); break;
         case 0xD9: swap(hl,hl2); swap(de,de2); swap(bc,bc2); burn(4); break;
         case 0xD2: jp_if(not f.c); break;
@@ -537,6 +537,9 @@ void Z80::step_ed()
         case 0x6E: set_irq_mode(0); burn(8); break;
         case 0x75: retn(); break;
         case 0x76: set_irq_mode(1); burn(8); break;
+        case 0x78: // in a,(c)
+            a = in((static_cast<uint16_t>(b)<<8) + c,12);
+           break;
         case 0x7D: retn(); break;
         case 0x7E: set_irq_mode(2); burn(8); break;
         case 0xB0: // ldir
@@ -854,11 +857,28 @@ uint8_t Z80::sra(uint8_t) { nop(0, "sra");  return 0; }
 uint8_t Z80::sll(uint8_t) { nop(0, "sll");  return 0; }
 uint8_t Z80::srl(uint8_t) { nop(0, "srl");  return 0; }
 
-void Z80::out(uint8_t port, uint8_t val)
+void Z80::out(Memory::addr_t port, uint8_t val, cycle burnt)
 {
+    //!\ : See Z80 specs.... It seems that upper byte of port is set but unused...
+
     // TODO
     // Send notification to out listeners
     cout << "Z80: nyi out" << endl;
+    clock.burn(burnt);
+}
+
+uint8_t Z80::in(Memory::addr_t port, cycle burnt)
+{
+    static Message inport(Message::INPORT);
+    if (inport.port == nullptr)
+    {
+        inport.port = new CpuPort;
+    }
+    inport.port->port = port;
+    notify(inport);
+    clock.burn(burnt);
+    // TODO inport.port->valid ?
+    return inport.port->value;
 }
 
 void Z80::and_(reg8 n, cycle burnt)

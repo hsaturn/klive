@@ -40,7 +40,9 @@ protected:
     void step_dd_fd(reg16&);
     void step_xxcb(reg16);
     void nop(byte opcode, const char* prefix=nullptr);
-    void out(uint8_t port, uint8_t val);
+    void out(Memory::addr_t port, uint8_t val, cycle burn);
+    uint8_t in(Memory::addr_t port, cycle burn);
+
 
     inline uint8_t getByte(const cycle t=0) { burn(t); return memory->peek(pc++); }
 
