@@ -156,6 +156,8 @@ void Z80::step_no_obs()
         case 0x2B: hl.val--; burn(6); break; 			// dec hl
         case 0x2C: l=inc(l, 4); break;
         case 0x2D: l=dec(l, 4); break;
+        case 0x2E: l=getByte(7); break;
+        case 0x2F: a=~a; f.h=1; f.n=1; burn(4); break;
         case 0x30:
                     jr(!f.c); break;
         case 0x31: sp=readMem16(10); break;				// ld sp, **
@@ -303,6 +305,7 @@ void Z80::step_no_obs()
         case 0xBA: compare(d); burn(4); break;	// cp d
         case 0xBB: compare(e); burn(4); break;	// cp e
         case 0xBC: compare(h); burn(4); break;	// cp h
+        case 0xBD: compare(l); burn(4); break;  // cp l
         case 0xC0: ret(not f.z, 11,5); break;
         case 0xc1: pop(bc.val, 11); break;
         case 0xC2: jp_if(not f.z); break;
@@ -521,6 +524,13 @@ void Z80::step_ed()
         case 0x53: writeMem16(de.val, 20); break;	// ld(**), de
         case 0x55: retn(); break;
         case 0x56: set_irq_mode(1); burn(8); break;
+        case 0x57: // ld a,i
+            a = i;
+            f.n = 0;
+            f.h = 0;
+            f.z = a==0 ? 1 : 0;
+            f.s = a&0x80 ? 1 : 0;
+            f.pv = iff2;
             break;
         case 0x5B:	// ld de, (**)
             {
@@ -531,10 +541,25 @@ void Z80::step_ed()
             }
         case 0x5D: retn(); break;
         case 0x5E: set_irq_mode(2); burn(8); break;
+        case 0x5F:	// ld a,r
+            a = r;
+            f.n = 0;
+            f.h = 0;
+            f.z = a==0 ? 1 : 0;
+            f.s = a&0x80 ? 1 : 0;
+            f.pv = iff2;
+            break;
         case 0x65: retn(); break;
         case 0x66: set_irq_mode(0); burn(8); break;
         case 0x6D: retn(); break;
         case 0x6E: set_irq_mode(0); burn(8); break;
+        case 0x73:	// ld (**), sp
+            {
+                Memory::addr_t addr=getWord(20);
+                memory->poke(addr, sp & 0xff);
+                memory->poke(addr+1, sp >> 8);
+                break;
+            }
         case 0x75: retn(); break;
         case 0x76: set_irq_mode(1); burn(8); break;
         case 0x78: // in a,(c)
