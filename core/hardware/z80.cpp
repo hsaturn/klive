@@ -306,6 +306,7 @@ void Z80::step_no_obs()
         case 0xBB: compare(e); burn(4); break;	// cp e
         case 0xBC: compare(h); burn(4); break;	// cp h
         case 0xBD: compare(l); burn(4); break;  // cp l
+        case 0xBE: compare(memory->peek(hl.val)); burn(7); break;	// cp (hl)
         case 0xC0: ret(not f.z, 11,5); break;
         case 0xc1: pop(bc.val, 11); break;
         case 0xC2: jp_if(not f.z); break;
@@ -339,11 +340,13 @@ void Z80::step_no_obs()
         case 0xE9: pc=hl.val; burn(4); break;	// jp (hl)
         case 0xEB: swap(de, hl); burn(4); break;	// ex de,hl
         case 0xED: step_ed(); break;
+        case 0xEE: xor_(getByte(), 7); break;
         case 0xF1: pop(af.val, 11); break;
         case 0xF3: di(); burn(4); break;
         case 0xF5: push(af.val, 11); break;		// push hl
         case 0xf6: or_(getByte(), 7); break;
         case 0xF9: sp=hl.val; burn(6); break; // ld sp,hl
+        case 0xFA: jp_if(f.s); break;
         case 0xFB: ei(); burn(4); break;
         case 0xFD: step_dd_fd(iy); break;
         case 0xFE: compare(getByte(7)); break;	// cp *
@@ -483,12 +486,30 @@ void Z80::writeMem16(uint16_t val, const cycle burnt)
     memory->poke(dest+1, val >> 8);
 }
 
+void Z80::sbc_hl(uint16_t val)
+{
+    burn(15);
+    uint8_t carry = f.c;
+    f.c = val+f.c > hl.val;
+    hl.val -= val+carry;
+
+    f.s = h & 0x80 ? 1 : 0;
+    f.u5 = h & 0x20 ? 1 : 0;
+    f.u3 = h & 0x08 ? 1 : 0;
+
+    f.z = hl.val == 0 ? 1 : 0;
+    f.h = 0;	// TODO set if borrow from bit 12
+    f.pv = f.c; // TODO set if overflow
+    f.n = 1;
+}
+
 void Z80::step_ed()
 {
     incr();
     uint8_t opcode=getByte();
     switch(opcode)
     {
+        case 0x42: sbc_hl(bc.val); break;
         case 0x43: writeMem16(bc.val, 20); break;
 
         case 0x45: retn(); break;
@@ -504,23 +525,7 @@ void Z80::step_ed()
         case 0x4D:
             reti(); break;
         case 0x4E: set_irq_mode(0); burn(8); break;
-        case 0x52:	// sbc hl, de
-            burn(15);
-            {
-                uint8_t carry = f.c;
-                f.c = de.val+f.c > hl.val;
-                hl.val -= de.val+carry;
-
-                f.s = h & 0x80 ? 1 : 0;
-                f.u5 = h & 0x20 ? 1 : 0;
-                f.u3 = h & 0x08 ? 1 : 0;
-
-                f.z = hl.val == 0 ? 1 : 0;
-                f.h = 0;	// TODO set if borrow from bit 12
-                f.pv = f.c; // TODO set if overflow
-                f.n = 1;
-            }
-            break;
+        case 0x52: sbc_hl(de.val); break;	// sbc hl, de
         case 0x53: writeMem16(de.val, 20); break;	// ld(**), de
         case 0x55: retn(); break;
         case 0x56: set_irq_mode(1); burn(8); break;
@@ -549,10 +554,12 @@ void Z80::step_ed()
             f.s = a&0x80 ? 1 : 0;
             f.pv = iff2;
             break;
+        case 0x62: sbc_hl(hl.val); break;
         case 0x65: retn(); break;
         case 0x66: set_irq_mode(0); burn(8); break;
         case 0x6D: retn(); break;
         case 0x6E: set_irq_mode(0); burn(8); break;
+        case 0x72: sbc_hl(sp); break;
         case 0x73:	// ld (**), sp
             {
                 Memory::addr_t addr=getWord(20);
@@ -611,7 +618,10 @@ void Z80::step_dd_fd(reg16& in)
     uint8_t opcode=getByte();
     switch(opcode)
     {
+        case 0x09: add_in_pp(in, bc.val); break;
+        case 0x19: add_in_pp(in, de.val); break;
         case 0x21: in=getWord(14); break;	// ld i?, nn
+        case 0x29: add_in_pp(in, in); break;
         case 0x35: // dec (i?+*)
             {
                 Memory::addr_t addr=in+static_cast<int8_t>(getByte());
@@ -626,10 +636,29 @@ void Z80::step_dd_fd(reg16& in)
                 burn(19);
             }
             break;
+        case 0x39: add_in_pp(in, sp); break;
         case 0x46:	// ld b, (ii+*)
             {
                 Memory::addr_t addr=in+static_cast<int8_t>(getByte(19));
                 b = memory->peek(addr);
+            }
+            break;
+        case 0x4E:
+            {
+                Memory::addr_t addr=in+static_cast<int8_t>(getByte(19));
+                c = memory->peek(addr);
+            }
+            break;
+        case 0x56:
+            {
+                Memory::addr_t addr=in+static_cast<int8_t>(getByte(19));
+                d = memory->peek(addr);
+            }
+            break;
+       case 0x5E:
+            {
+                Memory::addr_t addr=in+static_cast<int8_t>(getByte(19));
+                e = memory->peek(addr);
             }
             break;
         case 0x60:	// ld i?h, reg
@@ -676,8 +705,15 @@ void Z80::step_dd_fd(reg16& in)
                 a=add_(a, memory->peek(in+offset), 19);
             }
             break;
+        case 0x96:
+            {
+                Memory::addr_t addr=in+static_cast<int8_t>(getByte(19));
+                a=compare(memory->peek(addr)); break;		// sub a, (in+*)
+            }
         case 0xCB: step_xxcb(in); break;
-        default: nop(opcode, "0xdd/fd "); break;
+        case 0xE9: pc=in; burn(8); break; // jp (in)
+
+        default: nop(opcode, "0xdd or 0xfd "); break;
     }
 }
 
@@ -878,7 +914,19 @@ uint8_t Z80::rr(uint8_t) { nop(0, "rr");  return 0; }
 uint8_t Z80::sla(uint8_t) { nop(0, "sla");  return 0; }
 uint8_t Z80::sra(uint8_t) { nop(0, "sra");  return 0; }
 uint8_t Z80::sll(uint8_t) { nop(0, "sll");  return 0; }
-uint8_t Z80::srl(uint8_t) { nop(0, "srl");  return 0; }
+
+uint8_t Z80::srl(uint8_t reg)
+{
+    f.s = 0;
+    f.c = reg & 0x01 ? 1 : 0;
+    reg >>= 1;
+    f.z = reg == 0 ? 1 : 0;
+    f.h = 0;
+    f.pv = parity(reg);
+    f.n = 0;
+
+    return reg;
+}
 
 void Z80::out(Memory::addr_t port, uint8_t val, cycle burnt)
 {
@@ -1012,6 +1060,12 @@ void Z80::rlca()
     f.n=0;
     f.c= (a & 1) ? 1 : 0;
     burn(4);
+}
+
+void Z80::add_in_pp(reg16& in, uint16_t value)
+{
+    in += value;
+    // TODO H is set if carry from bit 11; otherwise, it is reset.
 }
 
 

@@ -92,6 +92,9 @@ protected:
     uint8_t sll(uint8_t);
     uint8_t srl(uint8_t);
 
+    void add_in_pp(reg16& in, uint16_t val);
+    void sbc_hl(uint16_t);
+
     // return adress of srce/dest register
     // from opcode (see DDxx, FDxx, FDCB**XX instructions etc.)
     uint8_t* calc_dest_reg(uint8_t opcode);
