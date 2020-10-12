@@ -572,33 +572,31 @@ void Z80::step_ed()
                 r-=2;
                 // TODO it seems that interrupts are taken in account
                 f.h=0; f.pv= (bc.val==1); f.n=0;
-                do
-                {
-                    burn(bc.val ? 21 : 16);
-                    incr();
-                    incr();
-                    memory->poke(de.val, memory->peek(hl.val));
-                    hl.val++;
-                    de.val++;
-                    bc.val--;
-                } while(bc.val);
+
+                burn(bc.val ? 21 : 16);
+                incr();
+                incr();
+                memory->poke(de.val, memory->peek(hl.val));
+                hl.val++;
+                de.val++;
+                bc.val--;
+
+                if (bc.val) pc -=2;
             }
             break;
         case 0xb8: // lddr
             {
                 r-=2;
                 f.h=0; f.pv=0; f.n=0;
-                do
-                {
-                    // TODO it seems that interrupts are taken in account
-                    burn(bc.val ? 21 : 16);
-                    incr();
-                    incr();
-                    memory->poke(de.val, memory->peek(hl.val));
-                    hl.val--;
-                    de.val--;
-                    bc.val--;
-                } while(bc.val);
+
+                burn(bc.val ? 21 : 16);
+                incr();
+                incr();
+                memory->poke(de.val, memory->peek(hl.val));
+                hl.val--;
+                de.val--;
+                bc.val--;
+                if (bc.val) pc -=2;
             }
             break;
         default:
