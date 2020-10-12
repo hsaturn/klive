@@ -45,7 +45,6 @@ MainWindow::MainWindow() : QMainWindow()
     restoreLayout();
 }
 
-
 MainWindow::~MainWindow()
 {
 }

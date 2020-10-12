@@ -22,8 +22,14 @@ public:
 
     // Run steps until the 'real-time' is reached
     void steps_to_rt(uint32_t max_steps=1e6);
-    void irq_mode(int /*mode*/){}
-    void di() {}
+    void set_irq_mode(int mode){ irq_mode = mode; }
+    void di();
+    void ei();
+    void nmi();
+    void irq(Memory::addr_t);
+    void retn();
+    void reti();
+
     Registers* regs() override { return &R; }
 
 protected:
@@ -116,6 +122,11 @@ private:
     reg8&    i;
     reg8&    r;
 
+    // Interrupt vars
+    int irq_enabler;	// <0 : disabled 0: enabled >0 enable in n instructions
+    int irq_mode;
+    bool iff1;
+    bool iff2;
 };
 
 }

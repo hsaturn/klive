@@ -8,7 +8,6 @@ namespace hw
 using namespace std;
 static Cpu::Message stepMsg;
 
-
 const BreakPoints::BreakPoint* BreakPoints::get(Memory::addr_t addr) const
 {
     const auto& it=breakpoints.find(addr);

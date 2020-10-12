@@ -20,7 +20,7 @@ Z80::Z80(Memory* mem)
 void Z80::_reset()
 {
     pc=0;
-    irq_mode(0);
+    set_irq_mode(0);
     di();
     i=0;
     r=0;
@@ -39,6 +39,7 @@ void Z80::_reset()
 
     clock.setFrequency(3750000);
     clock.restart();
+    clock.irq(70800);
 
     Message rst;
     notify(rst);
@@ -50,11 +51,47 @@ void Z80::nop(byte opcode, const char* prefix)
     const char c=0;
     if (prefix==nullptr) prefix=&c;
     printf("Z80 %04x: %s%02x Unknown opcode\n", pc-1, prefix, opcode);
-    burn(4);	// Dummy
+    burn(4);	// Avoid cycle error
     running=false;
     unknown.data = opcode | (static_cast<uint32_t>(last) << 16);
     notify(unknown);
     cout << std::flush;
+}
+
+void Z80::nmi()
+{
+    iff2 = iff1;
+    std::cout << "TODO : NMI" << std::endl;
+}
+
+void Z80::retn()
+{
+    iff1 = iff2;
+    ret(true, 14);
+}
+
+void Z80::reti()
+{
+    ret(true, 14);
+}
+
+void Z80::irq(Memory::addr_t next_pc)
+{
+    push(pc, 17);
+    pc = next_pc;
+}
+
+void Z80::di()
+{
+    iff1 = 0;
+    iff2 = 0;
+}
+
+void Z80::ei()
+{
+    iff1 = 1;
+    iff2 = 1;
+    irq_enabler = 1;
 }
 
 void Z80::step_no_obs()
@@ -63,6 +100,15 @@ void Z80::step_no_obs()
     CpuClock before(clock);
     incr();
 
+    if (irq_enabler>0)
+    {
+        irq_enabler--;
+    }
+    else if (iff1 && (irq_enabler==0) && clock.irq())
+    {
+        irq(0x38);	// TODO, the addr has to be computed
+        return;
+    }
     byte opcode = getByte();
 
     switch(opcode)
@@ -291,13 +337,11 @@ void Z80::step_no_obs()
         case 0xEB: swap(de, hl); burn(4); break;	// ex de,hl
         case 0xED: step_ed(); break;
         case 0xF1: pop(af.val, 11); break;
-        case 0xF3:	// DI
-            cerr << "z80: DI nyi" << endl; burn(4); break;
+        case 0xF3: di(); burn(4); break;
         case 0xF5: push(af.val, 11); break;		// push hl
         case 0xf6: or_(getByte(), 7); break;
         case 0xF9: sp=hl.val; burn(6); break; // ld sp,hl
-        case 0xFB: // EI
-            cerr << "z80: EI nyi" << endl; burn(4); break;
+        case 0xFB: ei(); burn(4); break;
         case 0xFD: step_dd_fd(iy); break;
         case 0xFE: compare(getByte(7)); break;	// cp *
         default: nop(opcode); break;
@@ -444,6 +488,8 @@ void Z80::step_ed()
     {
         case 0x43: writeMem16(bc.val, 20); break;
 
+        case 0x45: retn(); break;
+        case 0x46: set_irq_mode(0); burn(8); break;
         case 0x47: i=a; burn(9); break; // ld i,a
         case 0x4B: // ld bc, (**)
             {
@@ -452,6 +498,9 @@ void Z80::step_ed()
                 b=memory->peek(addr+1);
                 break;
             }
+        case 0x4D:
+            reti(); break;
+        case 0x4E: set_irq_mode(0); burn(8); break;
         case 0x52:	// sbc hl, de
             burn(15);
             {
@@ -470,9 +519,8 @@ void Z80::step_ed()
             }
             break;
         case 0x53: writeMem16(de.val, 20); break;	// ld(**), de
-        case 0x56:
-            cout << "z80: IM1 nyi" << endl;
-            burn(8);
+        case 0x55: retn(); break;
+        case 0x56: set_irq_mode(1); burn(8); break;
             break;
         case 0x5B:	// ld de, (**)
             {
@@ -481,6 +529,16 @@ void Z80::step_ed()
                 d=memory->peek(addr+1);
                 break;
             }
+        case 0x5D: retn(); break;
+        case 0x5E: set_irq_mode(2); burn(8); break;
+        case 0x65: retn(); break;
+        case 0x66: set_irq_mode(0); burn(8); break;
+        case 0x6D: retn(); break;
+        case 0x6E: set_irq_mode(0); burn(8); break;
+        case 0x75: retn(); break;
+        case 0x76: set_irq_mode(1); burn(8); break;
+        case 0x7D: retn(); break;
+        case 0x7E: set_irq_mode(2); burn(8); break;
         case 0xB0: // ldir
             {
                 r-=2;

@@ -72,12 +72,34 @@ public:
     auto getTimer() const { return timer; }
     void restart() { timer.restart(); curr=0; }
 
+    void irq(cycle interval) { irq_interval=interval; }
+
+    bool irq()
+    {
+        if (irq_interval==0) return false;
+        if (curr > next_irq)
+        {
+            next_irq += irq_interval;
+            if (curr > next_irq)
+            {
+                next_irq = curr+irq_interval;
+            }
+            return true;
+        }
+        return false;
+    }
+
     cycle cycles() const { return curr; }
 
 private:
     cycle curr;
     QElapsedTimer timer;
     uint32_t freq_hz;
+
+    cycle irq_interval=0;
+    cycle next_irq = 0;
+};
+
 };
 
 class Cpu: public Observable<Cpu>
