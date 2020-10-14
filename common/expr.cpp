@@ -179,7 +179,9 @@ static exprtype parseUnary(string& s)
     }
     else if (unary=="*")
     {
-        return cpu->getMemory()->peek(parseAtom(s));
+        if (cpu)
+            return cpu->getMemory()->peek(parseAtom(s));
+        throw "cannot dereference without cpu";
     }
     else
     {
@@ -350,7 +352,7 @@ static exprtype parseLogical(string& s)
     return left;
 }
 
-bool parseExpression(hw::Cpu* c, string& s, exprtype& result)
+bool parseExpression(string& s, exprtype& result, hw::Cpu *c)
 {
     cpu = c;	// TODO better and better .... global vars
     try

@@ -38,7 +38,7 @@ MiniGdb::MiniGdb(Computer* computer_)
 static bool readAddr(Computer* comp, string& s, uint32_t& addr)
 {
     exprtype result;
-    if (parseExpression(comp->cpu, s, result))
+    if (parseExpression(s, result, comp->cpu))
     {
         addr=static_cast<uint32_t>(result);
         // TODO if addr > max ram
@@ -123,7 +123,7 @@ bool MiniGdb::outexpr(ostream& out, string& expr)
 {
     string copy(expr);
     exprtype eval;
-    if (parseExpression(computer->cpu, expr, eval))
+    if (parseExpression(expr, eval, computer->cpu))
     {
         size_t len=copy.length()-expr.length();
         if (len)	// Should be....
@@ -327,7 +327,7 @@ void MiniGdb::onCmdLine()
         {
             string expr=s;
             exprtype eval;
-            if (parseExpression(computer->cpu, s, eval))
+            if (parseExpression(s, eval, computer->cpu))
             {
                 output << "running " << found << expr << endl;
                 if (found=="while")
@@ -347,7 +347,7 @@ void MiniGdb::onCmdLine()
         {
             string expr(s);
             exprtype eval;
-            if (parseExpression(computer->cpu, s, eval))
+            if (parseExpression(s, eval, computer->cpu))
             {
                 output << "Inserting display(" << expr << ")" << endl;
                 displays.insert(expr);
@@ -401,7 +401,7 @@ void MiniGdb::onCmdLine()
             }
             s.erase(0,1);
             int32_t value;
-            if (!parseExpression(computer->cpu, s, value))
+            if (!parseExpression(s, value, computer->cpu))
             {
                 error << "Bad expression" << endl;
                 break;
@@ -424,7 +424,7 @@ void MiniGdb::onCmdLine()
             int32_t count(1);
             if (s.length())
             {
-                if (!parseExpression(computer->cpu, s, count))
+                if (!parseExpression(s, count, computer->cpu))
                 {
                     error << "Invalid expression" << endl;
                     count=0;

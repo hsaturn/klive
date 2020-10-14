@@ -49,7 +49,7 @@ bool Cpu::steps_to_rt(uint32_t max_steps)
             exprtype result;
             string tmp = sUntil;
             // TODO use an AST for speed
-            if (parseExpression(this, tmp, result))
+            if (parseExpression(tmp, result, this))
             {
                 if (result)
                 {
@@ -70,7 +70,7 @@ bool Cpu::steps_to_rt(uint32_t max_steps)
             exprtype result;
             string tmp = sWhile;
             // TODO use an AST for speed
-            if (parseExpression(this, tmp, result))
+            if (parseExpression(tmp, result, this))
             {
                 if (result==0)
                 {
