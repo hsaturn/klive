@@ -49,10 +49,8 @@ add_executable(klive
 
     handlers/project/projecthandler.cpp
     handlers/project/projecthandler.h
-    handlers/project/project.ui
 
     handlers/gadgets/z80/gens.cpp
-    handlers/gadgets/z80/gens.ui
     handlers/gadgets/z80/monsview.cpp
     handlers/gadgets/z80/monsview.h
     handlers/gadgets/z80/mons.cpp
@@ -65,7 +63,6 @@ add_executable(klive
     handlers/screen/screenhandler.cpp
     handlers/screen/screenhandler.h
 
-    handlers/memory/memory.ui
     handlers/memory/memoryviewer.cpp
     handlers/memory/memoryviewer.h
 

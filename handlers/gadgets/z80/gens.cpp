@@ -1,14 +1,9 @@
 #include "gens.h"
-#include "ui_gens.h"
 
-Gens::Gens(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::Gens)
+Gens::Gens(QWidget *parent) : QWidget(parent)
 {
-    ui->setupUi(this);
 }
 
 Gens::~Gens()
 {
-    delete ui;
 }
