@@ -1,0 +1,195 @@
+# vim: ts=12
+# Ascii keycode port:value port:value ...
+# Shift, z,x,c,v
+
+shift 0xFEFE:0
+Z 0xFEFE:1
+X 0xFEFE:2
+C 0xFEFE:3
+V 0xFEFE:4
+
+A 0xFDFE:0
+S 0xFDFE:1
+D 0xFDFE:2
+F 0xFDFE:3
+G 0xFDFE:4
+
+Q 0xFBFE:0
+W 0xFBFE:1
+E 0xFBFE:2
+R 0xFBFE:3
+T 0xFBFE:4
+
+1 0xF7FE:0
+2 0xF7FE:1
+3 0xF7FE:2
+4 0xF7FE:3
+5 0xF7FE:4
+
+0 0xEFFE:0
+9 0xEFFE:1
+8 0xEFFE:2
+7 0xEFFE:3
+6 0xEFFE:4
+
+P 0xDFFE:0
+O 0xDFFE:1
+I 0xDFFE:2
+U 0xDFFE:3
+Y 0xDFFE:4
+
+enter 0xBFFE:0
+L 0xBFFE:1
+K 0xBFFE:2
+J 0xBFFE:3
+H 0xBFFE:4
+
+space 0x7FFE:0
+sym 0x7FFE:1
+M 0x7FFE:2
+N 0x7FFE:3
+B 0x7FFE:4
+
+back shift 0
+16777234 shift 5 // left
+16777236 shift 8 // right
+16777235 shift 7 // up
+16777237 shift 6 // down
+
+! sym 1
+@ sym 2
+# sym 3
+$ sym 4
+% sym 5
+& sym 6
+' sym 7
+( sym 8
+) sym 9
+_ sym 0
+
+# multiple symbol keys can be toggled in gui
+# Those should be case sensitive (to avoid confusion)
+# ~ separates sequences by a short delay
+ext=shift sym
+.L SIN	ext ~ Q
+.L COS	ext ~ W
+.L TAN	ext ~ E
+.L INT	ext ~ R
+.L RND	ext ~ T
+.L STR$	ext ~ Y
+.L CHR$	ext ~ U
+.L CODE	ext ~ I
+.L PEEK	ext ~ O
+.L TAB	ext ~ P
+.K READ	ext ~ A
+.K RESTORE	ext ~ S
+.K DATA	ext ~ D
+.L SGN	ext ~ F
+.L ABS	ext ~ G
+.L SQR	ext ~ H
+.L VAL	ext ~ J
+.L LEN	ext ~ K
+.L USR	ext ~ L
+.L LN	ext ~ Z
+.L EXP	ext ~ X
+.K LPRINT	ext ~ C
+.K LLIST	ext ~ V
+.L BIN	ext ~ B
+.L INKEY	ext ~ N
+.L PI	ext ~ M
+
+<= sym Q
+<> sym W
+!= sym W
+>= sym E
+< sym R
+> sym T
+.L AND sym Y
+.L OR sym U
+.L AT sym I
+; sym O
+" sym P
+.K STOP sym A
+.L NOT sym S
+.L STEP sym D
+.L TO sym F
+.L THEN sym G
+.L POW sym H
+-	sym J
++	sym K
+=	sym L
+:	sym Z
+£       sym X
+?	sym C
+/	sym V
+*	sym B
+,	sym N
+.	sym M
+[	shift sym ~ sym Y
+]	shift sym ~ sym U
+~	shift sym ~ sym A
+|	shift sym ~ sym S
+\	shift sym ~ sym D
+{	shift sym ~ sym F
+}	shift sym ~ sym G
+.K CIRCLE	shift sym ~ sym H
+.L VAL	shift sym ~ sym J
+.L SCREEN	shift sym ~ sym K
+.L ATTR	shift sym ~ sym L
+.K BEEP	shift sym ~ sym Z
+INK	shift sym ~ sym X
+PAPER	shift sym ~ sym C
+FLASH	shift sym ~ sym V
+BRIGHT	shift sym ~ sym B
+OVER	shift sym ~ sym N
+INVERSE	shift sym ~ sym M
+
+# BASIC KEYWORDS (option should exist to toggle also)
+.K DEF	shift sym ~ sym 1
+.L FN	shift sym ~ sym 2
+.L LINE	shift sym ~ sym 3
+.K OPEN	shift sym ~ sym 4
+.K CLOSE	shift sym ~ sym 5
+.K MOVE	shift sym ~ sym 6
+.K ERASE	shift sym ~ sym 7
+.L POINT	shift sym ~ sym 8
+.K CAT	shitt sym ~ sym 9
+.K FORMAT	shift sym ~ sym 0
+
+.L ASN	shift sym ~ Q
+.L ACS	shift sym ~ W
+.L ATN	shift sym ~ E
+.K VERIFY	shift sym ~ R
+.K MERGE	shift sym ~ T
+.L IN	shift sym ~ I
+.K OUT	shift sym ~ O
+
+
+# .M indicates K mode
+.K PLOT Q
+.K DRAW W
+.K REM E
+.K RUN R
+.K RAND T
+.K RETURN Y
+.K IF U
+.K INPUT I
+.K POKE O
+.K PRINT P
+.K NEW A
+.K SAVE S
+.K DIM D
+.K FOR F
+.K GOTO G
+.K GOSUB H
+.K LOAD J
+.K LIST K
+.K LET L
+.K COPY Z
+.K CLEAR X
+.K CONT C
+.K CLS V
+.K BORDER B
+.K NEXT N
+.K PAUSE M
+
