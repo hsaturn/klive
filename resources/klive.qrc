@@ -6,5 +6,6 @@
         <file>images/undo.png</file>
         <file>mons/z80.txt</file>
         <file>roms/48.rom</file>
+        <file>keyboard.txt</file>
     </qresource>
 </RCC>
