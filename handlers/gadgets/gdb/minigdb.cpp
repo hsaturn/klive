@@ -66,6 +66,8 @@ void MiniGdb::cpuStep()
 
 void MiniGdb::update(Cpu* , const Cpu::Message& msg)
 {
+    if (!isVisible()) return;
+
     stringstream d;
     result->setStyleSheet("color: black;");
     switch(msg.event)

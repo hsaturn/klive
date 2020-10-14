@@ -271,6 +271,7 @@ static void setCells(QTableView* table, int col, reg16& top, regaf& af, reg16u& 
 void Z80RegisterWidgets::update()
 {
     if (table == nullptr) return;
+    if (!isVisible()) return;
 
     setCells(table, 1, r->pc, r->af,  r->bc,  r->de,  r->hl,  r->ix, r->i);
     setCells(table, 3, r->sp, r->af2, r->bc2, r->de2, r->hl2, r->iy, r->r);

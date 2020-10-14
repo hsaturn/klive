@@ -39,6 +39,8 @@ void MemoryViewer::setMemory(Memory *mem)
 
 void MemoryViewer::update(Memory* sender , const Memory::Message& msg)
 {
+    if (!isVisible()) return;	// Bug when it becomes visible, data is old
+
     centerViewOnAddress(msg.start+msg.size/2);
     lastModified = msg;
     // QString str = dataHex.mid(bPos * 2, 2).toUpper();
