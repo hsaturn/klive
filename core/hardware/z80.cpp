@@ -43,6 +43,7 @@ void Z80::_reset()
 
     Message rst;
     notify(rst);
+    break_on_ret=0;
 }
 
 void Z80::nop(byte opcode, const char* prefix)
@@ -50,12 +51,20 @@ void Z80::nop(byte opcode, const char* prefix)
     Message unknown(Message::UNKNOWN_OP);
     const char c=0;
     if (prefix==nullptr) prefix=&c;
-    printf("Z80 %04x: %s%02x Unknown opcode\n", pc-1, prefix, opcode);
+    printf("Z80 %04x: %s %02x Unknown opcode\n", pc-1, prefix, opcode);
     burn(4);	// Avoid cycle error
     running=false;
     unknown.data = opcode | (static_cast<uint32_t>(last) << 16);
     notify(unknown);
     cout << std::flush;
+}
+
+void Z80::halt()
+{
+    static Message hlt(Message::HALTED);
+    burn(4);	// TODO, what is the real value ?
+    notify(hlt);
+    running=false;
 }
 
 void Z80::nmi()
@@ -77,6 +86,11 @@ void Z80::reti()
 
 void Z80::irq(Memory::addr_t next_pc)
 {
+    if (break_on_ret)
+    {
+        // running=true;	// TODO sure ?
+        // break_on_ret++;
+    }
     push(pc, 17);
     pc = next_pc;
 }
@@ -92,6 +106,41 @@ void Z80::ei()
     iff1 = 1;
     iff2 = 1;
     irq_enabler = 1;
+}
+
+void Z80::step_over()
+{
+    uint8_t opcode=memory->peek(pc);
+    uint8_t opcode2=memory->peek(pc+1);
+    uint8_t hi = (opcode & 0xf0) >> 4;
+    uint8_t lo = opcode & 0x0f;
+    bool gosub = false;
+
+    if ((hi==0xc || hi==0xd || hi==0xe || hi==0xf) and (lo==0x7 || lo==0x0f)) gosub=true;
+    if (opcode==0xcd) gosub=true;
+
+    if (gosub)
+    {
+        running = true;
+        break_on_ret++;
+    }
+    else  if (opcode==0xed and (opcode2==0xb0 or opcode2==0xb8))	// lddr ldir
+    {
+        auto current_pc = pc;
+        do
+        {
+            step_no_obs();
+        } while (pc == current_pc);
+        notify(stepMsg);
+    }
+    else
+        run_steps(1);
+}
+
+void Z80::step_out()
+{
+    break_on_ret++;
+    running=true;
 }
 
 void Z80::step_no_obs()
@@ -110,6 +159,7 @@ void Z80::step_no_obs()
         return;
     }
     byte opcode = getByte();
+    byte opcode2 = memory->peek(pc); // TODO for debugging purpose
 
     switch(opcode)
     {
@@ -377,18 +427,15 @@ void Z80::jp_if(bool flag)
 
 void Z80::call_if(bool flag)
 {
-    reg16 next_pc = getWord();
     if (flag)
-    {
-        push(pc, 17);
-        pc = next_pc;
-    }
+        call();
     else
         burn(10);
 }
 
 void Z80::call()
 {
+    if (break_on_ret) break_on_ret++;
     reg16 next_pc = getWord();
     push(pc, 17);
     pc = next_pc;
@@ -396,6 +443,7 @@ void Z80::call()
 
 void Z80::rst(uint8_t addr)
 {
+    if (break_on_ret) break_on_ret++;
     push(pc, 11);
     pc = addr;
 }
@@ -407,6 +455,16 @@ void Z80::ret(bool flag, cycle burn_ret, cycle burn_noret)
         pc = memory->peek(sp)+(memory->peek(sp+1)<<8);
         sp += 2;
         burn(burn_ret);
+        if (break_on_ret)
+        {
+            break_on_ret--;
+            if (break_on_ret == 1)
+            {
+                break_on_ret = 0;
+                if (running) notify(stepMsg);
+                running=false;
+            }
+        }
     }
     else {
         burn(burn_noret);

@@ -30,5 +30,6 @@ private:
     Memory::addr_t visible_mem;
     QStandardItemModel *model;
     map<Memory::addr_t, long> addr_to_table_line;
+    Memory::addr_t curr_pc;
 };
 

@@ -18,6 +18,9 @@ class Z80: public Cpu
 public:
     Z80(Memory* memory);
 
+    void step_over() override;	// run until next instruction
+    void step_out() override;	// run until next
+
     void step_no_obs() override;
 
     // Run steps until the 'real-time' is reached
@@ -29,6 +32,8 @@ public:
     void irq(Memory::addr_t);
     void retn();
     void reti();
+    void halt();
+
 
     Registers* regs() override { return &R; }
 
@@ -132,6 +137,8 @@ private:
     int irq_mode;
     bool iff1;
     bool iff2;
+
+    int break_on_ret;
 };
 
 }

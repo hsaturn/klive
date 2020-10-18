@@ -195,7 +195,8 @@ void MiniGdb::onCmdLine()
     cmds["break addr"] = "Add breakpoint [if...]";
     cmds["delete addr"] = "Delete breakpoint";
     cmds["next"] = "Next statement";
-    cmds["step"] = "Step";
+    cmds["step"] = "Step in";
+    cmds["finish"] = "Step out";
     cmds["continue"] = "Continue";
     cmds["reset"] = "Reset cpu";
     cmds["print or ? expr"] = "eval expr";
@@ -421,7 +422,7 @@ void MiniGdb::onCmdLine()
         {
             computer->reset();
         }
-        else if (found=="next")
+        else if (found=="step")
         {
             int32_t count(1);
             if (s.length())
@@ -435,8 +436,10 @@ void MiniGdb::onCmdLine()
             }
             computer->cpu->run_steps(count);
         }
-        else if (found=="step")
-            computer->cpu->step();	// TODO
+        else if (found=="next")
+            computer->cpu->step_over();
+        else if (found=="finish")
+            computer->cpu->step_out();
         else if (found=="continue")
             computer->cpu->start();
         else if (found=="run")

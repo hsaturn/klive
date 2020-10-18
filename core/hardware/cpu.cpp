@@ -6,7 +6,7 @@ namespace hw
 {
 
 using namespace std;
-static Cpu::Message stepMsg;
+Cpu::Message stepMsg(Cpu::Message::STEP);
 
 const BreakPoints::BreakPoint* BreakPoints::get(Memory::addr_t addr) const
 {
@@ -17,6 +17,19 @@ const BreakPoints::BreakPoint* BreakPoints::get(Memory::addr_t addr) const
         return &it->second;
     }
     return nullptr;
+}
+
+CpuClock::CpuClock()
+{
+    restart();
+}
+
+void CpuClock::restart()
+{
+    timer.restart();
+    curr=0;
+    irq_interval=0;
+    next_irq = 0;
 }
 
 Cpu::~Cpu(){}
@@ -92,6 +105,8 @@ bool Cpu::steps_to_rt(uint32_t max_steps)
 
 void Cpu::reset()
 {
+    Message rst(Message::RESET);
+    notify(rst);
     clock.restart();
     running = false;
     _reset();

@@ -65,38 +65,43 @@ Mons::Mons()
 
 void Mons::loadStaticLabels()
 {
-    rom_labels[0x0038]="MASK_INT";
-    rom_labels[0x0048]="KEY_INT";
-    rom_labels[0x028E]="KEY_SCAN";
-    rom_labels[0x0296]="KEY_LINE";
-    rom_labels[0x029F]="KEY_3KEYS";
-    rom_labels[0x02A1]="KEY_BITS";
-    rom_labels[0x02AB]="KEY_DONE";
-    rom_labels[0x02BF]="KEYBOARD";
-    rom_labels[0x02F1]="K_NEW";
-    rom_labels[0x0310]="K_REPEAT";
-    rom_labels[0x0D4D]="TEMPS";
-    rom_labels[0x0E44]="CL_LINE";
-    rom_labels[0x0E9B]="CL_ADDR";
-    rom_labels[0x10A8]="KEY_INPUT";
-    rom_labels[0x11CB]="START_NEW";
-    rom_labels[0x15D4]="WAIT_KEY";
-    rom_labels[0x15DE]="WAIT_KEY1";
-    rom_labels[0x15E6]="INPUT_AD";
-    rom_labels[0x15EF]="OUT_CODE";
-    rom_labels[0x15F2]="PRINT_A_2";
-    rom_labels[0x15F7]="CALL_SUB";
-    rom_labels[0x1601]="CHAN_OPEN";
-    rom_labels[0x162D]="CHANCODE";
-    rom_labels[0x1642]="CHAN_S";
-    rom_labels[0x16DB]="INDEXER_1";
-    rom_labels[0x16DC]="INDEXER";
+    rom_labels= {
+        {0x0008, "ERROR_1"},
+        {0x0018, "GET_CHAR"},
+        {0x0020, "NEXT_CHAR"},
+        {0x0028, "FP_CALC"},
+        {0x0038, "MASK_INT"},
+        {0x0048, "KEY_INT"},
+        {0x028E, "KEY_SCAN"},
+        {0x0296, "KEY_LINE"},
+        {0x029F, "KEY_3KEYS"},
+        {0x02A1, "KEY_BITS"},
+        {0x02AB, "KEY_DONE"},
+        {0x02BF, "KEYBOARD"},
+        {0x02F1, "K_NEW"},
+        {0x0310, "K_REPEAT"},
+        {0x0D4D, "TEMPS"},
+        {0x0E44, "CL_LINE"},
+        {0x0E9B, "CL_ADDR"},
+        {0x10A8, "KEY_INPUT"},
+        {0x11CB, "START_NEW"},
+        {0x15D4, "WAIT_KEY"},
+        {0x15DE, "WAIT_KEY1"},
+        {0x15E6, "INPUT_AD"},
+        {0x15EF, "OUT_CODE"},
+        {0x15F2, "PRINT_A_2"},
+        {0x15F7, "CALL_SUB"},
+        {0x1601, "CHAN_OPEN"},
+        {0x162D, "CHANCODE"},
+        {0x1642, "CHAN_S"},
+        {0x16DB, "INDEXER_1"},
+        {0x16DC, "INDEXER"},
 
-    // RAM labels... TODO.. in rom_labels[]
-    rom_labels[0x5C00]="KSTATE0";
-    rom_labels[0x5C3D]="ERR_SP";
-    rom_labels[0x5C78]="FRAMES";
-    rom_labels[0x5C51]="CURCHL";
+        // RAM labels... TODO.. in {]
+        {0x5C00, "KSTATE0"},
+        {0x5C3D, "ERR_SP"},
+        {0x5C78, "FRAMES"},
+        {0x5C51, "CURCHL"}};
 
 }
 

@@ -59,7 +59,7 @@ private:
 class CpuClock
 {
 public:
-    CpuClock() : curr(0) {}
+    CpuClock();
 
     inline void burn(const cycle n) { curr+=n; }
 
@@ -70,7 +70,7 @@ public:
     auto getEllapsedNs() const { return timer.nsecsElapsed(); }
     auto getFrequency() const { return freq_hz; }
     auto getTimer() const { return timer; }
-    void restart() { timer.restart(); curr=0; }
+    void restart();
 
     void irq(cycle interval) { irq_interval=interval; }
 
@@ -96,8 +96,8 @@ private:
     QElapsedTimer timer;
     uint32_t freq_hz;
 
-    cycle irq_interval=0;
-    cycle next_irq = 0;
+    cycle irq_interval;
+    cycle next_irq;
 };
 
 struct CpuPort
@@ -113,8 +113,8 @@ public:
 
     struct Message
     {
-       enum event_t { STEP, BREAK_POINT, WHILE_REACHED, UNTIL_REACHED, UNKNOWN_OP,
-                  INPORT,
+       enum event_t { RESET, STEP, BREAK_POINT, WHILE_REACHED, UNTIL_REACHED, UNKNOWN_OP,
+                  INPORT, HALTED
                     };
        Message(event_t event_in=STEP): event(event_in) {}
        event_t event;
@@ -144,6 +144,8 @@ public:
 
     void update();
     void step();
+    virtual void step_out() = 0;
+    virtual void step_over() = 0;
     void jp(Memory::addr_t);
     void reset();
     virtual void step_no_obs()=0;
@@ -180,5 +182,6 @@ protected:
     bool running = true;
 };
 
+extern Cpu::Message stepMsg;
 
 }
