@@ -73,14 +73,19 @@ protected:
     void or_(reg8, cycle burnt);
     void ex_word_at_sp(uint16_t& val);
     reg8 compare(reg8);
+    reg8 compare(reg8, reg8);
     void sbc(uint8_t val, cycle burnt);
+    void neg();
     void rlca();
+    void rla();
     void jr(bool condition);
     void rst(uint8_t addr);
     void jp_if(bool flag);
     void call_if(bool flag);
     void call();
     void ret(bool flag, cycle burn_ret, cycle burn_noret=0);
+    void ldi();
+    void ldd();
     inline void incr(){ r=(r+1) & 0x7F; } // TODO See http://z80.info/z80info.htm
 
     void push(uint16_t, cycle burnt);

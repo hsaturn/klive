@@ -1,8 +1,10 @@
-# vim: ts=12
-# Ascii keycode port:value port:value ...
-# Shift, z,x,c,v
+// vim: ts=12
+// Ascii keycode port:value port:value ...
+// Shift, z,x,c,v
 
-shift 0xFEFE:0
+capsshift=0xFEFE:0
+
+lshift capsshift
 Z 0xFEFE:1
 X 0xFEFE:2
 C 0xFEFE:3
@@ -45,16 +47,17 @@ J 0xBFFE:3
 H 0xBFFE:4
 
 space 0x7FFE:0
-sym 0x7FFE:1
+altgr 0x7FFE:1	// symbol shift
 M 0x7FFE:2
 N 0x7FFE:3
 B 0x7FFE:4
 
-back shift 0
-16777234 shift 5 // left
-16777236 shift 8 // right
-16777235 shift 7 // up
-16777237 shift 6 // down
+back capsshift 0
+16777234 lshift 5 // left
+16777236 lshift 8 // right
+16777235 lshift 7 // up
+16777237 lshift 6 // down
+
 
 ! sym 1
 @ sym 2
@@ -67,9 +70,9 @@ $ sym 4
 ) sym 9
 _ sym 0
 
-# multiple symbol keys can be toggled in gui
-# Those should be case sensitive (to avoid confusion)
-# ~ separates sequences by a short delay
+// multiple symbol keys can be toggled in gui
+// Those should be case sensitive (to avoid confusion)
+// ~ separates sequences by a short delay
 ext=shift sym
 .L SIN	ext ~ Q
 .L COS	ext ~ W
@@ -122,7 +125,7 @@ ext=shift sym
 £       sym X
 ?	sym C
 /	sym V
-*	sym B
+// *	sym B
 ,	sym N
 .	sym M
 [	shift sym ~ sym Y
@@ -144,7 +147,7 @@ BRIGHT	shift sym ~ sym B
 OVER	shift sym ~ sym N
 INVERSE	shift sym ~ sym M
 
-# BASIC KEYWORDS (option should exist to toggle also)
+// BASIC KEYWORDS (option should exist to toggle also)
 .K DEF	shift sym ~ sym 1
 .L FN	shift sym ~ sym 2
 .L LINE	shift sym ~ sym 3
@@ -165,7 +168,7 @@ INVERSE	shift sym ~ sym M
 .K OUT	shift sym ~ O
 
 
-# .M indicates K mode
+// .M indicates K mode
 .K PLOT Q
 .K DRAW W
 .K REM E

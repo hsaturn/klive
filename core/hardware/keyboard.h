@@ -28,7 +28,7 @@ public:
 
 private:
     Cpu* cpu = nullptr;
-    std::unordered_map<char, Ports> ascii;				// Keyboard mapping
+    std::unordered_map<int, Ports> ascii;				// Keyboard mapping
     std::unordered_map<Memory::addr_t, uint8_t> ports;	// Physical port values
 };
 

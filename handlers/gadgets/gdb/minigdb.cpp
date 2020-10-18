@@ -69,10 +69,10 @@ void MiniGdb::update(Cpu* , const Cpu::Message& msg)
     if (!isVisible()) return;
 
     stringstream d;
-    result->setStyleSheet("color: black;");
     switch(msg.event)
     {
         case Cpu::Message::BREAK_POINT:
+            result->setStyleSheet("color: black;");
             if (msg.brk->isEnabled())
             {
                 switch(msg.brk->type())
@@ -101,13 +101,16 @@ void MiniGdb::update(Cpu* , const Cpu::Message& msg)
             }
             break;
         case Cpu::Message::UNTIL_REACHED:
+            result->setStyleSheet("color: black;");
             d << "Until condition reached" << endl;
             break;
         case Cpu::Message::WHILE_REACHED:
+            result->setStyleSheet("color: black;");
             d << "While condition reached" << endl;
             break;
         case Cpu::Message::UNKNOWN_OP:
             {
+                result->setStyleSheet("color: black;");
                 Memory::addr_t addr=(msg.data & 0xFFFF0000) >> 16;
                 result->setStyleSheet("color: red;");
                 d << uppercase << hex << showbase;
@@ -115,7 +118,11 @@ void MiniGdb::update(Cpu* , const Cpu::Message& msg)
             }
             break;
         case Cpu::Message::STEP:
+            result->setStyleSheet("color: black;");
             break;
+
+        default:
+            return;
     }
     update(d);
     result->setText(d.str().c_str());

@@ -33,6 +33,14 @@ Keyboard::Keyboard(Cpu* cpu_) : cpu(cpu_)
     QFile file(filename.c_str());
     if (file.open(QFile::ReadOnly))
     {
+        std::map<std::string, int> str_to_key=
+                {{"enter", 16777220},
+                 {"space", 32},
+                 {"back", 16777219},
+                 {"altgr", 16777251},
+                 {"lshift", 16777248}};	// TODO Modifier is not taken in account
+
+        std::map<std::string, std::string> equ;
         QTextStream stream(&file);
         while(!stream.atEnd())
         {
@@ -40,65 +48,86 @@ Keyboard::Keyboard(Cpu* cpu_) : cpu(cpu_)
             string line = stream.readLine().toStdString();
 
             while(line[0]==' ' || line[0]=='\t') line.erase(0,1);
-            if (line[0]=='#') continue;
-            if (line[0]=='\'') continue;
             if (line.length()==0) continue;
 
             Ports* vports;
 
             std::string lex=getlex(line);
-
-            if (lex.length()==1)	// Ascii
+            if (lex=="//")
             {
-                vports=&ascii[lex[0]];
+                continue;
+            }
+            else if (line[0]=='=')
+            {
+                equ[lex]=line;
             }
             else
             {
-                static Ports dummy;
-                vports=&dummy;	// TODO
-            }
-
-            while (line.length())
-            {
-                std::stringstream error;
-                lex=getlex(line);
-                if (line[0]==':' && lex[0]=='0' && lex[1]=='x')	// addr:port
+                if (lex.length()==1)	// Ascii
                 {
-                        line.erase(0,1);	// erase :
-                        if (!parseExpression(line, port))
-                        {
-                            error << "Expected port number";
-                        }
-                        else if (parseExpression(lex, addr))
-                        {
-                            uint8_t value = ~ (1 << port);
-                            vports->push_back({static_cast<Memory::addr_t>(addr), value});
-                            if (ports.count(addr)==0)
-                            {
-                                ports[addr]=~0;	// Init to no key pressed
-                                std::cout << "  Adding " << hex << addr << '=' << ports[addr] << dec << std::endl;
-                            }
-                        }
-                        else
-                        {
-                            error << "Bad address" << endl;
-                        }
+                    vports=&ascii[lex[0]];
                 }
-                else if (lex.length()==0)
+                else if (str_to_key.count(lex))
                 {
-                    error << "syntax error (" << line << ")";
-                    line="";
+                    vports=&ascii[str_to_key[lex]];
                 }
                 else
                 {
-                    error << "syntax error (" << lex << ")";
-                    lex="";
+                    static Ports dummy;
+                    vports=&dummy;	// TODO
                 }
-                if (error.str().length())
+
+                while (line.length())
                 {
-                    std::cerr << "ERROR in " << filename << " at line " << line_nr << ":" << error.str() << std::endl;
-                    line="";
-                    error.clear();
+                    std::stringstream error;
+                    lex=getlex(line);
+                    if (equ.count(lex))
+                    {
+                        lex=equ[lex];
+                    }
+
+                    if (lex=="//")
+                    {
+                        continue;
+                    }
+                    else if (line[0]==':' && lex[0]=='0' && lex[1]=='x')	// addr:port
+                    {
+                            line.erase(0,1);	// erase :
+                            if (!parseExpression(line, port))
+                            {
+                                error << "Expected port number";
+                            }
+                            else if (parseExpression(lex, addr))
+                            {
+                                uint8_t value = ~ (1 << port);
+                                vports->push_back({static_cast<Memory::addr_t>(addr), value});
+                                if (ports.count(addr)==0)
+                                {
+                                    ports[addr]=~0;	// Init to no key pressed
+                                    std::cout << "  Adding " << hex << addr << '=' << ports[addr] << dec << std::endl;
+                                }
+                            }
+                            else
+                            {
+                                error << "Bad address" << endl;
+                            }
+                    }
+                    else if (lex.length()==0)
+                    {
+                        error << "syntax error (" << line << ")";
+                        line="";
+                    }
+                    else
+                    {
+                        error << "syntax error (" << lex << ")";
+                        lex="";
+                    }
+                    if (error.str().length())
+                    {
+                        std::cerr << "ERROR in " << filename << " at line " << line_nr << ":" << error.str() << std::endl;
+                        line="";
+                        error.clear();
+                    }
                 }
             }
         }
@@ -122,7 +151,6 @@ bool Keyboard::eventFilter(QObject* object, QEvent* event)
     {
         QKeyEvent* key=dynamic_cast<QKeyEvent*>(event);
 
-            std::cout << endl;
             // key() is ascii if possible else key code
             // -> Left and Right (ctrl or shift) have the same code
             const auto& it=ascii.find(key->key());
@@ -165,25 +193,37 @@ bool Keyboard::eventFilter(QObject* object, QEvent* event)
 
 void Keyboard::update(Cpu *sender, const typename Cpu::Message &msg)
 {
+    if (sender != cpu) return;
+    if (msg.event == Cpu::Message::RESET)
+    {
+        for(auto& port: ports)
+        {
+            std::cout << "Resetting kbd #" << hex << port.first << dec << std::endl;
+            port.second = ~0;
+        }
+        return;
+    }
+
    static std::unordered_map<hw::Memory::addr_t, int> view;
-   if (sender==cpu && msg.event==Cpu::Message::INPORT)
+   if (msg.event==Cpu::Message::INPORT)
    {
        const auto &it = ports.find(msg.port->port);
        if (it != ports.end())
        {
-         if (view[msg.port->port] != it->second)
-         {
-             view[msg.port->port] = it->second;
-             // std::cout << "INPORT(" << hex << showbase << it->first << "=" << it->second << dec << endl;
-         }
          msg.port->value = it->second;
        }
        else
        {
-           // std::cout << "INPUT = ? " << hex << showbase << msg.port->port << " " << dec << endl;
-           msg.port->value=~0;
+         // std::cout << "INPUT = ? " << hex << showbase << msg.port->port << " " << dec << endl;
+         msg.port->value=~0;
        }
-       view[msg.port->port] = msg.port->value;
+
+       // TODO remove once kbd is ok
+       if (view[msg.port->port] != msg.port->value)
+       {
+           // std::cout << "INPORT " << hex << showbase << msg.port->port << "=" << (uint16_t)(msg.port->value) << dec << endl;
+           view[msg.port->port] = msg.port->value;
+       }
    }
 }
 

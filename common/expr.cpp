@@ -63,7 +63,7 @@ string getlex(string& s)
         s.erase(0,2);
     }
     // char that can be doubled
-    else if (c=='|' || c=='&' || c=='<' || c=='>')
+    else if (c=='|' || c=='&' || c=='<' || c=='>' || c=='/')
     {
         s.erase(0,1);
         lex=c;
