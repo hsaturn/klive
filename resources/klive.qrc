@@ -7,5 +7,10 @@
         <file>mons/z80.txt</file>
         <file>roms/48.rom</file>
         <file>keyboard.txt</file>
+        <file>roms/DIAG037.ROM</file>
+        <file>roms/STR128.ROM</file>
+        <file>roms/RAM_Tester.ROM</file>
+        <file>roms/ROM_Tester.ROM</file>
+        <file>roms/VMM-TEST.ROM</file>
     </qresource>
 </RCC>
