@@ -5,7 +5,10 @@ Spectrum emulator/IDO, Work in progress (10/2020)
 The emulator boot until the prompt is displayed
 (c) 1982 Sinclair Reseach Ltd
 
-Now I new to emulate the keyboard.
+The keyboard is now working.
+Almost all is working, but the zx still crashes.
+
+Still a few work to do before the emulator is 100% ok
 ------
 
 Attempt to create a modern and powerful for
