@@ -63,8 +63,20 @@ void ScreenHandler::initialize(MainWindow *main)
 
 void ScreenHandler::update(Cpu* z80, const Z80::Message& msg)
 {
-    // TODO down cast grrr
-    Z80Registers* regs = dynamic_cast<Z80Registers*>(z80->regs());
-    if (monsView) monsView->setPointer(regs->pc);
-    regs->update();
+    switch(msg.event)
+    {
+    case Cpu::Message::MACROSTEP:
+    case Cpu::Message::BREAK_POINT:
+    case Cpu::Message::HALTED:
+    case Cpu::Message::RESET:
+    {
+        // TODO down cast grrr
+        Z80Registers* regs = dynamic_cast<Z80Registers*>(z80->regs());
+        if (monsView) monsView->setPointer(regs->pc);
+        regs->update();
+    }
+        break;
+    default:
+        return;
+    }
 }

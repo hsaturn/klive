@@ -72,7 +72,6 @@ void MiniGdb::update(Cpu* , const Cpu::Message& msg)
     switch(msg.event)
     {
         case Cpu::Message::BREAK_POINT:
-            result->setStyleSheet("color: black;");
             if (msg.brk->isEnabled())
             {
                 switch(msg.brk->type())
@@ -101,24 +100,21 @@ void MiniGdb::update(Cpu* , const Cpu::Message& msg)
             }
             break;
         case Cpu::Message::UNTIL_REACHED:
-            result->setStyleSheet("color: black;");
             d << "Until condition reached" << endl;
             break;
         case Cpu::Message::WHILE_REACHED:
-            result->setStyleSheet("color: black;");
             d << "While condition reached" << endl;
             break;
         case Cpu::Message::UNKNOWN_OP:
             {
-                result->setStyleSheet("color: black;");
                 Memory::addr_t addr=(msg.data & 0xFFFF0000) >> 16;
                 result->setStyleSheet("color: red;");
                 d << uppercase << hex << showbase;
                 d << "Unknown opcode [" << (msg.data & 0xFF) << "] at " << addr << endl;
+                result->setStyleSheet("color: black;");
             }
             break;
-        case Cpu::Message::STEP:
-            result->setStyleSheet("color: black;");
+        case Cpu::Message::MACROSTEP:
             break;
 
         default:
@@ -473,6 +469,7 @@ void MiniGdb::onCmdLine()
         result->setStyleSheet("color: red;");
         output << "ERROR: " << error.str();
     }
+    result->setStyleSheet("color: black;");
     if (displays.size())
     {
         output << "---------------------" << endl;

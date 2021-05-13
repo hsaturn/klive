@@ -82,6 +82,7 @@ public:
             next_irq += irq_interval;
             if (curr > next_irq)
             {
+                // NOTE: we've lost one or more irq (except in debug mode) TODO
                 next_irq = curr+irq_interval;
             }
             return true;
@@ -113,10 +114,10 @@ public:
 
     struct Message
     {
-       enum event_t { RESET, STEP, BREAK_POINT, WHILE_REACHED, UNTIL_REACHED, UNKNOWN_OP,
+       enum event_t { RESET, MACROSTEP, BREAK_POINT, WHILE_REACHED, UNTIL_REACHED, UNKNOWN_OP,
                   INPORT, HALTED
                     };
-       Message(event_t event_in=STEP): event(event_in) {}
+       Message(event_t event_in=MACROSTEP): event(event_in) {}
        event_t event;
        union
        {
