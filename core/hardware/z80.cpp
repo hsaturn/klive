@@ -159,7 +159,7 @@ void Z80::step_out()
 void Z80::step_no_obs()
 {
     last = pc;
-    CpuClock before(clock);
+    CpuClock before(clock);	// TODO used to check if the clock advances, could be removed later for speed
     inc_r();
 
     if (irq_enabler>0)
@@ -270,7 +270,7 @@ void Z80::step_no_obs()
         case 0x4f: c = a; burn(4); break;
         case 0x50: d = b; burn(4); break;
         case 0x51: d = c; burn(4); break;
-        case 0x52: burn(4); break;	// ld d=d
+        case 0x52: burn(4); break;	// ld d,d
         case 0x53: d = e; burn(4); break;
         case 0x54: d = h; burn(4); break;
         case 0x55: d = l; burn(4); break;
@@ -386,6 +386,7 @@ void Z80::step_no_obs()
         case 0xCB: step_cb(); break;
         case 0xCC: call_if(f.z); break;
         case 0xCD: call(); break;
+        // case 0xCE: adc_(getByte(), 7); break; // adc a,*
         case 0xCF: rst(0x08); break;
         case 0xD0: ret(not f.c, 11,5); break;
         case 0xD1: pop(de.val, 11); break;
@@ -597,12 +598,14 @@ void Z80::step_ed()
     uint8_t opcode=getByte();
     switch(opcode)
     {
+        case 0x40: b=in(bc.val, 12); break;
         case 0x42: sbc_hl(bc.val); break;
         case 0x43: writeMem16(bc.val, 20); break;
         case 0x44: neg(); break;
         case 0x45: retn(); break;
         case 0x46: set_irq_mode(0); burn(8); break;
         case 0x47: i=a; burn(9); break; // ld i,a
+        case 0x48: c=in(bc.val, 12); break;
         case 0x4B: // ld bc, (**)
             {
                 Memory::addr_t addr=getWord(20);
@@ -628,6 +631,7 @@ void Z80::step_ed()
             f.s = a&0x80 ? 1 : 0;
             f.pv = iff2;
             break;
+        case 0x58: e=in(bc.val, 12); break;
         case 0x5B:	// ld de, (**)
             {
                 Memory::addr_t addr=getWord(20);
@@ -646,10 +650,12 @@ void Z80::step_ed()
             f.s = a&0x80 ? 1 : 0;
             f.pv = iff2;
             break;
+        case 0x60: h=in(bc.val, 12); break;
         case 0x62: sbc_hl(hl.val); break;
         case 0x64: neg(); break;
         case 0x65: retn(); break;
         case 0x66: set_irq_mode(0); burn(8); break;
+        case 0x68: l=in(bc.val, 12); break;
         case 0x6C: neg(); break;
         case 0x6D: retn(); break;
         case 0x6E: set_irq_mode(0); burn(8); break;
@@ -664,9 +670,7 @@ void Z80::step_ed()
         case 0x74: neg(); break;
         case 0x75: retn(); break;
         case 0x76: set_irq_mode(1); burn(8); break;
-        case 0x78: // in a,(c)
-            a = in((static_cast<uint16_t>(b)<<8) + c,12);
-           break;
+        case 0x78: a = in(bc.val,12); break; // in a,(c)
         case 0x79: out(bc.val, a, 11); break;
         case 0x7B:
             {
