@@ -1,4 +1,5 @@
 #pragma once
+#include "common/observer.h"
 #include "memory.h"
 #include <QElapsedTimer>
 #include <QWidget>
