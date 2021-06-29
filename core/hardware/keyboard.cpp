@@ -59,6 +59,8 @@ Keyboard::Keyboard(Cpu* cpu_) : cpu(cpu_)
             }
             else if (line[0]=='=')
             {
+                line.erase(0,1);
+                std::cout << "  equ " << lex << '=' << line << std::endl;
                 equ[lex]=line;
             }
             else
