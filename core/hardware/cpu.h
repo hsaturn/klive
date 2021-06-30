@@ -16,7 +16,6 @@ using cycle=uint64_t;	// TODO not an obvious place for this
 class BreakPoints
 {
 public:
-
     class BreakPoint
     {
     public:
@@ -45,6 +44,13 @@ public:
         bool enabled=true;
     };
 
+    using Container = std::unordered_map<Memory::addr_t, BreakPoint>;
+
+    using const_iterator = Container::const_iterator;
+    const_iterator begin() const { return breakpoints.cbegin(); }
+    const_iterator end() const { return breakpoints.cend(); }
+
+
     bool remove(Memory::addr_t addr) { return 0 != breakpoints.erase(addr); }
     void add(Memory::addr_t addr, BreakPoint bp = {})    { breakpoints[addr] = bp; }
 
@@ -53,7 +59,7 @@ public:
     void clearAll() { breakpoints.clear(); }
 
 private:
-    std::unordered_map<Memory::addr_t, BreakPoint> breakpoints;
+    Container breakpoints;
 };
 
 // TODO move elsewhere
