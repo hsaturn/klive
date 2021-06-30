@@ -45,7 +45,7 @@ public:
         bool enabled=true;
     };
 
-    void remove(Memory::addr_t addr) { breakpoints.erase(addr); }
+    bool remove(Memory::addr_t addr) { return 0 != breakpoints.erase(addr); }
     void add(Memory::addr_t addr, BreakPoint bp = {})    { breakpoints[addr] = bp; }
 
     const BreakPoint* get(Memory::addr_t addr) const;

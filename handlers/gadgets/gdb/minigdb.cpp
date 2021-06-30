@@ -283,7 +283,10 @@ void MiniGdb::onCmdLine()
             Memory::addr_t addr;
             if (readAddr(computer, s, addr))
             {
-                computer->cpu->breaks.remove(addr);
+                if (not computer->cpu->breaks.remove(addr))
+                {
+                    error << "Not found (" << hex << addr << dec << ')';
+                }
             }
         }
         else if (found=="delete" || found=="break")
