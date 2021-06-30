@@ -171,11 +171,9 @@ void MainWindow::createActions()
     connect(printAct, &QAction::triggered, this, &MainWindow::print);
     fileToolBar->addAction(printAct);
 
-    // TODO Bad, because could be null ptr
-    menus["File"]->addSeparator();
-
     // TODO fileMenu could be nullptr
     QMenu* fileMenu = menus["File"];
+    fileMenu->addSeparator();
     QAction *quitAct = fileMenu->addAction(tr("&Quit"), this, &QWidget::close);
     quitAct->setShortcuts(QKeySequence::Quit);
     quitAct->setStatusTip(tr("Quit the application"));
