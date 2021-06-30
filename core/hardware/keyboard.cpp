@@ -106,7 +106,7 @@ Keyboard::Keyboard(Cpu* cpu_) : cpu(cpu_)
                                 if (ports.count(addr)==0)
                                 {
                                     ports[addr]=~0;	// Init to no key pressed
-                                    std::cout << "  Adding " << hex << addr << '=' << ports[addr] << dec << std::endl;
+                                    std::cout << "  Adding " << hex << addr << '=' << (int)ports[addr] << dec << std::endl;
                                 }
                             }
                             else
@@ -205,7 +205,7 @@ void Keyboard::update(Cpu *sender, const typename Cpu::Message &msg)
          msg.port->value = it->second;
          if (msg.port->value != 255)
          {
-            std::cout << "in " << msg.port->port << "=" << msg.port->value << std::endl;
+          //  std::cout << "in " << hex << msg.port->port << "=" << (int) msg.port->value << std::endl;
          }
          msg.port->filled = true;
        }

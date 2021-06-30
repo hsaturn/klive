@@ -31,9 +31,10 @@ void Handlers::unregisterHandler(const Handler *handler)
 
 void Handlers::initialize(MainWindow *main)
 {
+    std::cout << "Initializing handlers" << std::endl;
     for(auto it: *handlers)
     {
-        std::cout << "Initializing '" << it.second->name() << "'." << std::endl;
+        std::cout << "  Initializing '" << it.second->name() << "'." << std::endl;
         it.second->initialize(main);
     }
 }

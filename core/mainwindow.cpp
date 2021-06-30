@@ -1,5 +1,9 @@
 #include <QtWidgets>
 #include "mainwindow.h"
+#include <iostream>
+
+using std::cout;
+using std::endl;
 
 #if defined(QT_PRINTSUPPORT_LIB)
 #include <QtPrintSupport/qtprintsupportglobal.h>
@@ -43,6 +47,7 @@ MainWindow::MainWindow() : QMainWindow()
 
     setUnifiedTitleAndToolBarOnMac(true);
     restoreLayout();
+    cout << "Main window init done" << endl;
 }
 
 MainWindow::~MainWindow()
@@ -133,6 +138,7 @@ QAction* MainWindow::addMenuEntry(
 
 void MainWindow::createActions()
 {
+    std::cout << "Creating actions" << std::endl;
     // File Manager
     QToolBar *fileToolBar = addToolBar(tr("File"));
 
@@ -210,6 +216,7 @@ void MainWindow::saveLayout()
 
 void MainWindow::restoreLayout()
 {
+    cout << "Restoring layout" << endl;
     QSettings Settings("Settings.ini", QSettings::IniFormat);
     restoreGeometry(Settings.value("mainWindow/Geometry").toByteArray());
     restoreState(Settings.value("mainWindow/State").toByteArray());
@@ -218,6 +225,7 @@ void MainWindow::restoreLayout()
 
 void MainWindow::createStatusBar()
 {
+    std::cout << "Creating status bar" << std::endl;
     statusBar()->showMessage(tr("Ready"));
 }
 
