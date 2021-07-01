@@ -3,5 +3,9 @@
 #include <string>
 
 using exprtype = int32_t;
-std::string getlex(std::string& s);
-bool parseExpression(std::string& s, exprtype& result, hw::Cpu* c=nullptr);
+using std::string;
+
+std::string getlex(string& s);
+bool parseExpression(string& s, exprtype& result, hw::Cpu* c=nullptr);
+string getword(string& s, char cSep=' ');
+void trim(string& s);

@@ -47,18 +47,6 @@ static bool readAddr(Computer* comp, string& s, uint32_t& addr)
     return false;
 }
 
-static string getword(string &s, char sep=' ')
-{
-    string word;
-    while(s.length() && s[0]!=sep)
-    {
-        word += s[0];
-        s.erase(0,1);
-    }
-    while(s.length() && s[0]==sep) s.erase(0,1);
-    return word;
-}
-
 void MiniGdb::cpuStep()
 {
     computer->cpu->step();

@@ -47,7 +47,7 @@ Keyboard::Keyboard(Cpu* cpu_) : cpu(cpu_)
             line_nr++;
             string line = stream.readLine().toStdString();
 
-            while(line[0]==' ' || line[0]=='\t') line.erase(0,1);
+						trim(line);
             if (line.length()==0) continue;
 
             Ports* vports;
