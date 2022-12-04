@@ -1,4 +1,5 @@
 #pragma once
+#include "common/observer.h"
 #include "memory.h"
 #include <QElapsedTimer>
 #include <QWidget>
@@ -15,7 +16,6 @@ using cycle=uint64_t;	// TODO not an obvious place for this
 class BreakPoints
 {
 public:
-
     class BreakPoint
     {
     public:
@@ -44,7 +44,14 @@ public:
         bool enabled=true;
     };
 
-    void remove(Memory::addr_t addr) { breakpoints.erase(addr); }
+    using Container = std::unordered_map<Memory::addr_t, BreakPoint>;
+
+    using const_iterator = Container::const_iterator;
+    const_iterator begin() const { return breakpoints.cbegin(); }
+    const_iterator end() const { return breakpoints.cend(); }
+
+
+    bool remove(Memory::addr_t addr) { return 0 != breakpoints.erase(addr); }
     void add(Memory::addr_t addr, BreakPoint bp = {})    { breakpoints[addr] = bp; }
 
     const BreakPoint* get(Memory::addr_t addr) const;
@@ -52,7 +59,7 @@ public:
     void clearAll() { breakpoints.clear(); }
 
 private:
-    std::unordered_map<Memory::addr_t, BreakPoint> breakpoints;
+    Container breakpoints;
 };
 
 // TODO move elsewhere
@@ -82,6 +89,7 @@ public:
             next_irq += irq_interval;
             if (curr > next_irq)
             {
+                // NOTE: we've lost one or more irq (except in debug mode) TODO
                 next_irq = curr+irq_interval;
             }
             return true;
@@ -113,10 +121,10 @@ public:
 
     struct Message
     {
-       enum event_t { RESET, STEP, BREAK_POINT, WHILE_REACHED, UNTIL_REACHED, UNKNOWN_OP,
+       enum event_t { RESET, MACROSTEP, BREAK_POINT, WHILE_REACHED, UNTIL_REACHED, UNKNOWN_OP,
                   INPORT, HALTED
                     };
-       Message(event_t event_in=STEP): event(event_in) {}
+       Message(event_t event_in=MACROSTEP): event(event_in) {}
        event_t event;
        union
        {

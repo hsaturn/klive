@@ -306,6 +306,9 @@ static ostream& operator<<(ostream& out, const reg8& u)
     return out;
 }
 
+// TODO why does registers contains a view on registers...
+// New design needed there, we should remove this function
+// and see what happens
 void Z80Registers::update()
 {
     view->update();

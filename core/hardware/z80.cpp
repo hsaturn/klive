@@ -1,5 +1,6 @@
 #include "z80.h"
 #include <iostream>
+#include <iomanip>
 #include <bitset>
 
 using namespace std;
@@ -26,6 +27,7 @@ void Z80::_reset()
     r=0;
 
     f.f=0;	// TODO not sure at all but convenient
+    af.val=0;
     bc.val=0;
     de.val=0;
     hl.val=0;
@@ -67,6 +69,15 @@ void Z80::halt()
     running=false;
 }
 
+void Z80::set_irq_mode(int mode)
+{
+    if (irq_mode != mode)
+    {
+        irq_mode = mode;
+        std::cout << "IRQ MODE " << mode << std::endl;
+    }
+}
+
 void Z80::nmi()
 {
     iff2 = iff1;
@@ -90,6 +101,8 @@ void Z80::irq(Memory::addr_t next_pc)
     {
         // running=true;	// TODO sure ?
         // break_on_ret++;
+
+// NOTE: we've lost one or more irq (except in debug mode) TODO
     }
     push(pc, 17);
     pc = next_pc;
@@ -146,8 +159,8 @@ void Z80::step_out()
 void Z80::step_no_obs()
 {
     last = pc;
-    CpuClock before(clock);
-    incr();
+    CpuClock before(clock);	// TODO used to check if the clock advances, could be removed later for speed
+    inc_r();
 
     if (irq_enabler>0)
     {
@@ -235,7 +248,7 @@ void Z80::step_no_obs()
         case 0x39: add_hl(sp, 11); break;
         case 0x3a: a=memory->peek(getWord(13)); break;
         case 0x3b: sp--; burn(6); break;
-        case 0X3c: a=inc(a, 4); break;
+        case 0x3c: a=inc(a, 4); break;
         case 0x3d: a=dec(a, 4); break;
         case 0x3e: a = getByte(); burn(7); break; // ld a, n
         case 0x3f: f.c = f.c ? 0 : 1; f.n=0; burn(4); break;	// ccf	TODO f.u5=a.5 f.u3=a.3
@@ -257,7 +270,7 @@ void Z80::step_no_obs()
         case 0x4f: c = a; burn(4); break;
         case 0x50: d = b; burn(4); break;
         case 0x51: d = c; burn(4); break;
-        case 0x52: burn(4); break;	// ld d=d
+        case 0x52: burn(4); break;	// ld d,d
         case 0x53: d = e; burn(4); break;
         case 0x54: d = h; burn(4); break;
         case 0x55: d = l; burn(4); break;
@@ -373,6 +386,7 @@ void Z80::step_no_obs()
         case 0xCB: step_cb(); break;
         case 0xCC: call_if(f.z); break;
         case 0xCD: call(); break;
+        // case 0xCE: adc_(getByte(), 7); break; // adc a,*
         case 0xCF: rst(0x08); break;
         case 0xD0: ret(not f.c, 11,5); break;
         case 0xD1: pop(de.val, 11); break;
@@ -515,11 +529,13 @@ uint8_t Z80::inc(uint8_t val, cycle burnt)
 uint8_t Z80::dec(uint8_t val, cycle burnt)
 {
     f.pv= val==0x80 ? 1 : 0;
-    f.h = (val&0x10)==0x10;	// TODO borrow from bit 4
+    f.h = ((val&0x0f)-1) & 0x10 ? 1 : 0;
     val--;
     f.s = val & 0x80 ? 1 : 0;
     f.z = val == 0 ? 1 : 0;
     f.n = 1;
+    f.u3 = val & 0x08;
+    f.u5 = val & 0x20;
     burn(burnt);
     return val;
 }
@@ -560,33 +576,36 @@ void Z80::writeMem16(uint16_t val, const cycle burnt)
 
 void Z80::sbc_hl(uint16_t val)
 {
+    uint16_t hl0 = hl.val;
     burn(15);
     uint8_t carry = f.c;
-    f.c = val+f.c > hl.val;
     hl.val -= val+carry;
 
     f.s = h & 0x80 ? 1 : 0;
-    f.u5 = h & 0x20 ? 1 : 0;
     f.u3 = h & 0x08 ? 1 : 0;
+    f.u5 = h & 0x20 ? 1 : 0;
 
     f.z = hl.val == 0 ? 1 : 0;
-    f.h = 0;	// TODO set if borrow from bit 12
-    f.pv = f.c; // TODO set if overflow
+    f.h = (((hl0 & 0x0fff) - (val & 0x0fff) - f.c) & 0x1000) != 0;
+    f.c = ((hl0-val) & 0x10000) != 0 ? 1 : 0;
+    f.pv = ((hl0 ^ val) & (hl0 ^ hl.val) & 0x8000) != 0 ? 1 : 0;
     f.n = 1;
 }
 
 void Z80::step_ed()
 {
-    incr();
+    inc_r();
     uint8_t opcode=getByte();
     switch(opcode)
     {
+        case 0x40: b=in(bc.val, 12); break;
         case 0x42: sbc_hl(bc.val); break;
         case 0x43: writeMem16(bc.val, 20); break;
         case 0x44: neg(); break;
         case 0x45: retn(); break;
         case 0x46: set_irq_mode(0); burn(8); break;
         case 0x47: i=a; burn(9); break; // ld i,a
+        case 0x48: c=in(bc.val, 12); break;
         case 0x4B: // ld bc, (**)
             {
                 Memory::addr_t addr=getWord(20);
@@ -612,6 +631,7 @@ void Z80::step_ed()
             f.s = a&0x80 ? 1 : 0;
             f.pv = iff2;
             break;
+        case 0x58: e=in(bc.val, 12); break;
         case 0x5B:	// ld de, (**)
             {
                 Memory::addr_t addr=getWord(20);
@@ -630,10 +650,12 @@ void Z80::step_ed()
             f.s = a&0x80 ? 1 : 0;
             f.pv = iff2;
             break;
+        case 0x60: h=in(bc.val, 12); break;
         case 0x62: sbc_hl(hl.val); break;
         case 0x64: neg(); break;
         case 0x65: retn(); break;
         case 0x66: set_irq_mode(0); burn(8); break;
+        case 0x68: l=in(bc.val, 12); break;
         case 0x6C: neg(); break;
         case 0x6D: retn(); break;
         case 0x6E: set_irq_mode(0); burn(8); break;
@@ -648,10 +670,14 @@ void Z80::step_ed()
         case 0x74: neg(); break;
         case 0x75: retn(); break;
         case 0x76: set_irq_mode(1); burn(8); break;
-        case 0x78: // in a,(c)
-            a = in((static_cast<uint16_t>(b)<<8) + c,12);
-           break;
+        case 0x78: a = in(bc.val,12); break; // in a,(c)
         case 0x79: out(bc.val, a, 11); break;
+        case 0x7B:
+            {
+                Memory::addr_t addr=getWord(20);
+                sp = memory->peek(addr)+(memory->peek(addr+1)<<8);
+                break;
+            }
         case 0x7C: neg(); break;
         case 0x7D: retn(); break;
         case 0x7E: set_irq_mode(2); burn(8); break;
@@ -674,34 +700,40 @@ void Z80::step_ed()
 void Z80::ldd()
 {
     r-=2;
-    f.h=0; f.pv=0; f.n=0;
 
     burn(bc.val ? 21 : 16);
-    incr();
-    incr();
+    inc_r();
+    inc_r();
     memory->poke(de.val, memory->peek(hl.val));
     hl.val--;
     de.val--;
     bc.val--;
+    if (bc.val==0)
+    {
+        f.h=0; f.pv=0; f.n=0;
+    }
 }
 
 void Z80::ldi()
 {
     r-=2;
-    f.h=0; f.pv= (bc.val==1); f.n=0;
 
     burn(bc.val ? 21 : 16);
-    incr();
-    incr();
+    inc_r();
+    inc_r();
     memory->poke(de.val, memory->peek(hl.val));
     hl.val++;
     de.val++;
     bc.val--;
+    if (bc.val==0)
+    {
+        f.h=0; f.pv= (bc.val==1); f.n=0;
+    }
 }
 
 void Z80::step_dd_fd(reg16& in)
 {
-    incr();
+    inc_r();
     uint8_t opcode=getByte();
     switch(opcode)
     {
@@ -860,13 +892,12 @@ uint8_t* Z80::calc_dest_reg(uint8_t reg)
         case 0x07: return &a;
     }
 
-    cerr << "z80: step_dd_fd Should never occur, unable to compute reg#" << reg << endl;
     return nullptr;
 }
 
 void Z80::step_cb()
 {
-    incr();
+    inc_r();
     bool ismem=false;
     uint8_t mem;
     uint8_t opcode=getByte();
@@ -1095,7 +1126,7 @@ void Z80::out(Memory::addr_t port, uint8_t val, cycle burnt)
 
     // TODO
     // Send notification to out listeners
-    cout << "Z80: nyi out" << endl;
+    // cout << "Z80: nyi out" << endl;
     clock.burn(burnt);
 }
 
@@ -1110,6 +1141,7 @@ uint8_t Z80::in(Memory::addr_t port, cycle burnt)
         l=0;
         std::cout << "IN " << recurse++ << std::endl;
     }
+    recurse++;
 
     static Message inport(Message::INPORT);
     if (inport.port == nullptr)
@@ -1117,9 +1149,17 @@ uint8_t Z80::in(Memory::addr_t port, cycle burnt)
         inport.port = new CpuPort;
     }
     inport.port->port = port;
+    inport.port->filled = false;
+
+    // TODO using notification for in/out is a poor design
+    // performances problems and freezes...
     notify(inport);
     clock.burn(burnt);
-    // TODO inport.port->valid ?
+    if (!inport.port->filled)
+    {
+        std::cerr << "in(" << std::hex << port << std::dec << ") not filled." << endl;
+    }
+    // TODO inport.port->filled ?
     recurse--;
     return inport.port->value;
 }

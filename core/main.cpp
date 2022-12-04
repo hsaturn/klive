@@ -49,8 +49,11 @@
 ****************************************************************************/
 
 #include <QApplication>
+#include <iostream>
 
 #include "mainwindow.h"
+using std::cout;
+using std::endl;
 
 int main(int argc, char *argv[])
 {
@@ -61,5 +64,6 @@ int main(int argc, char *argv[])
     Q_INIT_RESOURCE(klive);
     MainWindow mainWin;
     mainWin.show();
+    cout << "MainWindow shown" << endl;
     return app.exec();
 }

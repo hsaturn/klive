@@ -41,3 +41,9 @@ with common features
 - Printer emulation
 - ZX Interface 1 emulation
 - Internet direct games downloads with search tool
+
+# Dependencies
+
+Kubuntu 
+sudo apt-get install qtbase5-dev qttools5-dev
+sudo apt-get install libqt5x11extras5-dev

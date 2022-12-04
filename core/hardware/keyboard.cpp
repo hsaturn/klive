@@ -47,7 +47,7 @@ Keyboard::Keyboard(Cpu* cpu_) : cpu(cpu_)
             line_nr++;
             string line = stream.readLine().toStdString();
 
-            while(line[0]==' ' || line[0]=='\t') line.erase(0,1);
+						trim(line);
             if (line.length()==0) continue;
 
             Ports* vports;
@@ -59,6 +59,8 @@ Keyboard::Keyboard(Cpu* cpu_) : cpu(cpu_)
             }
             else if (line[0]=='=')
             {
+                line.erase(0,1);
+                std::cout << "  equ " << lex << '=' << line << std::endl;
                 equ[lex]=line;
             }
             else
@@ -104,7 +106,7 @@ Keyboard::Keyboard(Cpu* cpu_) : cpu(cpu_)
                                 if (ports.count(addr)==0)
                                 {
                                     ports[addr]=~0;	// Init to no key pressed
-                                    std::cout << "  Adding " << hex << addr << '=' << ports[addr] << dec << std::endl;
+                                    std::cout << "  Adding " << hex << addr << '=' << (int)ports[addr] << dec << std::endl;
                                 }
                             }
                             else
@@ -193,36 +195,32 @@ bool Keyboard::eventFilter(QObject* object, QEvent* event)
 
 void Keyboard::update(Cpu *sender, const typename Cpu::Message &msg)
 {
-    if (sender != cpu) return;
-    if (msg.event == Cpu::Message::RESET)
-    {
-        for(auto& port: ports)
-        {
-            std::cout << "Resetting kbd #" << hex << port.first << dec << std::endl;
-            port.second = ~0;
-        }
-        return;
-    }
+   if (sender != cpu) return;
 
-   static std::unordered_map<hw::Memory::addr_t, int> view;
    if (msg.event==Cpu::Message::INPORT)
    {
        const auto &it = ports.find(msg.port->port);
        if (it != ports.end())
        {
          msg.port->value = it->second;
+         if (msg.port->value != 255)
+         {
+          //  std::cout << "in " << hex << msg.port->port << "=" << (int) msg.port->value << std::endl;
+         }
+         msg.port->filled = true;
        }
-       else
-       {
-         // std::cout << "INPUT = ? " << hex << showbase << msg.port->port << " " << dec << endl;
-         msg.port->value=~0;
-       }
+   }
+   else if (msg.event == Cpu::Message::MACROSTEP)
+   {
+       // check shift key
 
-       // TODO remove once kbd is ok
-       if (view[msg.port->port] != msg.port->value)
+   }
+   else if (msg.event == Cpu::Message::RESET)
+   {
+       for(auto& port: ports)
        {
-           // std::cout << "INPORT " << hex << showbase << msg.port->port << "=" << (uint16_t)(msg.port->value) << dec << endl;
-           view[msg.port->port] = msg.port->value;
+           std::cout << "Resetting kbd #" << hex << port.first << dec << std::endl;
+           port.second = ~0;
        }
    }
 }

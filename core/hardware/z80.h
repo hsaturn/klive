@@ -25,7 +25,7 @@ public:
 
     // Run steps until the 'real-time' is reached
     void steps_to_rt(uint32_t max_steps=1e6);
-    void set_irq_mode(int mode){ irq_mode = mode; }
+    void set_irq_mode(int mode);
     void di();
     void ei();
     void nmi();
@@ -86,7 +86,7 @@ protected:
     void ret(bool flag, cycle burn_ret, cycle burn_noret=0);
     void ldi();
     void ldd();
-    inline void incr(){ r=(r+1) & 0x7F; } // TODO See http://z80.info/z80info.htm
+    inline void inc_r(){ r=(r+1) & 0x7F; } // TODO See http://z80.info/z80info.htm
 
     void push(uint16_t, cycle burnt);
     void pop(uint16_t&, cycle burnt);

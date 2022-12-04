@@ -6,10 +6,23 @@ static hw::Cpu* cpu;	// TODO Grrrr horrible
 
 static exprtype parseLogical(string& s);
 
-static void trim(string& s)
+void trim(string& s)
 {
-    while(s[0]==' ') s.erase(0,1);
+    while(s[0]==' ' or s[0]=='\t') s.erase(0,1);
 }
+
+string getword(string &s, char sep)
+{
+    string word;
+    while(s.length() && s[0]!=sep)
+    {
+        word += s[0];
+        s.erase(0,1);
+    }
+    while(s.length() && s[0]==sep) s.erase(0,1);
+    return word;
+}
+
 
 string getlex(string& s)
 {

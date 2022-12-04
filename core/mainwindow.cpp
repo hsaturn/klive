@@ -1,5 +1,9 @@
 #include <QtWidgets>
 #include "mainwindow.h"
+#include <iostream>
+
+using std::cout;
+using std::endl;
 
 #if defined(QT_PRINTSUPPORT_LIB)
 #include <QtPrintSupport/qtprintsupportglobal.h>
@@ -43,6 +47,7 @@ MainWindow::MainWindow() : QMainWindow()
 
     setUnifiedTitleAndToolBarOnMac(true);
     restoreLayout();
+    cout << "Main window init done" << endl;
 }
 
 MainWindow::~MainWindow()
@@ -133,6 +138,7 @@ QAction* MainWindow::addMenuEntry(
 
 void MainWindow::createActions()
 {
+    std::cout << "Creating actions" << std::endl;
     // File Manager
     QToolBar *fileToolBar = addToolBar(tr("File"));
 
@@ -165,11 +171,9 @@ void MainWindow::createActions()
     connect(printAct, &QAction::triggered, this, &MainWindow::print);
     fileToolBar->addAction(printAct);
 
-    // TODO Bad, because could be null ptr
-    menus["File"]->addSeparator();
-
     // TODO fileMenu could be nullptr
     QMenu* fileMenu = menus["File"];
+    fileMenu->addSeparator();
     QAction *quitAct = fileMenu->addAction(tr("&Quit"), this, &QWidget::close);
     quitAct->setShortcuts(QKeySequence::Quit);
     quitAct->setStatusTip(tr("Quit the application"));
@@ -210,6 +214,7 @@ void MainWindow::saveLayout()
 
 void MainWindow::restoreLayout()
 {
+    cout << "Restoring layout" << endl;
     QSettings Settings("Settings.ini", QSettings::IniFormat);
     restoreGeometry(Settings.value("mainWindow/Geometry").toByteArray());
     restoreState(Settings.value("mainWindow/State").toByteArray());
@@ -218,6 +223,7 @@ void MainWindow::restoreLayout()
 
 void MainWindow::createStatusBar()
 {
+    std::cout << "Creating status bar" << std::endl;
     statusBar()->showMessage(tr("Ready"));
 }
 

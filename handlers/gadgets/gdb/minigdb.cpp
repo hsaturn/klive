@@ -47,18 +47,6 @@ static bool readAddr(Computer* comp, string& s, uint32_t& addr)
     return false;
 }
 
-static string getword(string &s, char sep=' ')
-{
-    string word;
-    while(s.length() && s[0]!=sep)
-    {
-        word += s[0];
-        s.erase(0,1);
-    }
-    while(s.length() && s[0]==sep) s.erase(0,1);
-    return word;
-}
-
 void MiniGdb::cpuStep()
 {
     computer->cpu->step();
@@ -72,7 +60,6 @@ void MiniGdb::update(Cpu* , const Cpu::Message& msg)
     switch(msg.event)
     {
         case Cpu::Message::BREAK_POINT:
-            result->setStyleSheet("color: black;");
             if (msg.brk->isEnabled())
             {
                 switch(msg.brk->type())
@@ -101,24 +88,21 @@ void MiniGdb::update(Cpu* , const Cpu::Message& msg)
             }
             break;
         case Cpu::Message::UNTIL_REACHED:
-            result->setStyleSheet("color: black;");
             d << "Until condition reached" << endl;
             break;
         case Cpu::Message::WHILE_REACHED:
-            result->setStyleSheet("color: black;");
             d << "While condition reached" << endl;
             break;
         case Cpu::Message::UNKNOWN_OP:
             {
-                result->setStyleSheet("color: black;");
                 Memory::addr_t addr=(msg.data & 0xFFFF0000) >> 16;
                 result->setStyleSheet("color: red;");
                 d << uppercase << hex << showbase;
                 d << "Unknown opcode [" << (msg.data & 0xFF) << "] at " << addr << endl;
+                result->setStyleSheet("color: black;");
             }
             break;
-        case Cpu::Message::STEP:
-            result->setStyleSheet("color: black;");
+        case Cpu::Message::MACROSTEP:
             break;
 
         default:
@@ -205,6 +189,7 @@ void MiniGdb::onCmdLine()
     cmds["step"] = "Step in";
     cmds["finish"] = "Step out";
     cmds["continue"] = "Continue";
+    cmds["info [b]"] = "info";
     cmds["reset"] = "Reset cpu";
     cmds["print or ? expr"] = "eval expr";
     cmds["display expr"] = "display expr";
@@ -287,10 +272,33 @@ void MiniGdb::onCmdLine()
             Memory::addr_t addr;
             if (readAddr(computer, s, addr))
             {
-                computer->cpu->breaks.remove(addr);
+                if (not computer->cpu->breaks.remove(addr))
+                    output << found << ": ok" << endl;
+                else
+                    error << "Not found (" << hex << addr << dec << ')';
             }
         }
-        else if (found=="delete" || found=="break")
+        else if (found=="info")
+        {
+            while(s.length())
+            {
+                string what=getlex(s);
+                if (what=="b")
+                {
+                    for(const auto& it : computer->cpu->breaks)
+                    {
+                        const hw::BreakPoints::BreakPoint &b = it.second;
+                        output << hex << it.first << dec << " : "
+                               << b.getString()
+                               << endl;
+                    }
+                    output << found << ' ' << s << ": ok" << endl;
+                }
+                else
+                    error << "Unknown info (" << what << ')' << endl;
+            }
+        }
+        else if (found=="break")
         {
             Memory::addr_t addr;
             if (readAddr(computer, s, addr))
@@ -318,6 +326,7 @@ void MiniGdb::onCmdLine()
             if (readAddr(computer, s, addr))
             {
                 computer->cpu->jp(addr);
+                output << found << ": ok" << endl;
             }
             else {
                 error << "Expected valid address" << endl;
@@ -344,6 +353,7 @@ void MiniGdb::onCmdLine()
                     computer->cpu->setWhile(expr);
                 else
                     computer->cpu->setUntil(expr);
+                output << found << ": ok" << endl;
             }
             else {
                 error << "Error in expression " << expr << endl;
@@ -352,6 +362,7 @@ void MiniGdb::onCmdLine()
         else if (found=="stop")
         {
             computer->cpu->stop();
+            output << found << ": ok" << endl;
         }
         else if (found=="display")
         {
@@ -374,6 +385,7 @@ void MiniGdb::onCmdLine()
                     if (i=='A' || i=='*')
                     {
                         displays.erase(it);
+                        output << found << ": ok" << endl;
                         if (i != '*')
                             break;
                     }
@@ -428,6 +440,7 @@ void MiniGdb::onCmdLine()
         else if (found=="reset")
         {
             computer->reset();
+            output << found << ": ok" << endl;
         }
         else if (found=="step")
         {
@@ -439,12 +452,18 @@ void MiniGdb::onCmdLine()
                     error << "Invalid expression" << endl;
                     count=0;
                 }
-
             }
-            computer->cpu->run_steps(count);
+            if (count)
+            {
+                computer->cpu->run_steps(count);
+                output << found << ' ' << count << ": ok" << endl;
+            }
         }
         else if (found=="next")
+        {
             computer->cpu->step_over();
+            output << found << ": ok" << endl;
+        }
         else if (found=="finish")
             computer->cpu->step_out();
         else if (found=="continue")
@@ -465,7 +484,6 @@ void MiniGdb::onCmdLine()
             error << "Shouldn't arrive here found(" << found << ") s(" << s << ") cmd(" << cmd << ") amb(" << ambiguous << ")" << endl;
             break;
         }
-        output << found << ": ok" << endl;
     }
     result->setStyleSheet("color: black;");
     if (error.str().length())
@@ -473,6 +491,7 @@ void MiniGdb::onCmdLine()
         result->setStyleSheet("color: red;");
         output << "ERROR: " << error.str();
     }
+    result->setStyleSheet("color: black;");
     if (displays.size())
     {
         output << "---------------------" << endl;

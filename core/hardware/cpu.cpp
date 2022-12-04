@@ -6,7 +6,7 @@ namespace hw
 {
 
 using namespace std;
-Cpu::Message stepMsg(Cpu::Message::STEP);
+Cpu::Message stepMsg(Cpu::Message::MACROSTEP);
 
 const BreakPoints::BreakPoint* BreakPoints::get(Memory::addr_t addr) const
 {
@@ -36,9 +36,10 @@ Cpu::~Cpu(){}
 
 bool Cpu::steps_to_rt(uint32_t max_steps)
 {
-    float ns_per_cycle =1e9 / clock.getFrequency();
+    const float ns_per_cycle =1e9 / clock.getFrequency();
+    const auto ns = clock.getTimer().nsecsElapsed();
 
-    cycle to_reach = clock.getTimer().nsecsElapsed()/ns_per_cycle;
+    cycle to_reach = ns / ns_per_cycle;
 
     while(running && max_steps && (clock.cycles() < to_reach))
     {
@@ -100,6 +101,10 @@ bool Cpu::steps_to_rt(uint32_t max_steps)
             }
         }
     }
+
+    static Message macroStep(Message::MACROSTEP);
+    notify(macroStep);
+
     return true;
 }
 
@@ -115,7 +120,7 @@ void Cpu::reset()
 void Cpu::jp(Memory::addr_t addr)
 {
     pc_=addr;
-    notify(stepMsg);	// TODO really ?
+    notify(stepMsg);
 }
 
 void Cpu::step()

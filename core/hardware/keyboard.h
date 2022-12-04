@@ -5,6 +5,8 @@
 #include <vector>
 #include <unordered_map>
 
+using std::string;
+
 namespace hw
 {
 
