@@ -11,24 +11,46 @@
 using namespace std;
 
 namespace hw
+
 {
+
+Memory::byte_t Memory::peek(const addr_t& addr) const
+{
+    if (addr < ramtop)
+    {
+        return bytes[addr];
+    }
+    else
+    {
+        std::cerr << "TODO: manage memory access error" << std::endl;
+        return 0;   // TODO err ?
+    }
+}
+
+void Memory::poke(const addr_t& start, byte_t value, attrib type /* = UNCHANGE */)
+
+{
+    // TODO faster implem
+    fill(start, value, 1, type);
+}
+
 void Memory::fill(addr_t start, byte_t value, size_t size, attrib type)
 {
     Message msg;
     msg.event = Message::WRITTEN;
     msg.flags = Message::DATA | (type==UNCHANGE ? 0 : Message::TYPE);
-    msg.size = 1;
-
-    if (start+size>ramtop)
-    {
-        msg.event = Message::BAD_WRITE;
-        notify(msg);
-        return;
-    }
+    msg.size = size;
 
     while(size--)
     {
         msg.start = start;
+
+        if (start>=ramtop)
+        {
+            msg.event = Message::BAD_WRITE;
+            notify(msg);
+            return;
+        }
 
         if ((attribs[start] & RD_ONLY) && mem_protection)
         {
@@ -43,13 +65,14 @@ void Memory::fill(addr_t start, byte_t value, size_t size, attrib type)
         }
         else
             bytes[start] = value;
+
         if (type != UNCHANGE)
         {
             attribs[start] = type;
         }
-        notify(msg);
         start++;
     }
+    notify(msg);
 }
 
 uint16_t Memory::crc16() const

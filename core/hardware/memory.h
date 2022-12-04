@@ -20,7 +20,7 @@ public:
         TEXT     = 2,    // code section
         ASM      = 4,    // start of z80 instruction (detect slide)
         RD_ONLY  = 128,
-        UNCHANGE = 255, // Special value for fill set etc.. functions, UNCHANGE means do not change the type
+        UNCHANGE = 255, // Do not change the type (parameter of poke, fill ...)
     };
 
     using byte_t = unsigned char;
@@ -38,7 +38,8 @@ public:
         enum Event
         {
             WRITTEN,
-            BAD_WRITE
+            BAD_WRITE,
+            BAD_READ
         };
 
         Event event;
@@ -58,28 +59,13 @@ public:
     uint32_t size() const { return ramtop; }
     uint16_t crc16() const;
 
-    byte_t peek(const addr_t& addr) const
-    {
-        if (addr < ramtop)
-        {
-            return bytes[addr];
-        }
-        else
-        {
-            std::cerr << "TODO: manage memory access error" << std::endl;
-            return 0;   // TODO err ?
-        }
-    }
+    byte_t peek(const addr_t& addr) const;
 
     void fill(addr_t start, byte_t value, size_t size=1, attrib type=UNCHANGE);
 
     void loadRomImage(std::string f, addr_t start, bool dump=false);
 
-    void poke(const addr_t& start, byte_t value, attrib type=UNCHANGE)
-    {
-        // TODO faster implem (exh
-        fill(start, value, 1, type);
-    }
+    void poke(const addr_t& start, byte_t value, attrib type=UNCHANGE);
 
     void zero() { fill(0, 0, ramtop); }
 
