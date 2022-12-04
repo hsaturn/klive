@@ -63,7 +63,7 @@ private:
     bool disableSignal = false;
 };
 
-class Z80Registers;
+struct Z80Registers;
 
 class Z80RegisterWidgets: public QWidget
 {
