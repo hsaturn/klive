@@ -22,7 +22,15 @@ Memory::byte_t Memory::peek(const addr_t& addr) const
     }
     else
     {
-        std::cerr << "TODO: manage memory access error" << std::endl;
+        Message msg;
+        msg.event = Message::BAD_READ;
+        msg.start = addr;
+        msg.size = 1;
+        // TODO, find a better way to call observers !
+        // Adding a const notify is bad because both notify functions should then be called
+        // at each notification
+        Memory* wtf = const_cast<Memory*>(this);
+        wtf->notify(msg);
         return 0;   // TODO err ?
     }
 }
