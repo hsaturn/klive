@@ -1,4 +1,4 @@
-#include "core/handler.h"
+#include <handler.h>
 #include <QMessageBox>
 #include <QApplication>
 #include <QObject>
@@ -32,6 +32,11 @@ void Handlers::unregisterHandler(const Handler *handler)
 void Handlers::initialize(MainWindow *main)
 {
     std::cout << "Initializing handlers" << std::endl;
+    if (handlers == nullptr)
+    {
+        std::cout << "No handlers registered. Nothing will probably happen now." << std::endl;
+        return;
+    }
     for(auto it: *handlers)
     {
         std::cout << "  Initializing '" << it.second->name() << "'." << std::endl;
