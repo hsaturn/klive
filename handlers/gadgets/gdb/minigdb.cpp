@@ -172,7 +172,7 @@ void MiniGdb::onCmdLine()
     result->setText("");
 
     // TODO better help system completion etc
-    map<string, string> cmds;
+    static map<string, string> cmds;
     cmds["jp addr"] = "Jump to addr";
     cmds["set reg=expr"] = "Change register";
 

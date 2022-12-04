@@ -21,19 +21,22 @@ using std::endl;
 #include <ads_globals.h>
 
 using ads::CDockWidget;
+using ads::CDockManager;
 
 MainWindow::MainWindow() : QMainWindow()
 {
-    ads::CDockManager::setConfigFlag(ads::CDockManager::OpaqueSplitterResize, true);
-    ads::CDockManager::setConfigFlag(ads::CDockManager::XmlCompressionEnabled, false);
-    ads::CDockManager::setConfigFlag(ads::CDockManager::FocusHighlighting, true);
+    CDockManager::setConfigFlags(CDockManager::DefaultOpaqueConfig);
+    CDockManager::setConfigFlag(CDockManager::RetainTabSizeWhenCloseButtonHidden, true);
+    CDockManager::setConfigFlag(ads::CDockManager::OpaqueSplitterResize, true);
+    CDockManager::setConfigFlag(ads::CDockManager::XmlCompressionEnabled, false);
+    CDockManager::setConfigFlag(ads::CDockManager::FocusHighlighting, true);
     DockManager = new ads::CDockManager(this);
 
     // Set central widget
     QPlainTextEdit* w = new QPlainTextEdit();
     w->setPlaceholderText("This is the central editor. Enter your text here.");
     CDockWidget* CentralDockWidget = new CDockWidget("CentralWidget");
-    CentralDockWidget->setWidget(w);
+    // CentralDockWidget->setWidget(w);
     CentralDockArea = DockManager->setCentralWidget(CentralDockWidget);
     CentralDockArea->setAllowedAreas(ads::DockWidgetArea::OuterDockAreas);
 

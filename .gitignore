@@ -1,3 +1,5 @@
 resources/klive_fr_FR.ts
 build/
 *~
+build.ninja
+build.clang

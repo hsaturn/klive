@@ -44,6 +44,21 @@ with common features
 
 # Dependencies
 
-Kubuntu 
-sudo apt-get install qtbase5-dev qttools5-dev
-sudo apt-get install libqt5x11extras5-dev
+Kubuntu
+use apt-file search if needed
+
+sudo apt install clangd
+sudo apt install libqt6core5compat6-dev
+sudo apt install libqt6core6
+sudo apt install libqt6core7
+sudo apt install libqt6gui6
+sudo apt install qmake6
+sudo apt install qt6-base-dev
+sudo apt install qt6-base-private-dev
+sudo apt install qt6-connectivity-dev
+sudo apt install qt6-declarative-dev-tools
+sudo apt install qt6-l10n-tools
+sudo apt install qt6-positioning-dev
+sudo apt install qt6-tools-dev
+sudo apt install qt6-tools-dev-tools
+sudo apt-get install apt-file
