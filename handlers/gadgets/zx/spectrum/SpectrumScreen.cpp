@@ -26,69 +26,70 @@ void SpectrumScreen::setMemory(hw::Memory *new_memory)
     memory = new_memory;
 
     if (memory) memory->attach(this);
+    // Todo redraw screen with this new memory
 }
 
-void SpectrumScreen::update(Memory* mem, const Memory::Message& msg)
+void SpectrumScreen::update(hw::Memory *mem, const Memory::Message& msg)
 {
     constexpr int dx=20;
     constexpr int dy=20;
     if (msg.start<16384 || msg.start>=(16384+6912))
         return;
 
-    if (msg.start < 16384+6144) // pixels
+    for(auto addr = msg.start; addr < msg.start+msg.size; addr++)
     {
-        int start = msg.start-16384;
-        int x = 8*(start%32);
-        int y = 64*(start / 2048)+8*((start%256)/32) +(start%2048)/256;
-        uint16_t pixels=mem->peek(msg.start);
-
-        Memory::addr_t attr_ptr=16384+6144+int(x/8)+32*int(y/8);
-        int attr=mem->peek(attr_ptr);
-        int bright=attr&0x40 ? 8 : 0;   // Bright
-
-        uint32_t on_color  = colors[(attr & 7) + bright];
-        uint32_t off_color = colors[((attr>>3) & 7) + bright];
-
-        x+=dx;
-        y+=dy;  // Margin (todo, center)
-        for(int z=0; z<8; z++)
+        if (addr < 16384+6144) // pixels
         {
-            // TODO use .bits() for performance
-            // -> see setPixel help
-            image.setPixel(x++,y, pixels & 0x80 ? on_color : off_color);
-            pixels <<= 1;
-        }
-        //rect.moveCenter(QPoint(x, y));
+            int start = addr-16384;
+            int x = 8*(start%32);
+            int y = 64*(start / 2048)+8*((start%256)/32) +(start%2048)/256;
+            uint16_t pixels=mem->peek(addr);
 
-    }
-    else // Color attributes
-    {
-        // int on_color=0x0000;   // TODO get real color
-        // int off_color=0xFFFFffff;  // TODO get real color
+            Memory::addr_t attr_ptr=16384+6144+int(x/8)+32*int(y/8);
+            int attr=mem->peek(attr_ptr);
+            int bright=attr&0x40 ? 8 : 0;   // Bright
 
-        int attr=mem->peek(msg.start);
-        int start = msg.start-16384-6144;
-        int y=8*(start/32);
-        int x=8*(start%32);
-        if (x+y==0)
-            std::cout << (int)attr << std::endl;
-        int bright=attr&0x40 ? 8 : 0;   // Bright
+            uint32_t on_color  = colors[(attr & 7) + bright];
+            uint32_t off_color = colors[((attr>>3) & 7) + bright];
 
-        uint32_t on_color  = colors[(attr & 7) + bright];
-        uint32_t off_color = colors[((attr>>3) & 7) + bright];
-
-        Memory::addr_t hl = 16384+2048*(y/64)+32*((y%64)/8)+256*(y%8)+x/8;
-
-        x+=dx;
-        y+=dy;  // Margin (todo, center)
-        for(int yy=y; yy<y+8; yy++)
-        {
-            uint16_t pixels=mem->peek(hl);
-            hl+=256;
-            for(int xx=x; xx<x+8; xx++)
+            x+=dx;
+            y+=dy;  // Margin (todo, center)
+            for(int z=0; z<8; z++)
             {
-                image.setPixel(xx,yy, pixels & 0x80 ? on_color : off_color);
+                // TODO use .bits() for performance
+                // -> see setPixel help
+                image.setPixel(x++,y, pixels & 0x80 ? on_color : off_color);
                 pixels <<= 1;
+            }
+            //rect.moveCenter(QPoint(x, y));
+
+        }
+        else // Color attributes
+        {
+            int attr=mem->peek(addr);
+            int start = addr-16384-6144;
+            int y=8*(start/32);
+            int x=8*(start%32);
+            if (x+y==0)
+                std::cout << (int)attr << std::endl;
+            int bright=attr&0x40 ? 8 : 0;   // Bright
+
+            uint32_t on_color  = colors[(attr & 7) + bright];
+            uint32_t off_color = colors[((attr>>3) & 7) + bright];
+
+            Memory::addr_t hl = 16384+2048*(y/64)+32*((y%64)/8)+256*(y%8)+x/8;
+
+            x+=dx;
+            y+=dy;  // Margin (todo, center)
+            for(int yy=y; yy<y+8; yy++)
+            {
+                uint16_t pixels=mem->peek(hl);
+                hl+=256;
+                for(int xx=x; xx<x+8; xx++)
+                {
+                    image.setPixel(xx,yy, pixels & 0x80 ? on_color : off_color);
+                    pixels <<= 1;
+                }
             }
         }
     }
@@ -109,7 +110,7 @@ void SpectrumScreen::resizeImage(QImage *image, const QSize &newSize)
         return;
 
     QImage newImage(newSize, QImage::Format_RGB32);
-    newImage.fill(qRgb(255, 255, 255));
+    newImage.fill(qRgb(192, 192, 192));
     QPainter painter(&newImage);
     painter.drawImage(QPoint(0, 0), *image);
     *image = newImage;
