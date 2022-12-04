@@ -7,9 +7,6 @@ public:
     ProjectHandler();
 
     virtual void initialize(MainWindow*) override;
-
-private:
-    QMenu* menu;
 };
 
 
