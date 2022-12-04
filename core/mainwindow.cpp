@@ -33,16 +33,12 @@ MainWindow::MainWindow() : QMainWindow()
     DockManager = new ads::CDockManager(this);
 
     // Set central widget
-    QPlainTextEdit* w = new QPlainTextEdit();
-    w->setPlaceholderText("This is the central editor. Enter your text here.");
     CDockWidget* CentralDockWidget = new CDockWidget("CentralWidget");
-    // CentralDockWidget->setWidget(w);
     CentralDockArea = DockManager->setCentralWidget(CentralDockWidget);
     CentralDockArea->setAllowedAreas(ads::DockWidgetArea::OuterDockAreas);
 
     createActions();
     createStatusBar();
-   // createDockWindows();
 
     Handlers::initialize(this);
 
