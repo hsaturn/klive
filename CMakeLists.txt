@@ -6,6 +6,7 @@ add_subdirectory(ext/Qt-Advanced-Docking-System)
 add_compile_options(-Wall -g)
 
 include_directories(ext/Qt-Advanced-Docking-System/src)
+include_directories(.)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 set(CMAKE_AUTOUIC ON)
