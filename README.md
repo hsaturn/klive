@@ -44,21 +44,36 @@ with common features
 
 # Dependencies
 
-Kubuntu
-use apt-file search if needed
+nix / nixos : the easiest and preferred way
+	I'm strongly advise one to use nixos or nix in order to build klive.
+	After having installed nix-os, you just have to run the following commands:
 
-sudo apt install clangd
-sudo apt install libqt6core5compat6-dev
-sudo apt install libqt6core6
-sudo apt install libqt6core7
-sudo apt install libqt6gui6
-sudo apt install qmake6
-sudo apt install qt6-base-dev
-sudo apt install qt6-base-private-dev
-sudo apt install qt6-connectivity-dev
-sudo apt install qt6-declarative-dev-tools
-sudo apt install qt6-l10n-tools
-sudo apt install qt6-positioning-dev
-sudo apt install qt6-tools-dev
-sudo apt install qt6-tools-dev-tools
-sudo apt-get install apt-file
+``` sh
+nix-shell -p git
+git clone https://github.com/hsaturn/klive.git
+cd klive && git submodule init && git submodule update
+nix-shell
+mkdir build && cd build && cmake .. -G Ninja && ninja
+./klive
+``` 
+
+Kubuntu
+	I've built successfully klive under Kubuntu (after having upgraded to Qt6 which was a one way upgrade).
+
+	use apt-file search if needed
+
+	sudo apt install clangd
+	sudo apt install libqt6core5compat6-dev
+	sudo apt install libqt6core6
+	sudo apt install libqt6core7
+	sudo apt install libqt6gui6
+	sudo apt install qmake6
+	sudo apt install qt6-base-dev
+	sudo apt install qt6-base-private-dev
+	sudo apt install qt6-connectivity-dev
+	sudo apt install qt6-declarative-dev-tools
+	sudo apt install qt6-l10n-tools
+	sudo apt install qt6-positioning-dev
+	sudo apt install qt6-tools-dev
+	sudo apt install qt6-tools-dev-tools
+	sudo apt-get install apt-file
