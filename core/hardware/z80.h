@@ -24,7 +24,7 @@ public:
     void step_no_obs() override;
 
     // Run steps until the 'real-time' is reached
-    void steps_to_rt(uint32_t max_steps=1e6);
+    void steps_to_rt(uint32_t max_steps=1000000000);
     void set_irq_mode(int mode);
     void di();
     void ei();
