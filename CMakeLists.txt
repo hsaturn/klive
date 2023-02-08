@@ -30,6 +30,8 @@ add_executable(klive
     common/mapreader.h
     common/expr.h
     common/expr.cpp
+    common/scopevar.h
+    common/utils.h
 
     core/handler.cpp
     core/handler.h

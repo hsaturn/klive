@@ -63,7 +63,7 @@ public:
 
     void fill(addr_t start, byte_t value, size_t size=1, attrib type=UNCHANGE);
 
-    void loadRomImage(std::string f, addr_t start, bool dump=false);
+    bool load(std::string f, addr_t start, bool dump=false);
 
     void poke(const addr_t& start, byte_t value, attrib type=UNCHANGE);
 

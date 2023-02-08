@@ -72,7 +72,7 @@ void MonsView::setMemory(Memory *new_memory)
 
     // Pass 2 : populate list
     int line=1;
-    while(pc<16384)
+    while(pc<65536)
     {
         stringstream h;
         h << hex << showbase << uppercase << setw(4) << pc;
@@ -96,6 +96,13 @@ void MonsView::setMemory(Memory *new_memory)
 
 void MonsView::update(Memory* , const Memory::Message&)
 {
+    // TODO update disassemble
+    // 1 remove range
+    // 2 insert disasm
+    // This could be wrong depending on where pc is
+    // ex: load ram 0x8000
+    // disasm but instruction at 0x8000 is two bytes
+    // set pc=0x8001
 }
 
 void MonsView::setPointer(Memory::addr_t pc)

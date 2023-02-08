@@ -90,41 +90,45 @@ uint16_t Memory::crc16() const
     return crc;
 }
 
-void Memory::loadRomImage(string f, Memory::addr_t start, bool dump)
+bool Memory::load(string f, Memory::addr_t start_addr, bool dump)
 {
+    bool result = true;
+    Memory::addr_t memptr = start_addr;
     bool memprotect(mem_protection);
     mem_protection = false;
     long bytesRead=0;
-    QFile rom(f.c_str());
+    QFile memfile(f.c_str());
     // ifstream rom(f.c_str(), ios::in | ios::binary);
-    if (rom.open(QFile::ReadOnly))
+    if (memfile.open(QFile::ReadOnly))
     {
         int count=0;
         char c;
-        while(!rom.atEnd())
+        while(!memfile.atEnd())
         {
-            rom.read(&c, 1);
-            poke(start, c, RD_ONLY);
+            memfile.read(&c, 1);
+            poke(memptr, c, RD_ONLY);
             if (dump)
             {
                 if (count==0)
                 {
                     count=16;
-                    printf("\n%04x: ", start);
+                    printf("\n%04x: ", memptr);
                 }
                 printf("%02x ", (uint8_t)c);
             }
             count--;
-            start++;
+            memptr++;
             bytesRead++;
         }
     }
     else
     {
         cerr << "Unable to open ROM file " << f << endl;
+        result = false;
     }
-    cout << "Rom image load result: " << f << ", " << bytesRead << " bytes." << endl;
+    cout << "Memory loaded from file: " << f << ", " << bytesRead << " bytes at " << start_addr << "." << endl;
     mem_protection=memprotect;
+    return result;
 }
 
 }

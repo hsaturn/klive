@@ -21,12 +21,12 @@ Computer::Computer() : QWidget(nullptr)
     memory = new Memory(64*1024);
 
     // TODO  archi, rom selection etc.
-    // memory->loadRomImage(":/roms/48.rom", 0);
-    // memory->loadRomImage("C:\\Users\\hsaturn\\Google Drive\\Spectrum\\ROMS\\Diagnostic\\DIAG037.ROM", 0);
-    // memory->loadRomImage("C:\\Users\\hsaturn\\Google Drive\\Spectrum\\ROMS\\Diagnostic\\STR128.ROM", 0);
-    // memory->loadRomImage(":/roms/RAM_Tester.ROM", 0);
-    memory->loadRomImage(":/roms/48.rom", 0);
-    // memory->loadRomImage(":/roms/VMM-TEST.ROM", 0);
+    // memory->load(":/roms/48.rom", 0);
+    // memory->load("C:\\Users\\hsaturn\\Google Drive\\Spectrum\\ROMS\\Diagnostic\\DIAG037.ROM", 0);
+    // memory->load("C:\\Users\\hsaturn\\Google Drive\\Spectrum\\ROMS\\Diagnostic\\STR128.ROM", 0);
+    // memory->load(":/roms/RAM_Tester.ROM", 0);
+    memory->load(":/roms/48.rom", 0);
+    // memory->load(":/roms/VMM-TEST.ROM", 0);
     cpu = new Z80(memory);
 
     keyboard = new Keyboard(cpu);

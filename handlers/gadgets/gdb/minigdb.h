@@ -30,6 +30,7 @@ public slots:
     void cpuStep();
 
 private:
+    bool evaluate(std::string command);
     void update(std::ostream& out);
     bool outexpr(std::ostream& out, std::string& expr);
     Computer* computer;

@@ -7,6 +7,7 @@
 #include <fstream>
 #include <QPushButton>
 #include <common/expr.h>
+#include <common/scopevar.h>
 
 using namespace std;
 
@@ -123,7 +124,12 @@ bool MiniGdb::outexpr(ostream& out, string& expr)
         {
             out << '(' << copy.substr(0,len) << ") = ";
         }
-        out << dec << eval << ", " << showbase << hex << eval << endl;
+        out << dec << eval << ", " << showbase << hex << eval << ' ';
+        if (eval <= ' ' or eval >=128)
+            out << '-';
+        else
+            out << '\'' << (char)eval << '\'';
+        out << endl;
         return true;
     }
     else
@@ -157,6 +163,7 @@ void MiniGdb::observableDies(const Cpu *)
 void MiniGdb::onCmdLine()
 {
     static string lastCmd;
+    result->setText("");
 
     string s=cmdLine->text().toStdString();
     if (s=="")
@@ -167,9 +174,15 @@ void MiniGdb::onCmdLine()
     {
         lastCmd=s;
     }
+    evaluate(s);
+    cmdLine->setText("");
+}
+
+bool MiniGdb::evaluate(std::string s)
+{
+    static int recurse = 0;
     stringstream error;
     stringstream output;
-    result->setText("");
 
     // TODO better help system completion etc
     static map<string, string> cmds;
@@ -190,6 +203,7 @@ void MiniGdb::onCmdLine()
     cmds["finish"] = "Step out";
     cmds["continue"] = "Continue";
     cmds["info [b]"] = "info";
+    cmds["loadmem addr file"] = "Load binary file at address.";
     cmds["reset"] = "Reset cpu";
     cmds["print or ? expr"] = "eval expr";
     cmds["display expr"] = "display expr";
@@ -197,8 +211,15 @@ void MiniGdb::onCmdLine()
     cmds["undisplay # or '*'"] = "Remove a display";
     cmds["while cond"] = "Run while condition";
     cmds["stop"] = "Stop cpu";
-    cmds["run"] = "Reset and run cpu";
+    cmds["run (file)"] = "Reset and run cpu, or execute a gdb script";
     cmds["help"] = "Display this help";
+
+    ScopeVar<int> rec(recurse);
+    if (rec++ >= 10)
+    {
+        error << "Too many recursive calls" << endl;
+        s.clear();
+    }
 
     while (s.length())
     {
@@ -297,6 +318,18 @@ void MiniGdb::onCmdLine()
                 else
                     error << "Unknown info (" << what << ')' << endl;
             }
+        }
+        else if (found=="loadmem")
+        {
+            Memory::addr_t addr;
+            if (readAddr(computer, s, addr))
+            {
+                if (not computer->memory->load(s, addr))
+                    error << "Error" << endl;
+                s.clear();
+            }
+            else
+                error << "Bad address" << endl;
         }
         else if (found=="break")
         {
@@ -470,8 +503,31 @@ void MiniGdb::onCmdLine()
             computer->cpu->start();
         else if (found=="run")
         {
-            computer->cpu->reset();
-            computer->cpu->start();
+            if (s.length())
+            {
+                // TODO move at a more generic place (resolveName() ?)
+                if (s[0]=='~')
+                    s=getenv("HOME")+s.substr(1);
+                std::ifstream script(s);
+                if (script.good())
+                {
+                    while (script.good())
+                    {
+                        std::string line;
+                        std::getline(script, line);
+                        if (not this->evaluate(line))
+                            break;
+                    }
+                }
+                else
+                    error << "Unable to open (" << s << ')' << endl;
+                s.clear();
+            }
+            else
+            {
+                computer->cpu->reset();
+                computer->cpu->start();
+            }
         }
         else if (found=="")
         {
@@ -485,9 +541,11 @@ void MiniGdb::onCmdLine()
             break;
         }
     }
+    bool ok = true;
     result->setStyleSheet("color: black;");
     if (error.str().length())
     {
+        ok = false;
         result->setStyleSheet("color: red;");
         output << "ERROR: " << error.str();
     }
@@ -501,5 +559,5 @@ void MiniGdb::onCmdLine()
     {
         result->setText(result->toPlainText()+output.str().c_str());
     }
-    cmdLine->setText("");
+    return ok;
 }
