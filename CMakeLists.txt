@@ -31,6 +31,7 @@ add_executable(klive
     common/expr.h
     common/expr.cpp
     common/scopevar.h
+    common/utils.cpp
     common/utils.h
 
     core/handler.cpp

@@ -42,6 +42,7 @@ static bool readAddr(Computer* comp, string& s, uint32_t& addr)
     if (parseExpression(s, result, comp->cpu))
     {
         addr=static_cast<uint32_t>(result);
+        trim(s);
         // TODO if addr > max ram
         return true;
     }
@@ -325,7 +326,7 @@ bool MiniGdb::evaluate(std::string s)
             if (readAddr(computer, s, addr))
             {
                 if (not computer->memory->load(s, addr))
-                    error << "Error" << endl;
+                    error << "loadmem Error" << endl;
                 s.clear();
             }
             else

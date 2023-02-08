@@ -7,6 +7,7 @@
 #include <QTextStream>
 #include <QFile>
 #include <common/crc.h>
+#include <common/utils.h>
 
 using namespace std;
 
@@ -97,6 +98,7 @@ bool Memory::load(string f, Memory::addr_t start_addr, bool dump)
     bool memprotect(mem_protection);
     mem_protection = false;
     long bytesRead=0;
+    f = Utils::resolveFileName(f);
     QFile memfile(f.c_str());
     // ifstream rom(f.c_str(), ios::in | ios::binary);
     if (memfile.open(QFile::ReadOnly))
@@ -120,13 +122,13 @@ bool Memory::load(string f, Memory::addr_t start_addr, bool dump)
             memptr++;
             bytesRead++;
         }
+        cout << "Memory loaded from file: " << f << ", " << bytesRead << " bytes at " << start_addr << "." << endl;
     }
     else
     {
-        cerr << "Unable to open ROM file " << f << endl;
+        cerr << "Unable to open file (" << f << ')' << endl;
         result = false;
     }
-    cout << "Memory loaded from file: " << f << ", " << bytesRead << " bytes at " << start_addr << "." << endl;
     mem_protection=memprotect;
     return result;
 }

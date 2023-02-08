@@ -1,6 +1,6 @@
 #include "utils.h"
 
-std::strings Utils::resolveFileName(std::string s)
+std::string Utils::resolveFileName(std::string s)
 {
     if (s[0] == '~')
     {
