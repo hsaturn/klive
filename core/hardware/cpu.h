@@ -112,7 +112,7 @@ struct CpuPort
 {
     Memory::addr_t port;
     uint8_t value;
-    bool filled;	// Set to true if answered
+    bool filled;	// Set to true if answered (during IN, not out)
 };
 
 class Cpu: public Observable<Cpu>
@@ -122,7 +122,7 @@ public:
     struct Message
     {
        enum event_t { RESET, MACROSTEP, BREAK_POINT, WHILE_REACHED, UNTIL_REACHED, UNKNOWN_OP,
-                  INPORT, HALTED
+                  INPORT, OUTPORT, HALTED
                     };
        Message(event_t event_in=MACROSTEP): event(event_in) {}
        event_t event;
@@ -130,7 +130,7 @@ public:
        {
          unsigned long data = 0;
          const BreakPoints::BreakPoint* brk;
-         CpuPort* port;
+         CpuPort* port;	// FIXME why use a ptr there ?
        };
     };
 

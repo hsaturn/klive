@@ -43,8 +43,11 @@ void Z80::_reset()
     clock.restart();
     clock.irq(70800);
 
-    Message rst;
+    // TODO should be called by rst(0x0)
+    Message rst(Message::RESET);
+    rst.data = 0x0;
     notify(rst);
+
     break_on_ret=0;
 }
 
@@ -474,6 +477,10 @@ void Z80::rst(uint8_t addr)
     if (break_on_ret) break_on_ret++;
     push(pc, 11);
     pc = addr;
+
+    Message rst(Message::RESET);
+    rst.data = addr;
+    notify(rst);
 }
 
 void Z80::ret(bool flag, cycle burn_ret, cycle burn_noret)
@@ -1123,10 +1130,16 @@ uint8_t Z80::srl(uint8_t reg)
 void Z80::out(Memory::addr_t port, uint8_t val, cycle burnt)
 {
     //!\ : See Z80 specs.... It seems that upper byte of port is set but unused...
+    //!
+    static Message outport(Message::OUTPORT);
+    if (outport.port == nullptr)
+    {
+        outport.port = new CpuPort;
+    }
+    outport.port->port = port;
 
-    // TODO
-    // Send notification to out listeners
-    // cout << "Z80: nyi out" << endl;
+    // TODO using notification for in/out is a poor design ?
+    notify(outport);
     clock.burn(burnt);
 }
 
