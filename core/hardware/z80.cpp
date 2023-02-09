@@ -319,6 +319,13 @@ void Z80::step_no_obs()
         case 0x7d: a = l; burn(4); break;		// ld a,l
         case 0x7e: a = memory->peek(hl.val); burn(7); break; // ld a, (hl)
         case 0x7f: burn(4); break;							// ld a,a
+        case 0x80: a=add_(a,b,4); break;	// add a,b
+        case 0x81: a=add_(a,c,4); break;	// add a,c
+        case 0x82: a=add_(a,d,4); break;	// add a,d
+        case 0x83: a=add_(a,e,4); break;	// add a,e
+        case 0x84: a=add_(a,h,4); break;	// add a,h
+        case 0x85: a=add_(a,l,4); break;	// add a,l
+        case 0x86: a=add_(a,memory->peek(hl.val),7); break;	// add a,(hl)
         case 0x87: a=add_(a,a,4); break;	// add a,a
         case 0x88: adc_(b); break;
         case 0x89: adc_(c); break;
