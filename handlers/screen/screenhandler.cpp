@@ -6,6 +6,7 @@
 #include <handlers/gadgets/z80/monsview.h>
 #include <handlers/gadgets/gdb/minigdb.h>
 #include <handlers/memory/memoryviewer.h>
+#include <handlers/gadgets/console/console.h>
 
 using namespace hw;
 static ScreenHandler screen_handler_instance;
@@ -40,6 +41,12 @@ void ScreenHandler::initialize(MainWindow *main)
     // TODO c'est pour tester
     auto computer = new hw::Computer;
 
+    computer->memory->load("~/z80full.out", 0x8000);
+
+    std::cout << "Creating console" << std::endl;
+    console = new Console;
+    main->createDockWindow(this, console, "Console");
+
     std::cout << "Creating Zx Screen" << std::endl;
     screen = new SpectrumScreen;
     screen->setMemory(computer->memory);
@@ -57,7 +64,7 @@ void ScreenHandler::initialize(MainWindow *main)
     main->createDockWindow(this, registers_form, "Registers");
 
     std::cout << "Creating gdb view" << std::endl;
-    gdb = new MiniGdb(computer);
+    gdb = new MiniGdb(computer, console);
     main->createDockWindow(this, gdb, "Mini gdb");
 
     std::cout << "Creating memory viewer" << std::endl;

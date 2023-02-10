@@ -54,12 +54,13 @@ add_executable(klive
     handlers/project/projecthandler.cpp
     handlers/project/projecthandler.h
 
+    handlers/gadgets/console/console.h
+    handlers/gadgets/console/console.cpp
     handlers/gadgets/z80/gens.cpp
     handlers/gadgets/z80/monsview.cpp
     handlers/gadgets/z80/monsview.h
     handlers/gadgets/z80/mons.cpp
     handlers/gadgets/z80/mons.h
-
 
     handlers/gadgets/gdb/minigdb.cpp
     handlers/gadgets/gdb/minigdb.h

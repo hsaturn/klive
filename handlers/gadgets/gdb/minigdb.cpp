@@ -11,9 +11,8 @@
 
 using namespace std;
 
-
-MiniGdb::MiniGdb(Computer* computer_)
-    : computer(computer_)
+MiniGdb::MiniGdb(Computer* computer_, Console* con)
+    : computer(computer_), console(con)
 {
     QVBoxLayout* layout=new QVBoxLayout;
 
@@ -33,7 +32,39 @@ MiniGdb::MiniGdb(Computer* computer_)
     layout->addWidget(result);
     setLayout(layout);
 
-    computer->cpu->attach(this);	// Note this could be multi cpu !
+    if (computer) computer->cpu->attach(this);	// Note this could be multi cpu !
+    if (console)
+    {
+        console->attach(this);
+        console->registerHelp("gdb", {
+            { "jp {addr}" 	                   , "Jump to addr" },
+            { "set {reg}={expr}"               , "Change register"},
+
+            // Write machine state to checkpoints.dat
+            { "checkpoint"                     , "Build a checkpoint"},
+
+    // Read checkpoints.dat and create checkpoints
+    // that'll be checked while the computer is running
+            { "test"                           , "Test on/off" },
+            { "break {addr}"                   , "Add breakpoint [if...]" },
+            { "delete {addr}"                  , "Delete breakpoint" },
+            { "next"                           , "Next statement" },
+            { "step"                           , "Step in" },
+            { "finish"                         , "Step out" },
+            { "continue"                       , "Continue" },
+            { "info [b]"                       , "info" },
+            { "reset"                          , "Reset cpu" },
+            { "run {file}"                     , "Reset and run cpu, or execute a gdb script" },
+            { "display {expr}"                 , "display expr" },
+            { "until {expr}"                   , "Run until condition" },
+            { "while {expr}"                   , "Run while condition" },
+            { "stop"                           , "Stop cpu" },
+            { "print | ? {expr}"               , "eval expr" },
+            { "memload {addr} {file}"          , "Load binary file at address" },
+            { "memsave {addr} {file} {expr}"   , "Save memory into file" },
+            { "undisplay {#} | *"              , "Remove a display" },
+        });
+    }
 }
 
 static bool readAddr(Computer* comp, string& s, uint32_t& addr)
@@ -52,6 +83,14 @@ static bool readAddr(Computer* comp, string& s, uint32_t& addr)
 void MiniGdb::cpuStep()
 {
     computer->cpu->step();
+}
+
+void MiniGdb::update(Console*, const Console::Message& msg)
+{
+    if (evaluate(msg.data))
+    {
+        msg.processed++;
+    }
 }
 
 void MiniGdb::update(Cpu* , const Cpu::Message& msg)
@@ -82,6 +121,7 @@ void MiniGdb::update(Cpu* , const Cpu::Message& msg)
                                  ')' << endl;
                             computer->cpu->stop();
                         }
+                        break;
 
                     default:
                         d << "Unknown breakpoint type" << endl;
@@ -161,6 +201,10 @@ void MiniGdb::observableDies(const Cpu *)
     // TODO what to do ?
 }
 
+void MiniGdb::observableDies(const Console*)
+{
+}
+
 void MiniGdb::onCmdLine()
 {
     static string lastCmd;
@@ -177,95 +221,32 @@ void MiniGdb::onCmdLine()
     }
     evaluate(s);
     cmdLine->setText("");
+
 }
 
 bool MiniGdb::evaluate(std::string s)
 {
     static int recurse = 0;
+    ScopeVar<int> rec(recurse);
+
     stringstream error;
     stringstream output;
 
-    // TODO better help system completion etc
-    static map<string, string> cmds;
-    cmds["jp addr"] = "Jump to addr";
-    cmds["set reg=expr"] = "Change register";
-
-    // Write machine state to checkpoints.dat
-    cmds["checkpoint"] = "Build a checkpoint";
-
-    // Read checkpoints.dat and create checkpoints
-    // that'll be checked while the computer is running
-    cmds["test"] = "Test on/off";
-
-    cmds["break addr"] = "Add breakpoint [if...]";
-    cmds["delete addr"] = "Delete breakpoint";
-    cmds["next"] = "Next statement";
-    cmds["step"] = "Step in";
-    cmds["finish"] = "Step out";
-    cmds["continue"] = "Continue";
-    cmds["info [b]"] = "info";
-    cmds["loadmem addr file"] = "Load binary file at address.";
-    cmds["reset"] = "Reset cpu";
-    cmds["print or ? expr"] = "eval expr";
-    cmds["display expr"] = "display expr";
-    cmds["until expr"] = "Run until condition";
-    cmds["undisplay # or '*'"] = "Remove a display";
-    cmds["while cond"] = "Run while condition";
-    cmds["stop"] = "Stop cpu";
-    cmds["run (file)"] = "Reset and run cpu, or execute a gdb script";
-    cmds["help"] = "Display this help";
-
-    ScopeVar<int> rec(recurse);
     if (rec++ >= 10)
     {
         error << "Too many recursive calls" << endl;
-        s.clear();
+        return false;
     }
 
     while (s.length())
     {
-        string cmd=getlex(s);
-        string ambiguous;
-        string found;
-
-        if (cmd.length())
-        {
-            for(const auto& it: cmds)
-            {
-                string command=it.first;
-                command=getword(command);
-                if (command.substr(0, cmd.length())==cmd)
-                {
-                    if (ambiguous.length() || found != "")
-                    {
-                        if (ambiguous=="") ambiguous=found;
-                        ambiguous=command+" "+ambiguous;
-                    }
-                    else if (found=="")
-                        found=command;
-                }
-            }
-        }
-
-        if (ambiguous.length())
-        {
-            s=cmd+' '+s;
-            error << "Ambiguous command : " << cmd << endl;
-            error << "Candidates: " << ambiguous << endl;
-            break;
-        }
-        else if (cmd=="")
-        {
-            s=cmd+' '+s;
-            error << "Syntax error (" << s << ")" << endl;
-            break;
-        }
-        else if (found=="checkpoint")
+        std::string cmd = getlex(s);
+        if (cmd=="checkpoint")
         {
             output << checkpoints.takeSnapshot(computer) << endl;
             output << "Checkpoint written" << endl;
         }
-        else if (found=="test")
+        else if (cmd=="test")
         {
             error << "NOT FINISHED" << endl;
             string state=getlex(s);
@@ -289,18 +270,18 @@ bool MiniGdb::evaluate(std::string s)
                 error << "on or off expected " << endl;
             }
         }
-        else if (found=="delete")
+        else if (cmd=="delete")
         {
             Memory::addr_t addr;
             if (readAddr(computer, s, addr))
             {
                 if (not computer->cpu->breaks.remove(addr))
-                    output << found << ": ok" << endl;
+                    output << cmd << ": ok" << endl;
                 else
                     error << "Not found (" << hex << addr << dec << ')';
             }
         }
-        else if (found=="info")
+        else if (cmd=="info")
         {
             while(s.length())
             {
@@ -314,13 +295,13 @@ bool MiniGdb::evaluate(std::string s)
                                << b.getString()
                                << endl;
                     }
-                    output << found << ' ' << s << ": ok" << endl;
+                    output << cmd << ' ' << s << ": ok" << endl;
                 }
                 else
                     error << "Unknown info (" << what << ')' << endl;
             }
         }
-        else if (found=="loadmem")
+        else if (cmd=="memload")
         {
             Memory::addr_t addr;
             if (readAddr(computer, s, addr))
@@ -332,7 +313,21 @@ bool MiniGdb::evaluate(std::string s)
             else
                 error << "Bad address" << endl;
         }
-        else if (found=="break")
+        else if (cmd=="memsave")
+        {
+            s.clear();
+        /*    Memory::addr_t addr;
+            if (readAddr(computer, s, addr))
+            {
+                if (not computer->memory->save(s, addr, size))
+                    error << "loadmem Error" << endl;
+                s.clear();
+            }
+            else
+                error << "Bad address" << endl;
+                */
+        }
+        else if (cmd=="break")
         {
             Memory::addr_t addr;
             if (readAddr(computer, s, addr))
@@ -351,54 +346,44 @@ bool MiniGdb::evaluate(std::string s)
             }
             else
             {
-                error << "Missing argument after " << found << endl;
+                error << "Missing argument after " << cmd << endl;
             }
         }
-        else if (found=="jp")
+        else if (cmd=="jp")
         {
             Memory::addr_t addr;
             if (readAddr(computer, s, addr))
             {
                 computer->cpu->jp(addr);
-                output << found << ": ok" << endl;
+                output << cmd << ": ok" << endl;
             }
             else {
                 error << "Expected valid address" << endl;
             }
         }
-        else if (found=="help")
-        {
-            for(const auto& it: cmds)
-            {
-                auto command=it.first;
-                auto description=it.second;
-                output << command << " : " << description << endl;
-            }
-
-        }
-        else if (found=="while" or found=="until")
+        else if (cmd=="while" or cmd=="until")
         {
             string expr=s;
             exprtype eval;
             if (parseExpression(s, eval, computer->cpu))
             {
-                output << "running " << found << expr << endl;
-                if (found=="while")
+                output << "running " << cmd << expr << endl;
+                if (cmd=="while")
                     computer->cpu->setWhile(expr);
                 else
                     computer->cpu->setUntil(expr);
-                output << found << ": ok" << endl;
+                output << cmd << ": ok" << endl;
             }
             else {
                 error << "Error in expression " << expr << endl;
             }
         }
-        else if (found=="stop")
+        else if (cmd=="stop")
         {
             computer->cpu->stop();
-            output << found << ": ok" << endl;
+            output << cmd << ": ok" << endl;
         }
-        else if (found=="display")
+        else if (cmd=="display")
         {
             string expr(s);
             exprtype eval;
@@ -408,7 +393,7 @@ bool MiniGdb::evaluate(std::string s)
                 displays.insert(expr);
             }
         }
-        else if (found=="undisplay")
+        else if (cmd=="undisplay")
         {
             if (s.length())
             {
@@ -419,7 +404,7 @@ bool MiniGdb::evaluate(std::string s)
                     if (i=='A' || i=='*')
                     {
                         displays.erase(it);
-                        output << found << ": ok" << endl;
+                        output << cmd << ": ok" << endl;
                         if (i != '*')
                             break;
                     }
@@ -433,22 +418,18 @@ bool MiniGdb::evaluate(std::string s)
                 error << "Missing argument" << endl;
             }
         }
-        else if (found=="print" or cmd=="?")
+        else if (cmd=="print")
         {
-            if (cmd=="?")
-            {
-                found="print";
-            }
             outexpr(output, s);
         }
-        else if (found=="set" or (s[0]=='='))
+        else if (cmd=="set" or (s[0]=='='))
         {
             string reg;
             if (s[0]=='=')
                 reg=cmd;
             else
                 reg=getlex(s);
-            found="set";
+            cmd="set";
 
             if (s[0] != '=')
             {
@@ -471,12 +452,12 @@ bool MiniGdb::evaluate(std::string s)
                 error << "Bad register:" << reg << endl;
             }
         }
-        else if (found=="reset")
+        else if (cmd=="reset")
         {
             computer->reset();
-            output << found << ": ok" << endl;
+            output << cmd << ": ok" << endl;
         }
-        else if (found=="step")
+        else if (cmd=="step")
         {
             int32_t count(1);
             if (s.length())
@@ -490,19 +471,19 @@ bool MiniGdb::evaluate(std::string s)
             if (count)
             {
                 computer->cpu->run_steps(count);
-                output << found << ' ' << count << ": ok" << endl;
+                output << cmd << ' ' << count << ": ok" << endl;
             }
         }
-        else if (found=="next")
+        else if (cmd=="next")
         {
             computer->cpu->step_over();
-            output << found << ": ok" << endl;
+            output << cmd << ": ok" << endl;
         }
-        else if (found=="finish")
+        else if (cmd=="finish")
             computer->cpu->step_out();
-        else if (found=="continue")
+        else if (cmd=="continue")
             computer->cpu->start();
-        else if (found=="run")
+        else if (cmd=="run")
         {
             if (s.length())
             {
@@ -530,15 +511,14 @@ bool MiniGdb::evaluate(std::string s)
                 computer->cpu->start();
             }
         }
-        else if (found=="")
+        else if (cmd=="")
         {
             error << "Command not found: " << cmd << endl;
-            s=cmd+' '+s;
             break;
         }
         else
         {
-            error << "Shouldn't arrive here found(" << found << ") s(" << s << ") cmd(" << cmd << ") amb(" << ambiguous << ")" << endl;
+            error << "Shouldn't arrive here found(" << cmd << ")";
             break;
         }
     }

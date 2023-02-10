@@ -5,6 +5,7 @@
 
 using hw::Cpu;
 
+class Console;
 class MonsView;
 class SpectrumScreen;
 class MiniGdb;
@@ -24,6 +25,7 @@ public:
 
 private:
     Cpu* cpu = nullptr;
+    Console* console = nullptr;
     MonsView* monsView = nullptr;
     SpectrumScreen* screen = nullptr;
     MemoryViewer* mem_viewer = nullptr;

@@ -18,7 +18,7 @@ class Observable
 {
 public:
     Observable(){}
-    ~Observable()
+    virtual ~Observable()
     {
         for(auto& observer: observers)
             observer->observableDies(static_cast<const T*>(this));
