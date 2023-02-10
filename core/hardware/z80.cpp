@@ -867,6 +867,12 @@ void Z80::step_dd_fd(reg16& in)
                 a = memory->peek(addr);
             }
             break;
+        case 0x80: a=add_(a,b,4); break;	// add a,b
+        case 0x81: a=add_(a,c,4); break;	// add a,c
+        case 0x82: a=add_(a,d,4); break;	// add a,d
+        case 0x83: a=add_(a,e,4); break;	// add a,e
+        case 0x84: a=add_(a,e,4); break;	// add a,ixh
+        case 0x85: a=add_(a,l,4); break;	// add a,ixl
         case 0x86:	// add a, (ii+*)
             {
                 burn(19);
