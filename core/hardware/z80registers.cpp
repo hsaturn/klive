@@ -94,8 +94,8 @@ bool Z80Registers::set(string reg,int32_t value)
     else if (reg=="bc'") bc2.val=static_cast<uint16_t>(value);
     else if (reg=="de'") de2.val=static_cast<uint16_t>(value);
     else if (reg=="hl'") hl2.val=static_cast<uint16_t>(value);
-    else if (reg=="ix") ix=static_cast<uint16_t>(value);
-    else if (reg=="iy") iy=static_cast<uint16_t>(value);
+    else if (reg=="ix") ix.val=static_cast<uint16_t>(value);
+    else if (reg=="iy") iy.val=static_cast<uint16_t>(value);
     else if (reg=="a") a=static_cast<reg8>(value);
     else if (reg=="f") f.f=static_cast<reg8>(value);
     else if (reg=="b") b=static_cast<reg8>(value);
@@ -118,8 +118,8 @@ std::string Z80Registers::serialize() const
 
     out << hex << showbase << '{';
     out << " sp:" << sp;
-    out << " ix:" << ix;
-    out << " iy:" << iy;
+    out << " ix:" << ix.val;
+    out << " iy:" << iy.val;
     out << " af:" << af.val;
     out << " bc:" << bc.val;
     out << " de:" << de.val;
@@ -151,8 +151,8 @@ uint16_t Z80Registers::get(string regi)
     else if (reg=="bc'") return bc2.val;
     else if (reg=="de'") return de2.val;
     else if (reg=="hl'") return hl2.val;
-    else if (reg=="ix") return ix;
-    else if (reg=="iy") return iy;
+    else if (reg=="ix") return ix.val;
+    else if (reg=="iy") return iy.val;
     else if (reg=="a") return a;
     else if (reg=="f") return f.f;
     else if (reg=="b") return b;
@@ -255,7 +255,7 @@ static    int counter=0;
     row++;
 }
 
-static void setCells(QTableView* table, int col, reg16& top, regaf& af, reg16u& bc, reg16u& de, reg16u& hl, reg16& ii, reg8& bottom)
+static void setCells(QTableView* table, int col, reg16& top, regaf& af, reg16u& bc, reg16u& de, reg16u& hl, reg16u& ii, reg8& bottom)
 {
     auto model=dynamic_cast<QStandardItemModel*>(table->model());
     int row=firstRow;

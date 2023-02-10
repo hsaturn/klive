@@ -115,8 +115,8 @@ private:
 
     reg16&   pc;
     reg16&   sp;
-    reg16&   ix;
-    reg16&   iy;
+    reg16u&  ix;
+    reg16u&  iy;
     regaf&   af;
     reg16u&  bc;
     reg16u&  de;
@@ -134,8 +134,10 @@ private:
     flags&	f;
     reg8&	h;
     reg8&	l;
-    reg8&    i;
-    reg8&    r;
+    reg8&   i;
+    reg8&   r;
+    reg8&   ixl;
+    reg8&   ixh;
 
     // Interrupt vars
     int irq_enabler;	// <0 : disabled 0: enabled >0 enable in n instructions

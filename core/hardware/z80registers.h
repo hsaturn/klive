@@ -92,7 +92,9 @@ struct Z80Registers : public Cpu::Registers
           e(de.lo()),
           f(af.f()),
           h(hl.hi()),
-          l(hl.lo()) {}
+          l(hl.lo()),
+          ixl(ix.lo()),
+          ixh(ix.hi()) {}
 
     virtual ~Z80Registers() override = default;
 
@@ -100,8 +102,8 @@ struct Z80Registers : public Cpu::Registers
 
     reg16   pc;
     reg16   sp;
-    reg16   ix;
-    reg16   iy;
+    reg16u  ix;
+    reg16u  iy;
     regaf   af;
     reg16u  bc;
     reg16u  de;
@@ -118,9 +120,11 @@ struct Z80Registers : public Cpu::Registers
     reg8&	c;
     reg8&	d;
     reg8&	e;
-    flags&   f;
+    flags&  f;
     reg8&	h;
     reg8&	l;
+    reg8&	ixl;
+    reg8&	ixh;
 
     bool set(std::string reg, int32_t value) override;
 

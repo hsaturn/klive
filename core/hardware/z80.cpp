@@ -13,7 +13,7 @@ Z80::Z80(Memory* mem)
       af(R.af), bc(R.bc), de(R.de), hl(R.hl),
       af2(R.af2),bc2(R.bc2),de2(R.de2),hl2(R.hl2),
       a(R.a), b(R.b), c(R.c), d(R.d), e(R.e), f(R.f), h(R.h), l(R.l),
-      i(R.i), r(R.r)
+      i(R.i), r(R.r), ixl(R.ixl), ixh(R.ixh)
 {
     reset();
 }
@@ -36,8 +36,8 @@ void Z80::_reset()
     de2.val=0;
     hl2.val=0;
     sp=0;
-    ix=0;
-    iy=0;
+    ix.val=0;
+    iy.val=0;
 
     clock.setFrequency(3750000);
     clock.restart();
@@ -411,7 +411,7 @@ void Z80::step_no_obs()
         case 0xDA: jp_if(f.c); break;
         case 0xDB: a = in((static_cast<uint16_t>(a)<<8) + getByte(11),0); break;
         case 0xDC: call_if(f.c); break;
-        case 0xDD: step_dd_fd(ix); break;
+        case 0xDD: step_dd_fd(ix.val); break;
         case 0xDF: rst(0x18); break;
         case 0xE1: pop(hl.val, 11); break;
         case 0xE2: jp_if(!f.pv); break;				// jp po
@@ -435,7 +435,7 @@ void Z80::step_no_obs()
         case 0xFA: jp_if(f.s); break;
         case 0xFB: ei(); burn(4); break;
 
-        case 0xFD: step_dd_fd(iy); break;
+        case 0xFD: step_dd_fd(iy.val); break;
         case 0xFE: compare(getByte(7)); break;	// cp *
         case 0xFF: rst(0x38); break;
         default: nop(opcode); break;
