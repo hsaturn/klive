@@ -3,6 +3,7 @@
 #include <sstream>
 #include <iostream>
 #include <iomanip>
+#include <vector>
 
 #include <QFontDatabase>
 #include <QFile>
@@ -46,97 +47,85 @@ void MonsView::observableDies(const Memory *)
 
 void MonsView::setMemory(Memory *new_memory)
 {
+    if (memory == new_memory) return;
     if (memory) memory->detach(this);
     memory = new_memory;
-    if (memory==nullptr) return;
+    if (not memory) return;
+
+    decoded.clear();
+    decoded = vector<int>(memory->size()+10);
 
     memory->attach(this);
-
-    addr_to_table_line.clear();
 
     model=new QStandardItemModel();
     QStringList list = QString("ADDR,LABEL,MNEMO").simplified().split(',');
     model->setHorizontalHeaderLabels(list);
     setModel(model);
-    QStandardItem *newItem;
 
-    Memory::addr_t pc=0;
-
-    // Pass 1 : compute labels
-// pc=0x55;	// TODO for debug
-    while(pc<16384)
-    {
-        mons.decode(memory, pc);
-    }
-    pc=0;
-
-    // Pass 2 : populate list
-    int line=1;
-    while(pc<65536)
-    {
-        stringstream h;
-        h << hex << showbase << uppercase << setw(4) << pc;
-
-        addr_to_table_line[pc] = line;
-        Mons::Row row = mons.decode(memory, pc);
-
-        newItem = new QStandardItem(h.str().c_str());
-        model->setItem(line, 0, newItem);
-        newItem = new QStandardItem(row.label.c_str());
-        model->setItem(line, 1, newItem);
-        newItem = new QStandardItem(row.mnemo.c_str());
-        model->setItem(line, 2, newItem);
-        // cout << hex << setw(4) << pc << (dec) << mons.decode(memory, pc) << endl;
-        line++;
-    }
-    // Ne fonctionne pas (ou mal)
-    // resizeColumnsToContents();
-    resizeRowsToContents();
+    setPointer(curr_pc);
+    return;
 }
 
-void MonsView::update(Memory* , const Memory::Message&)
+void MonsView::update(Memory* , const Memory::Message& msg)
 {
-    // TODO update disassemble
-    // 1 remove range
-    // 2 insert disasm
-    // This could be wrong depending on where pc is
-    // ex: load ram 0x8000
-    // disasm but instruction at 0x8000 is two bytes
-    // set pc=0x8001
+    return;
+
+    int addr = static_cast<int>(msg.start);
+    for(int offset=0; offset<msg.size; offset++)
+    {
+        decoded[addr+offset] = 0;
+    }
 }
 
 void MonsView::setPointer(Memory::addr_t pc)
 {
-    if (curr_pc == pc) return;
-    if (!isVisible()) return;
+    static int j=0;
+    if (j++<100) return;
+    j = 0;
 
-    curr_pc=pc;
-
-    const auto& line = addr_to_table_line.find(pc);
-    if (line == addr_to_table_line.end())
-        return;
-    else
-    {
-        const QModelIndex& index=model->index(line->second, 0);
-        setCurrentIndex(index);
-       // scrollTo(index);
-    }
-    return;	// TODO manage memory update
-    QStandardItem *newItem;
     if (memory==nullptr) return;
+    if (!isVisible()) return;
+    curr_pc = pc;
 
-    for(int i=0; i<10; i++)
+    QStandardItem* newItem;
+
+    // Decode up to 30 mnemonics
+    std::vector<int> to_hide;
+    for(int i=0; i<30; i++)
     {
+        if (decoded[pc])
+        {
+            pc+=decoded[pc];
+            int index = static_cast<int>(pc);
+            continue;
+        }
+
+        int index = static_cast<int>(pc);
+        if (pc > decoded.size())
+            std::cout << "error " << pc << std::endl;
+        showRow(index);
         Mons::Row row = mons.decode(memory, pc);
+        decoded[index] = static_cast<int>(pc);
         stringstream h;
         h << hex << showbase << uppercase << setw(4) << pc;
 
         newItem = new QStandardItem(h.str().c_str());
-        model->setItem(i, 0, newItem);
+        model->setItem(index, 0, newItem);
         newItem = new QStandardItem(row.label.c_str());
-        model->setItem(i, 1, newItem);
+        model->setItem(index, 1, newItem);
         newItem = new QStandardItem(row.mnemo.c_str());
-        model->setItem(i, 2, newItem);
+        model->setItem(index, 2, newItem);
         // cout << hex << setw(4) << pc << (dec) << mons.decode(memory, pc) << endl;
+
+        while(++index < pc)
+        {
+            decoded[index] = 0;
+            to_hide.push_back(index);
+        }
     }
+    for(int hide: to_hide)
+        hideRow(hide);
+
+    resizeColumnsToContents();
+    setCurrentIndex(model->index(curr_pc, 0));
 }

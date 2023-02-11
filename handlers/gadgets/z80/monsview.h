@@ -3,6 +3,7 @@
 #include "mons.h"
 
 #include <QTableView>
+#include <QTimer>
 #include <QStandardItemModel>
 #include <core/hardware/memory.h>
 
@@ -29,7 +30,8 @@ private:
     Memory* memory;
     Memory::addr_t visible_mem;
     QStandardItemModel *model;
-    map<Memory::addr_t, long> addr_to_table_line;
     Memory::addr_t curr_pc;
+    QTimer timer_;
+    std::vector<int> decoded;	// chain of decoded instructions
 };
 
