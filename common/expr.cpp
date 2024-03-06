@@ -348,7 +348,7 @@ static exprtype parseBitwise(string& s)
 static exprtype parseLogical(string& s)
 {
     exprtype left = parseBitwise(s);
-    for(;s.length();)
+    while(s.length())
     {
         string op=getlex(s);
 
